@@ -1,0 +1,192 @@
+export function formatTanggalIso(nilaiTanggal) {
+  if (!nilaiTanggal) return "";
+  if (typeof nilaiTanggal === "string") {
+    return nilaiTanggal.slice(0, 10);
+  }
+  const tgl = new Date(nilaiTanggal);
+  const tahun = tgl.getFullYear();
+  const bulan = String(tgl.getMonth() + 1).padStart(2, "0");
+  const hari = String(tgl.getDate()).padStart(2, "0");
+  return `${tahun}-${bulan}-${hari}`;
+}
+
+export function buatTanggalLokal(teksTanggal) {
+  const bersih = formatTanggalIso(teksTanggal);
+  const [tahun, bulan, hari] = bersih.split("-").map(Number);
+  return new Date(tahun, bulan - 1, hari, 0, 0, 0, 0);
+}
+
+export function hitungHariKerjaCuti(
+  tanggalMulaiStr,
+  tanggalSelesaiStr,
+  opsiSetengahHari = false,
+  daftarTanggalLibur = []
+) {
+  if (!tanggalMulaiStr || !tanggalSelesaiStr) {
+    return {
+      totalHari: 0,
+      rincianHariKerja: [],
+      hariLiburTerlewati: [],
+      akhirPekanTerlewati: 0,
+    };
+  }
+
+  const mulai = buatTanggalLokal(tanggalMulaiStr);
+  const selesai = buatTanggalLokal(tanggalSelesaiStr);
+  if (selesai < mulai) {
+    return {
+      totalHari: 0,
+      rincianHariKerja: [],
+      hariLiburTerlewati: [],
+      akhirPekanTerlewati: 0,
+    };
+  }
+
+  const setLibur = new Set(
+    daftarTanggalLibur.map((item) =>
+      typeof item === "string" ? formatTanggalIso(item) : formatTanggalIso(item.tanggal)
+    )
+  );
+  const petaNamaLibur = new Map();
+  for (const item of daftarTanggalLibur) {
+    if (typeof item === "object" && item?.tanggal) {
+      petaNamaLibur.set(formatTanggalIso(item.tanggal), item.nama_libur || "Hari Libur");
+    }
+  }
+
+  const rincianHariKerja = [];
+  const hariLiburTerlewati = [];
+  let akhirPekanTerlewati = 0;
+
+  const kursor = new Date(mulai);
+  while (kursor <= selesai) {
+    const indeksHari = kursor.getDay();
+    const kunciTanggal = formatTanggalIso(kursor);
+
+    if (indeksHari === 0 || indeksHari === 6) {
+      akhirPekanTerlewati += 1;
+    } else if (setLibur.has(kunciTanggal)) {
+      hariLiburTerlewati.push({
+        tanggal: kunciTanggal,
+        nama: petaNamaLibur.get(kunciTanggal) || "Hari Libur",
+      });
+    } else {
+      rincianHariKerja.push(kunciTanggal);
+    }
+    kursor.setDate(kursor.getDate() + 1);
+  }
+
+  let totalHari = rincianHariKerja.length;
+  if (opsiSetengahHari && totalHari === 1) {
+    totalHari = 0.5;
+  }
+
+  return {
+    totalHari,
+    rincianHariKerja,
+    hariLiburTerlewati,
+    akhirPekanTerlewati,
+  };
+}
+
+export function selisihHariKalender(tanggalAwalStr, tanggalAkhirStr) {
+  const awal = buatTanggalLokal(tanggalAwalStr);
+  const akhir = buatTanggalLokal(tanggalAkhirStr);
+  const selisihMs = akhir.getTime() - awal.getTime();
+  return Math.round(selisihMs / (1000 * 60 * 60 * 24));
+}
+
+export function validasiBatasWaktuPengajuan(
+  jenisCuti,
+  tanggalPengajuanStr,
+  tanggalMulaiStr
+) {
+  const batas = Number(jenisCuti?.batas_hari_pengajuan ?? 0);
+  const selisihHari = selisihHariKalender(tanggalPengajuanStr, tanggalMulaiStr);
+
+  if (batas > 0) {
+    if (selisihHari < batas) {
+      return {
+        valid: false,
+        pesan: `${jenisCuti.nama_cuti} wajib diajukan minimal H-${batas} sebelum tanggal mulai cuti.`,
+      };
+    }
+  } else if (batas < 0) {
+    const maksTerlambat = Math.abs(batas);
+    if (selisihHari < -maksTerlambat) {
+      return {
+        valid: false,
+        pesan: `${jenisCuti.nama_cuti} maksimal diajukan ${maksTerlambat} hari setelah tanggal mulai.`,
+      };
+    }
+  } else if (selisihHari < 0) {
+    return {
+      valid: false,
+      pesan: `${jenisCuti.nama_cuti} tidak boleh diajukan untuk tanggal yang sudah lewat.`,
+    };
+  }
+
+  return { valid: true, pesan: "" };
+}
+
+export function hitungMasaKerjaTahun(tanggalBergabungStr, tanggalAcuan = new Date()) {
+  if (!tanggalBergabungStr) return 0;
+  const mulai = buatTanggalLokal(tanggalBergabungStr);
+  const acuan = new Date(
+    tanggalAcuan.getFullYear(),
+    tanggalAcuan.getMonth(),
+    tanggalAcuan.getDate()
+  );
+  const selisihMs = acuan.getTime() - mulai.getTime();
+  return selisihMs / (1000 * 60 * 60 * 24 * 365.25);
+}
+
+export function apakahLayakCutiTahunan(tanggalBergabungStr, tanggalAcuan = new Date()) {
+  if (!tanggalBergabungStr) return false;
+  const mulai = buatTanggalLokal(tanggalBergabungStr);
+  const batasSatuTahun = new Date(
+    mulai.getFullYear() + 1,
+    mulai.getMonth(),
+    mulai.getDate()
+  );
+  const acuan = new Date(
+    tanggalAcuan.getFullYear(),
+    tanggalAcuan.getMonth(),
+    tanggalAcuan.getDate()
+  );
+  return acuan >= batasSatuTahun;
+}
+
+export function formatTanggalIndo(nilaiTanggal, denganJam = false) {
+  if (!nilaiTanggal) return "-";
+  const tgl = new Date(nilaiTanggal);
+  if (Number.isNaN(tgl.getTime())) return "-";
+  const opsi = {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  };
+  if (denganJam) {
+    opsi.hour = "2-digit";
+    opsi.minute = "2-digit";
+  }
+  return new Intl.DateTimeFormat("id-ID", opsi).format(tgl);
+}
+
+export function formatAngkaKuota(nilai) {
+  const angka = Number(nilai ?? 0);
+  if (Number.isInteger(angka)) {
+    return String(angka);
+  }
+  return angka.toFixed(1).replace(/\.0$/, "");
+}
+
+export function labelPeranPengguna(peran) {
+  const petaPeran = {
+    admin: "Admin",
+    karyawan: "Karyawan",
+    ketua_divisi: "Ketua Divisi",
+    hrd: "HRD",
+  };
+  return petaPeran[peran] || peran;
+}
