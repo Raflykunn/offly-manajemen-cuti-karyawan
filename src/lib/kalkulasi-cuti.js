@@ -190,3 +190,15 @@ export function labelPeranPengguna(peran) {
   };
   return petaPeran[peran] || peran;
 }
+
+export function gayaStatusCuti(status) {
+  const peta = {
+    Pending: "bg-amber-100 text-amber-800 border-amber-200",
+    "Approved by Leader": "bg-sky-100 text-sky-800 border-sky-200",
+    "Approved by HRD": "bg-emerald-100 text-emerald-800 border-emerald-200",
+    "Rejected by Leader": "bg-rose-100 text-rose-800 border-rose-200",
+    "Rejected by HRD": "bg-rose-100 text-rose-800 border-rose-200",
+    Cancelled: "bg-zinc-100 text-zinc-700 border-zinc-200",
+  };
+  return peta[status] || "bg-muted text-muted-foreground";
+}
