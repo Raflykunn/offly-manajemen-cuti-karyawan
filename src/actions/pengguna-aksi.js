@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { jalankanKueri } from "@/lib/db";
+import { jalankanKueri, jalankanTransaksi } from "@/lib/db";
 import {
   ambilSesiPengguna,
   buatHashKataSandi,
@@ -135,7 +135,7 @@ export async function ubahProfilSendiri(statusSebelumnya, formData) {
       sukses: true,
       pesan: "Data profil Anda berhasil diperbarui.",
     };
-  } catch (galat) {
+  } catch {
     return {
       sukses: false,
       pesan: "Terjadi kesalahan saat menyimpan perubahan profil.",
@@ -160,4 +160,326 @@ export async function tandaiSatuNotifikasiDibaca(idNotifikasi) {
     [Number(idNotifikasi), sesi.id]
   );
   revalidatePath("/dasbor");
+}
+
+export async function ambilDaftarPengguna(filter = {}) {
+  await wajibSesiPengguna(["admin"]);
+
+  const kondisi = [];
+  const parameter = [];
+
+  if (filter.peran && filter.peran !== "semua") {
+    parameter.push(filter.peran);
+    kondisi.push(`p.peran = $${parameter.length}`);
+  }
+
+  if (filter.divisi_id && filter.divisi_id !== "semua") {
+    if (filter.divisi_id === "tanpa_divisi") {
+      kondisi.push(`p.divisi_id IS NULL`);
+    } else {
+      parameter.push(Number(filter.divisi_id));
+      kondisi.push(`p.divisi_id = $${parameter.length}`);
+    }
+  }
+
+  if (filter.status_aktif && filter.status_aktif !== "semua") {
+    parameter.push(filter.status_aktif === "aktif");
+    kondisi.push(`p.status_aktif = $${parameter.length}`);
+  }
+
+  if (filter.masa_kerja === "kurang_1_tahun") {
+    kondisi.push(`p.tanggal_bergabung > (CURRENT_DATE - INTERVAL '1 year')`);
+  } else if (filter.masa_kerja === "lebih_1_tahun") {
+    kondisi.push(`p.tanggal_bergabung <= (CURRENT_DATE - INTERVAL '1 year')`);
+  }
+
+  if (filter.cari && filter.cari.trim()) {
+    parameter.push(`%${filter.cari.trim()}%`);
+    kondisi.push(
+      `(p.nama_lengkap ILIKE $${parameter.length} OR p.email ILIKE $${parameter.length} OR p.username ILIKE $${parameter.length})`
+    );
+  }
+
+  const klausaWhere =
+    kondisi.length > 0 ? `WHERE ${kondisi.join(" AND ")}` : "";
+
+  const petaUrutan = {
+    nama_asc: "p.nama_lengkap ASC",
+    nama_desc: "p.nama_lengkap DESC",
+    gabung_baru: "p.tanggal_bergabung DESC",
+    gabung_lama: "p.tanggal_bergabung ASC",
+    divisi_asc: "COALESCE(d.nama_divisi, 'ZZZ') ASC, p.nama_lengkap ASC",
+  };
+  const urutan = petaUrutan[filter.urutkan] || "p.nama_lengkap ASC";
+
+  const [hasilPengguna, hasilDivisi] = await Promise.all([
+    jalankanKueri(
+      `SELECT p.id, p.username, p.email, p.nama_lengkap, p.peran, p.divisi_id,
+              p.kuota_cuti_awal, p.sisa_kuota_cuti, p.telepon, p.alamat,
+              p.tanggal_bergabung, p.status_aktif, d.nama_divisi,
+              EXTRACT(MONTH FROM AGE(CURRENT_DATE, p.tanggal_bergabung))::int +
+              (EXTRACT(YEAR FROM AGE(CURRENT_DATE, p.tanggal_bergabung))::int * 12) AS total_bulan_kerja
+       FROM pengguna p
+       LEFT JOIN divisi d ON d.id = p.divisi_id
+       ${klausaWhere}
+       ORDER BY ${urutan}`,
+      parameter
+    ),
+    jalankanKueri(`SELECT id, nama_divisi FROM divisi ORDER BY nama_divisi ASC`),
+  ]);
+
+  return {
+    daftarPengguna: hasilPengguna.rows.map((baris) => ({
+      ...baris,
+      kuota_cuti_awal: Number(baris.kuota_cuti_awal),
+      sisa_kuota_cuti: Number(baris.sisa_kuota_cuti),
+      tanggal_bergabung: new Date(baris.tanggal_bergabung)
+        .toISOString()
+        .slice(0, 10),
+    })),
+    daftarDivisi: hasilDivisi.rows,
+  };
+}
+
+export async function tambahPenggunaBaru(formData) {
+  await wajibSesiPengguna(["admin"]);
+
+  const username = String(formData.get("username") || "").trim();
+  const email = String(formData.get("email") || "").trim().toLowerCase();
+  const kataSandi = String(formData.get("kata_sandi") || "");
+  const namaLengkap = String(formData.get("nama_lengkap") || "").trim();
+  const peran = String(formData.get("peran") || "").trim();
+  const divisiMentah = String(formData.get("divisi_id") || "");
+  const divisiId =
+    divisiMentah && divisiMentah !== "kosong" ? Number(divisiMentah) : null;
+  const kuotaAwal = Number(formData.get("kuota_cuti_awal") || 12);
+  const tanggalBergabung =
+    String(formData.get("tanggal_bergabung") || "").trim() ||
+    new Date().toISOString().slice(0, 10);
+
+  if (!username || !email || !kataSandi || !namaLengkap || !peran) {
+    return {
+      sukses: false,
+      pesan: "Username, email, kata sandi, nama lengkap, dan peran wajib diisi.",
+    };
+  }
+
+  const polaEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!polaEmail.test(email)) {
+    return { sukses: false, pesan: "Format alamat email tidak valid." };
+  }
+
+  if (kataSandi.length < 6) {
+    return {
+      sukses: false,
+      pesan: "Kata sandi minimal terdiri dari 6 karakter.",
+    };
+  }
+
+  if (!["admin", "karyawan", "ketua_divisi", "hrd"].includes(peran)) {
+    return { sukses: false, pesan: "Peran pengguna tidak valid." };
+  }
+
+  if (Number.isNaN(kuotaAwal) || kuotaAwal < 0 || kuotaAwal > 30) {
+    return { sukses: false, pesan: "Kuota cuti awal harus antara 0 hingga 30 hari." };
+  }
+
+  try {
+    const hash = await buatHashKataSandi(kataSandi);
+    await jalankanKueri(
+      `INSERT INTO pengguna (
+         username, email, kata_sandi_hash, nama_lengkap, peran,
+         divisi_id, kuota_cuti_awal, sisa_kuota_cuti, tanggal_bergabung, status_aktif
+       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $7, $8, TRUE)`,
+      [
+        username,
+        email,
+        hash,
+        namaLengkap,
+        peran,
+        divisiId,
+        kuotaAwal,
+        tanggalBergabung,
+      ]
+    );
+
+    revalidatePath("/manajemen-pengguna");
+    revalidatePath("/dasbor");
+    return {
+      sukses: true,
+      pesan: `Pengguna ${namaLengkap} berhasil ditambahkan.`,
+    };
+  } catch (galat) {
+    if (galat.code === "23505") {
+      return {
+        sukses: false,
+        pesan: "Username atau email sudah terdaftar pada sistem.",
+      };
+    }
+    return {
+      sukses: false,
+      pesan: "Gagal menambahkan pengguna baru.",
+    };
+  }
+}
+
+export async function ubahDataPengguna(formData) {
+  await wajibSesiPengguna(["admin"]);
+
+  const id = Number(formData.get("id"));
+  const username = String(formData.get("username") || "").trim();
+  const email = String(formData.get("email") || "").trim().toLowerCase();
+  const namaLengkap = String(formData.get("nama_lengkap") || "").trim();
+  const peran = String(formData.get("peran") || "").trim();
+  const divisiMentah = String(formData.get("divisi_id") || "");
+  const divisiId =
+    divisiMentah && divisiMentah !== "kosong" ? Number(divisiMentah) : null;
+  const statusAktif = formData.get("status_aktif") === "true";
+  const kuotaAwal = Number(formData.get("kuota_cuti_awal") || 12);
+  const sisaKuota = Number(formData.get("sisa_kuota_cuti") ?? kuotaAwal);
+  const tanggalBergabung = String(formData.get("tanggal_bergabung") || "").trim();
+  const kataSandiBaru = String(formData.get("kata_sandi") || "");
+
+  if (!id || !username || !email || !namaLengkap || !peran || !tanggalBergabung) {
+    return {
+      sukses: false,
+      pesan: "Semua kolom wajib tidak boleh kosong.",
+    };
+  }
+
+  const polaEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!polaEmail.test(email)) {
+    return { sukses: false, pesan: "Format email tidak valid." };
+  }
+
+  try {
+    await jalankanTransaksi(async (klien) => {
+      const cekKetua = await klien.query(
+        `SELECT id, nama_divisi FROM divisi WHERE ketua_divisi_id = $1`,
+        [id]
+      );
+      if (cekKetua.rows.length > 0 && peran !== "ketua_divisi") {
+        throw new Error(
+          `Pengguna sedang menjabat Ketua Divisi ${cekKetua.rows[0].nama_divisi}. Ubah ketua divisi terlebih dahulu sebelum mengganti perannya.`
+        );
+      }
+
+      if (kataSandiBaru) {
+        const hashBaru = await buatHashKataSandi(kataSandiBaru);
+        await klien.query(
+          `UPDATE pengguna
+           SET username = $1, email = $2, nama_lengkap = $3, peran = $4,
+               divisi_id = $5, status_aktif = $6, kuota_cuti_awal = $7,
+               sisa_kuota_cuti = $8, tanggal_bergabung = $9,
+               kata_sandi_hash = $10, diperbarui_pada = NOW()
+           WHERE id = $11`,
+          [
+            username,
+            email,
+            namaLengkap,
+            peran,
+            divisiId,
+            statusAktif,
+            kuotaAwal,
+            sisaKuota,
+            tanggalBergabung,
+            hashBaru,
+            id,
+          ]
+        );
+      } else {
+        await klien.query(
+          `UPDATE pengguna
+           SET username = $1, email = $2, nama_lengkap = $3, peran = $4,
+               divisi_id = $5, status_aktif = $6, kuota_cuti_awal = $7,
+               sisa_kuota_cuti = $8, tanggal_bergabung = $9,
+               diperbarui_pada = NOW()
+           WHERE id = $10`,
+          [
+            username,
+            email,
+            namaLengkap,
+            peran,
+            divisiId,
+            statusAktif,
+            kuotaAwal,
+            sisaKuota,
+            tanggalBergabung,
+            id,
+          ]
+        );
+      }
+    });
+
+    revalidatePath("/manajemen-pengguna");
+    revalidatePath("/manajemen-divisi");
+    revalidatePath("/dasbor");
+    return {
+      sukses: true,
+      pesan: `Data pengguna ${namaLengkap} berhasil diperbarui.`,
+    };
+  } catch (galat) {
+    if (galat.code === "23505") {
+      return {
+        sukses: false,
+        pesan: "Username atau email sudah digunakan pengguna lain.",
+      };
+    }
+    return {
+      sukses: false,
+      pesan: galat.message || "Gagal memperbarui data pengguna.",
+    };
+  }
+}
+
+export async function hapusDataPengguna(idPengguna) {
+  const sesi = await wajibSesiPengguna(["admin"]);
+  const idTarget = Number(idPengguna);
+
+  if (idTarget === sesi.id) {
+    return {
+      sukses: false,
+      pesan: "Anda tidak dapat menghapus akun Anda sendiri.",
+    };
+  }
+
+  const hasilTarget = await jalankanKueri(
+    `SELECT id, nama_lengkap, peran FROM pengguna WHERE id = $1`,
+    [idTarget]
+  );
+
+  if (hasilTarget.rows.length === 0) {
+    return { sukses: false, pesan: "Pengguna tidak ditemukan." };
+  }
+
+  const target = hasilTarget.rows[0];
+  if (!["karyawan", "ketua_divisi"].includes(target.peran)) {
+    return {
+      sukses: false,
+      pesan: "Hanya akun dengan peran Karyawan atau Ketua Divisi yang dapat dihapus.",
+    };
+  }
+
+  try {
+    await jalankanTransaksi(async (klien) => {
+      await klien.query(
+        `UPDATE divisi SET ketua_divisi_id = NULL WHERE ketua_divisi_id = $1`,
+        [idTarget]
+      );
+      await klien.query(`DELETE FROM pengguna WHERE id = $1`, [idTarget]);
+    });
+
+    revalidatePath("/manajemen-pengguna");
+    revalidatePath("/manajemen-divisi");
+    revalidatePath("/dasbor");
+    return {
+      sukses: true,
+      pesan: `Pengguna ${target.nama_lengkap} berhasil dihapus.`,
+    };
+  } catch {
+    return {
+      sukses: false,
+      pesan: "Gagal menghapus data pengguna.",
+    };
+  }
 }
