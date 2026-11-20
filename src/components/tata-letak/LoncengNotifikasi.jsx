@@ -13,7 +13,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -65,9 +64,9 @@ export default function LoncengNotifikasi({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-80">
         <div className="flex items-center justify-between px-2 py-1.5">
-          <DropdownMenuLabel className="p-0 text-sm font-semibold text-foreground">
+          <span className="text-sm font-semibold text-foreground">
             Notifikasi
-          </DropdownMenuLabel>
+          </span>
           {jumlahBelumDibaca > 0 && (
             <button
               type="button"

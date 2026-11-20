@@ -315,6 +315,7 @@ export default function PersetujuanHrdClient({ daftarMenunggu }) {
                     <Button
                       size="sm"
                       variant="outline"
+                      nativeButton={false}
                       render={
                         <a
                           href={item.lampiran_url}

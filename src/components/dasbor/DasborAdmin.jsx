@@ -40,10 +40,19 @@ export default function DasborAdmin({ data }) {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button render={<Link href="/manajemen-pengguna" />} variant="outline" size="sm">
+          <Button
+            nativeButton={false}
+            render={<Link href="/manajemen-pengguna" />}
+            variant="outline"
+            size="sm"
+          >
             Kelola Pengguna
           </Button>
-          <Button render={<Link href="/manajemen-divisi" />} size="sm">
+          <Button
+            nativeButton={false}
+            render={<Link href="/manajemen-divisi" />}
+            size="sm"
+          >
             Kelola Divisi
           </Button>
         </div>

@@ -44,7 +44,11 @@ export default function DasborKaryawan({ data }) {
             Pantau sisa kuota cuti tahunan secara real-time, status pengajuan, dan tugas pengganti.
           </p>
         </div>
-        <Button render={<Link href="/pengajuan-cuti" />} size="sm">
+        <Button
+          nativeButton={false}
+          render={<Link href="/pengajuan-cuti" />}
+          size="sm"
+        >
           <CalendarPlus className="size-4 mr-1.5" />
           Ajukan Cuti Baru
         </Button>
@@ -128,7 +132,12 @@ export default function DasborKaryawan({ data }) {
                 Riwayat 5 permohonan cuti terakhir Anda.
               </CardDescription>
             </div>
-            <Button render={<Link href="/riwayat-cuti" />} variant="outline" size="sm">
+            <Button
+              nativeButton={false}
+              render={<Link href="/riwayat-cuti" />}
+              variant="outline"
+              size="sm"
+            >
               Lihat Semua
             </Button>
           </CardHeader>

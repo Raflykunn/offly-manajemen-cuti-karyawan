@@ -44,10 +44,19 @@ export default function DasborHrd({ data }) {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button render={<Link href="/pengaturan-kalender" />} variant="outline" size="sm">
+          <Button
+            nativeButton={false}
+            render={<Link href="/pengaturan-kalender" />}
+            variant="outline"
+            size="sm"
+          >
             Kalender &amp; Blackout
           </Button>
-          <Button render={<Link href="/persetujuan-hrd" />} size="sm">
+          <Button
+            nativeButton={false}
+            render={<Link href="/persetujuan-hrd" />}
+            size="sm"
+          >
             <ClipboardCheck className="size-4 mr-1.5" />
             Persetujuan Final ({statistik.pendingFinal})
           </Button>

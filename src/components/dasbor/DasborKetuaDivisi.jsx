@@ -48,11 +48,20 @@ export default function DasborKetuaDivisi({ data }) {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button render={<Link href="/verifikasi-divisi" />} variant="outline" size="sm">
+          <Button
+            nativeButton={false}
+            render={<Link href="/verifikasi-divisi" />}
+            variant="outline"
+            size="sm"
+          >
             <CheckSquare className="size-4 mr-1.5" />
             Verifikasi Divisi ({statistik.pendingVerifikasi})
           </Button>
-          <Button render={<Link href="/pengajuan-cuti" />} size="sm">
+          <Button
+            nativeButton={false}
+            render={<Link href="/pengajuan-cuti" />}
+            size="sm"
+          >
             <CalendarPlus className="size-4 mr-1.5" />
             Ajukan Cuti Pribadi
           </Button>
@@ -204,7 +213,12 @@ export default function DasborKetuaDivisi({ data }) {
                 Pengajuan cuti bawahan berstatus Pending.
               </CardDescription>
             </div>
-            <Button render={<Link href="/verifikasi-divisi" />} variant="outline" size="sm">
+            <Button
+              nativeButton={false}
+              render={<Link href="/verifikasi-divisi" />}
+              variant="outline"
+              size="sm"
+            >
               Proses Semua
             </Button>
           </CardHeader>

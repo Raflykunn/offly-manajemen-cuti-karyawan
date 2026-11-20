@@ -118,6 +118,7 @@ export default function ModalDetailCuti({ pengajuan, saatTutup }) {
               <Button
                 size="sm"
                 variant="outline"
+                nativeButton={false}
                 render={
                   <a
                     href={pengajuan.lampiran_url}
@@ -229,6 +230,7 @@ export default function ModalDetailCuti({ pengajuan, saatTutup }) {
           {disetujuiHrd && (
             <Button
               variant="default"
+              nativeButton={false}
               render={
                 <a href={`/api/cuti/${pengajuan.id}/surat`} target="_blank" rel="noreferrer" />
               }

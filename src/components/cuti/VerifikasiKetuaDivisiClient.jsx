@@ -182,6 +182,7 @@ export default function VerifikasiKetuaDivisiClient({
                       size="sm"
                       variant="outline"
                       className="w-full"
+                      nativeButton={false}
                       render={
                         <a
                           href={item.lampiran_url}

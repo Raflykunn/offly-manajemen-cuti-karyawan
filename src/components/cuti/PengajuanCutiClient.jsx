@@ -616,6 +616,7 @@ export default function PengajuanCutiClient({
                         <Button
                           size="sm"
                           variant="default"
+                          nativeButton={false}
                           render={
                             <a
                               href={`/api/cuti/${item.id}/surat`}

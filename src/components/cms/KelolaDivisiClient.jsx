@@ -372,6 +372,7 @@ export default function KelolaDivisiClient({
                       <Button
                         size="sm"
                         variant="outline"
+                        nativeButton={false}
                         render={<Link href={`/manajemen-divisi/${d.id}`} />}
                       >
                         <Eye className="size-3.5 mr-1" />

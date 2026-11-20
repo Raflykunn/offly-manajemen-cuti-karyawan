@@ -97,6 +97,7 @@ export default function DetailDivisiClient({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Button
+            nativeButton={false}
             render={<Link href="/manajemen-divisi" />}
             variant="outline"
             size="icon"
