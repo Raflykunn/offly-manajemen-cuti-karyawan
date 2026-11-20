@@ -105,40 +105,44 @@ export default function PengajuanCutiClient({
     return peta;
   }, [daftarRekanPengganti]);
 
+  const tanggalLengkap = Boolean(jenisCutiId && tanggalMulai && tanggalSelesai);
+
   useEffect(() => {
-    if (!jenisCutiId || !tanggalMulai || !tanggalSelesai) {
-      aturSimulasi(null);
+    if (!tanggalLengkap) {
       return;
     }
 
     let dibatalkan = false;
-    aturSedangSimulasi(true);
 
-    fetch("/api/cuti/simulasi", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        jenis_cuti_id: Number(jenisCutiId),
-        tanggal_mulai: tanggalMulai,
-        tanggal_selesai: tanggalSelesai,
-        opsi_setengah_hari: opsiSetengahHari,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
+    async function jalankanSimulasiWhatIf() {
+      try {
+        aturSedangSimulasi(true);
+        const res = await fetch("/api/cuti/simulasi", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            jenis_cuti_id: Number(jenisCutiId),
+            tanggal_mulai: tanggalMulai,
+            tanggal_selesai: tanggalSelesai,
+            opsi_setengah_hari: opsiSetengahHari,
+          }),
+        });
+        const data = await res.json();
         if (!dibatalkan && data?.sukses) {
           aturSimulasi(data.simulasi);
         }
-      })
-      .catch(() => {})
-      .finally(() => {
+      } catch {
+      } finally {
         if (!dibatalkan) aturSedangSimulasi(false);
-      });
+      }
+    }
+
+    jalankanSimulasiWhatIf();
 
     return () => {
       dibatalkan = true;
     };
-  }, [jenisCutiId, tanggalMulai, tanggalSelesai, opsiSetengahHari]);
+  }, [tanggalLengkap, jenisCutiId, tanggalMulai, tanggalSelesai, opsiSetengahHari]);
 
   async function tanganiUnggahBerkas(event) {
     const berkas = event.target.files?.[0];
@@ -476,7 +480,7 @@ export default function PengajuanCutiClient({
                   disabled={
                     sedangProses ||
                     sedangUnggah ||
-                    (simulasi && !simulasi.dapatDiajukan)
+                    (tanggalLengkap && simulasi && !simulasi.dapatDiajukan)
                   }
                 >
                   <Send className="size-4 mr-1.5" />
@@ -489,7 +493,7 @@ export default function PengajuanCutiClient({
 
         <div className="lg:col-span-5">
           <PanelSimulasiWhatIf
-            simulasi={simulasi}
+            simulasi={tanggalLengkap ? simulasi : null}
             sedangMemuat={sedangSimulasi}
             sisaKuotaAwal={pengguna.sisa_kuota_cuti}
           />
