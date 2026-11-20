@@ -21,8 +21,17 @@ export default function TataLetakAkar({ children }) {
   return (
     <html
       lang="id"
+      suppressHydrationWarning
       className={`${fontInter.variable} ${fontJetbrainsMono.variable} h-full antialiased`}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(localStorage.getItem('offly-tema')==='dark'){document.documentElement.classList.add('dark')}}catch{}",
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">
         {children}
       </body>

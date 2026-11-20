@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import BilahSisiNavigasi from "./BilahSisiNavigasi";
 import LoncengNotifikasi from "./LoncengNotifikasi";
+import TombolTema from "./TombolTema";
 
 function ambilInisialNama(nama) {
   if (!nama) return "OF";
@@ -92,6 +93,8 @@ export default function KerangkaDasbor({
               notifikasi={notifikasi}
               jumlahBelumDibaca={jumlahBelumDibaca}
             />
+
+            <TombolTema />
 
             <Link
               href="/profil"

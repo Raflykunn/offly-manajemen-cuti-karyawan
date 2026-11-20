@@ -193,12 +193,18 @@ export function labelPeranPengguna(peran) {
 
 export function gayaStatusCuti(status) {
   const peta = {
-    Pending: "bg-amber-100 text-amber-800 border-amber-200",
-    "Approved by Leader": "bg-sky-100 text-sky-800 border-sky-200",
-    "Approved by HRD": "bg-emerald-100 text-emerald-800 border-emerald-200",
-    "Rejected by Leader": "bg-rose-100 text-rose-800 border-rose-200",
-    "Rejected by HRD": "bg-rose-100 text-rose-800 border-rose-200",
-    Cancelled: "bg-zinc-100 text-zinc-700 border-zinc-200",
+    Pending:
+      "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800",
+    "Approved by Leader":
+      "bg-sky-100 text-sky-800 border-sky-200 dark:bg-sky-950/60 dark:text-sky-300 dark:border-sky-800",
+    "Approved by HRD":
+      "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800",
+    "Rejected by Leader":
+      "bg-rose-100 text-rose-800 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800",
+    "Rejected by HRD":
+      "bg-rose-100 text-rose-800 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800",
+    Cancelled:
+      "bg-zinc-100 text-zinc-700 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700",
   };
   return peta[status] || "bg-muted text-muted-foreground";
 }
