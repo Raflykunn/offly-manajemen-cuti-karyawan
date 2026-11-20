@@ -958,3 +958,51 @@ export async function setujuiBanyakCutiHrd(daftarPengajuanId, catatanHrd) {
     };
   }
 }
+
+export async function ambilRiwayatCutiLengkap() {
+  const sesi = await wajibSesiPengguna();
+
+  let kondisiPeran = "";
+  let parameter = [];
+
+  if (sesi.peran === "karyawan") {
+    parameter = [sesi.id];
+    kondisiPeran = `WHERE (pc.pengguna_id = $1 OR pc.rekan_pengganti_id = $1)`;
+  } else if (sesi.peran === "ketua_divisi") {
+    parameter = [sesi.id];
+    kondisiPeran = `WHERE (pc.pengguna_id = $1 OR d.ketua_divisi_id = $1)`;
+  }
+
+  const [hasilRiwayat, hasilJenis, hasilDivisi] = await Promise.all([
+    jalankanKueri(
+      `SELECT pc.*,
+              jc.nama_cuti, jc.kode_cuti,
+              p.nama_lengkap AS nama_pemohon, p.email AS email_pemohon,
+              p.peran AS peran_pemohon, p.divisi_id,
+              d.nama_divisi,
+              rp.nama_lengkap AS nama_rekan_pengganti,
+              ka.nama_lengkap AS nama_ketua_approver,
+              ha.nama_lengkap AS nama_hrd_approver
+       FROM pengajuan_cuti pc
+       JOIN jenis_cuti jc ON jc.id = pc.jenis_cuti_id
+       JOIN pengguna p ON p.id = pc.pengguna_id
+       LEFT JOIN divisi d ON d.id = p.divisi_id
+       LEFT JOIN pengguna rp ON rp.id = pc.rekan_pengganti_id
+       LEFT JOIN pengguna ka ON ka.id = pc.ketua_approver_id
+       LEFT JOIN pengguna ha ON ha.id = pc.hrd_approver_id
+       ${kondisiPeran}
+       ORDER BY pc.dibuat_pada DESC`,
+      parameter
+    ),
+    jalankanKueri(`SELECT id, nama_cuti FROM jenis_cuti ORDER BY id ASC`),
+    jalankanKueri(`SELECT id, nama_divisi FROM divisi ORDER BY nama_divisi ASC`),
+  ]);
+
+  return {
+    sesiPeran: sesi.peran,
+    sesiPenggunaId: sesi.id,
+    daftarRiwayat: hasilRiwayat.rows.map(normalisasiBarisPengajuan),
+    daftarJenisCuti: hasilJenis.rows,
+    daftarDivisi: hasilDivisi.rows,
+  };
+}
