@@ -16,16 +16,15 @@ export async function proxy(request) {
   const token = request.cookies.get(NAMA_COOKIE_SESI)?.value;
   const sesi = await verifikasiTokenSesi(token);
 
+  if (pathname === "/") {
+    return NextResponse.next();
+  }
+
   if (pathname === "/masuk") {
     if (sesi) {
       return NextResponse.redirect(new URL("/dasbor", request.url));
     }
     return NextResponse.next();
-  }
-
-  if (pathname === "/") {
-    const tujuan = sesi ? "/dasbor" : "/masuk";
-    return NextResponse.redirect(new URL(tujuan, request.url));
   }
 
   if (!sesi) {
