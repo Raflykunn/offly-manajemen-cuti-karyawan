@@ -3,9 +3,12 @@ import { SignJWT, jwtVerify } from "jose";
 export const NAMA_COOKIE_SESI = "offly_sesi";
 
 function dapatkanKunciRahasia() {
-  const rahasia =
-    process.env.AUTH_SECRET ||
-    "kunci-rahasia-pengembangan-offly-manajemen-cuti-2026";
+  const rahasia = process.env.AUTH_SECRET;
+  if (!rahasia) {
+    throw new Error(
+      "Variabel lingkungan AUTH_SECRET belum diatur pada berkas .env"
+    );
+  }
   return new TextEncoder().encode(rahasia);
 }
 
@@ -27,8 +30,9 @@ export async function buatTokenSesi(dataPengguna, ingatSaya = false) {
 
 export async function verifikasiTokenSesi(token) {
   if (!token) return null;
+  const kunciRahasia = dapatkanKunciRahasia();
   try {
-    const { payload } = await jwtVerify(token, dapatkanKunciRahasia());
+    const { payload } = await jwtVerify(token, kunciRahasia);
     return payload;
   } catch {
     return null;
