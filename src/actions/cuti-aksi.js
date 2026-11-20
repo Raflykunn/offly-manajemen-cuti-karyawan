@@ -485,3 +485,476 @@ export async function batalkanPengajuanCuti(pengajuanId, alasanPembatalan) {
     };
   }
 }
+
+export async function ambilDaftarVerifikasiKetuaDivisi() {
+  const sesi = await wajibSesiPengguna(["ketua_divisi"]);
+
+  const hasilDivisi = await jalankanKueri(
+    `SELECT id, nama_divisi, batas_kapasitas_persen
+     FROM divisi
+     WHERE ketua_divisi_id = $1
+     LIMIT 1`,
+    [sesi.id]
+  );
+
+  const divisi = hasilDivisi.rows[0] || null;
+  if (!divisi) {
+    return { divisi: null, daftarMenunggu: [], daftarRiwayatDivisi: [] };
+  }
+
+  const [hasilMenunggu, hasilRiwayat] = await Promise.all([
+    jalankanKueri(
+      `SELECT pc.*,
+              jc.nama_cuti, jc.kode_cuti, jc.potong_kuota_tahunan,
+              p.nama_lengkap AS nama_pemohon, p.email AS email_pemohon,
+              p.foto_profil AS foto_pemohon, p.peran AS peran_pemohon,
+              p.sisa_kuota_cuti, p.kuota_cuti_awal,
+              d.nama_divisi,
+              rp.nama_lengkap AS nama_rekan_pengganti
+       FROM pengajuan_cuti pc
+       JOIN jenis_cuti jc ON jc.id = pc.jenis_cuti_id
+       JOIN pengguna p ON p.id = pc.pengguna_id
+       LEFT JOIN divisi d ON d.id = p.divisi_id
+       LEFT JOIN pengguna rp ON rp.id = pc.rekan_pengganti_id
+       WHERE p.divisi_id = $1
+         AND p.peran = 'karyawan'
+         AND pc.status = 'Pending'
+       ORDER BY pc.dibuat_pada ASC`,
+      [divisi.id]
+    ),
+    jalankanKueri(
+      `SELECT pc.*,
+              jc.nama_cuti, jc.kode_cuti,
+              p.nama_lengkap AS nama_pemohon, p.peran AS peran_pemohon,
+              d.nama_divisi,
+              rp.nama_lengkap AS nama_rekan_pengganti,
+              ka.nama_lengkap AS nama_ketua_approver,
+              ha.nama_lengkap AS nama_hrd_approver
+       FROM pengajuan_cuti pc
+       JOIN jenis_cuti jc ON jc.id = pc.jenis_cuti_id
+       JOIN pengguna p ON p.id = pc.pengguna_id
+       LEFT JOIN divisi d ON d.id = p.divisi_id
+       LEFT JOIN pengguna rp ON rp.id = pc.rekan_pengganti_id
+       LEFT JOIN pengguna ka ON ka.id = pc.ketua_approver_id
+       LEFT JOIN pengguna ha ON ha.id = pc.hrd_approver_id
+       WHERE p.divisi_id = $1
+         AND p.peran = 'karyawan'
+         AND pc.status <> 'Pending'
+       ORDER BY pc.diperbarui_pada DESC
+       LIMIT 20`,
+      [divisi.id]
+    ),
+  ]);
+
+  return {
+    divisi,
+    daftarMenunggu: hasilMenunggu.rows.map((b) => ({
+      ...normalisasiBarisPengajuan(b),
+      sisa_kuota_cuti: Number(b.sisa_kuota_cuti),
+      kuota_cuti_awal: Number(b.kuota_cuti_awal),
+    })),
+    daftarRiwayatDivisi: hasilRiwayat.rows.map(normalisasiBarisPengajuan),
+  };
+}
+
+export async function verifikasiCutiKetuaDivisi(
+  pengajuanId,
+  keputusan,
+  catatanKetua
+) {
+  const sesi = await wajibSesiPengguna(["ketua_divisi"]);
+  const catatan = String(catatanKetua || "").trim();
+
+  if (!["setuju", "tolak"].includes(keputusan)) {
+    return { sukses: false, pesan: "Keputusan verifikasi tidak valid." };
+  }
+
+  if (keputusan === "tolak" && !catatan) {
+    return {
+      sukses: false,
+      pesan: "Catatan penolakan wajib diisi jika menolak pengajuan.",
+    };
+  }
+
+  try {
+    const info = await jalankanTransaksi(async (klien) => {
+      const hasil = await klien.query(
+        `SELECT pc.id, pc.nomor_pengajuan, pc.pengguna_id, pc.total_hari_cuti,
+                pc.status, jc.potong_kuota_tahunan, jc.nama_cuti,
+                p.nama_lengkap AS nama_pemohon, d.ketua_divisi_id
+         FROM pengajuan_cuti pc
+         JOIN jenis_cuti jc ON jc.id = pc.jenis_cuti_id
+         JOIN pengguna p ON p.id = pc.pengguna_id
+         JOIN divisi d ON d.id = p.divisi_id
+         WHERE pc.id = $1 FOR UPDATE OF pc`,
+        [Number(pengajuanId)]
+      );
+
+      if (hasil.rows.length === 0) {
+        throw new Error("Pengajuan cuti tidak ditemukan.");
+      }
+
+      const data = hasil.rows[0];
+      if (data.ketua_divisi_id !== sesi.id) {
+        throw new Error(
+          "Anda hanya dapat memverifikasi pengajuan anggota divisi Anda sendiri."
+        );
+      }
+      if (data.status !== "Pending") {
+        throw new Error("Pengajuan ini sudah pernah diproses sebelumnya.");
+      }
+
+      if (keputusan === "setuju") {
+        await klien.query(
+          `UPDATE pengajuan_cuti
+           SET status = 'Approved by Leader',
+               ketua_approver_id = $1,
+               catatan_ketua = $2,
+               waktu_verifikasi_ketua = NOW(),
+               diperbarui_pada = NOW()
+           WHERE id = $3`,
+          [sesi.id, catatan || null, data.id]
+        );
+
+        await klien.query(
+          `INSERT INTO notifikasi (pengguna_id, judul, pesan, tautan)
+           VALUES ($1, $2, $3, $4)`,
+          [
+            data.pengguna_id,
+            "Disetujui Ketua Divisi",
+            `Pengajuan ${data.nomor_pengajuan} telah disetujui Ketua Divisi dan diteruskan ke HRD.`,
+            "/pengajuan-cuti",
+          ]
+        );
+
+        const hrdRes = await klien.query(
+          `SELECT id FROM pengguna WHERE peran = 'hrd' AND status_aktif = TRUE`
+        );
+        for (const hrd of hrdRes.rows) {
+          await klien.query(
+            `INSERT INTO notifikasi (pengguna_id, judul, pesan, tautan)
+             VALUES ($1, $2, $3, $4)`,
+            [
+              hrd.id,
+              "Verifikasi Atasan Selesai — Menunggu HRD",
+              `Pengajuan ${data.nomor_pengajuan} atas nama ${data.nama_pemohon} telah disetujui Ketua Divisi.`,
+              "/persetujuan-hrd",
+            ]
+          );
+        }
+
+        return { nomor: data.nomor_pengajuan, aksi: "disetujui" };
+      }
+
+      await klien.query(
+        `UPDATE pengajuan_cuti
+         SET status = 'Rejected by Leader',
+             ketua_approver_id = $1,
+             catatan_ketua = $2,
+             waktu_verifikasi_ketua = NOW(),
+             diperbarui_pada = NOW()
+         WHERE id = $3`,
+        [sesi.id, catatan, data.id]
+      );
+
+      if (data.potong_kuota_tahunan) {
+        await klien.query(
+          `UPDATE pengguna
+           SET sisa_kuota_cuti = LEAST(kuota_cuti_awal, sisa_kuota_cuti + $1),
+               diperbarui_pada = NOW()
+           WHERE id = $2`,
+          [Number(data.total_hari_cuti), data.pengguna_id]
+        );
+      }
+
+      await klien.query(
+        `INSERT INTO notifikasi (pengguna_id, judul, pesan, tautan)
+         VALUES ($1, $2, $3, $4)`,
+        [
+          data.pengguna_id,
+          "Pengajuan Cuti Ditolak Ketua Divisi",
+          `Pengajuan ${data.nomor_pengajuan} ditolak Ketua Divisi dengan alasan: ${catatan}`,
+          "/pengajuan-cuti",
+        ]
+      );
+
+      return { nomor: data.nomor_pengajuan, aksi: "ditolak" };
+    });
+
+    revalidatePath("/verifikasi-divisi");
+    revalidatePath("/persetujuan-hrd");
+    revalidatePath("/pengajuan-cuti");
+    revalidatePath("/riwayat-cuti");
+    revalidatePath("/dasbor");
+    revalidatePath("/profil");
+
+    return {
+      sukses: true,
+      pesan: `Pengajuan ${info.nomor} berhasil ${info.aksi}.`,
+    };
+  } catch (galat) {
+    return {
+      sukses: false,
+      pesan: galat.message || "Gagal memproses verifikasi pengajuan cuti.",
+    };
+  }
+}
+
+export async function ambilDaftarPersetujuanHrd() {
+  await wajibSesiPengguna(["hrd"]);
+
+  const hasilMenunggu = await jalankanKueri(
+    `SELECT pc.*,
+            jc.nama_cuti, jc.kode_cuti, jc.potong_kuota_tahunan,
+            p.nama_lengkap AS nama_pemohon, p.email AS email_pemohon,
+            p.foto_profil AS foto_pemohon, p.peran AS peran_pemohon,
+            p.divisi_id, p.sisa_kuota_cuti, p.kuota_cuti_awal,
+            d.nama_divisi, d.batas_kapasitas_persen,
+            rp.nama_lengkap AS nama_rekan_pengganti,
+            ka.nama_lengkap AS nama_ketua_approver,
+            (
+              SELECT COUNT(*)::int
+              FROM pengguna p2
+              WHERE p2.divisi_id = p.divisi_id AND p2.status_aktif = TRUE
+            ) AS total_anggota_divisi,
+            (
+              SELECT COUNT(DISTINCT pc2.pengguna_id)::int
+              FROM pengajuan_cuti pc2
+              JOIN pengguna p3 ON p3.id = pc2.pengguna_id
+              WHERE p3.divisi_id = p.divisi_id
+                AND pc2.status IN ('Approved by Leader', 'Approved by HRD')
+                AND daterange(pc2.tanggal_mulai, pc2.tanggal_selesai, '[]') && daterange(pc.tanggal_mulai, pc.tanggal_selesai, '[]')
+            ) AS jumlah_cuti_bersamaan
+     FROM pengajuan_cuti pc
+     JOIN jenis_cuti jc ON jc.id = pc.jenis_cuti_id
+     JOIN pengguna p ON p.id = pc.pengguna_id
+     LEFT JOIN divisi d ON d.id = p.divisi_id
+     LEFT JOIN pengguna rp ON rp.id = pc.rekan_pengganti_id
+     LEFT JOIN pengguna ka ON ka.id = pc.ketua_approver_id
+     WHERE (p.peran = 'karyawan' AND pc.status = 'Approved by Leader')
+        OR (p.peran = 'ketua_divisi' AND pc.status = 'Pending')
+     ORDER BY pc.tanggal_mulai ASC, pc.dibuat_pada ASC`
+  );
+
+  return hasilMenunggu.rows.map((baris) => {
+    const totalAnggota = Number(baris.total_anggota_divisi || 1);
+    const jumlahCuti = Number(baris.jumlah_cuti_bersamaan || 0);
+    const tambahanDiri = baris.status === "Pending" ? 1 : 0;
+    const persenBeban =
+      baris.divisi_id && totalAnggota > 0
+        ? Math.round(((jumlahCuti + tambahanDiri) / totalAnggota) * 100)
+        : 0;
+    const batasPersen = Number(baris.batas_kapasitas_persen ?? 30);
+
+    return {
+      ...normalisasiBarisPengajuan(baris),
+      sisa_kuota_cuti: Number(baris.sisa_kuota_cuti),
+      kuota_cuti_awal: Number(baris.kuota_cuti_awal),
+      total_anggota_divisi: totalAnggota,
+      jumlah_cuti_bersamaan: jumlahCuti + tambahanDiri,
+      persen_beban_divisi: persenBeban,
+      batas_kapasitas_persen: batasPersen,
+      melebihi_kapasitas:
+        Boolean(baris.divisi_id) &&
+        totalAnggota >= 2 &&
+        persenBeban > batasPersen,
+    };
+  });
+}
+
+export async function verifikasiFinalHrd(pengajuanId, keputusan, catatanHrd) {
+  const sesi = await wajibSesiPengguna(["hrd"]);
+  const catatan = String(catatanHrd || "").trim();
+
+  if (!["setuju", "tolak"].includes(keputusan)) {
+    return { sukses: false, pesan: "Keputusan tidak valid." };
+  }
+
+  if (keputusan === "tolak" && !catatan) {
+    return {
+      sukses: false,
+      pesan: "Catatan penolakan wajib diisi jika menolak pengajuan.",
+    };
+  }
+
+  try {
+    const info = await jalankanTransaksi(async (klien) => {
+      const hasil = await klien.query(
+        `SELECT pc.id, pc.nomor_pengajuan, pc.pengguna_id, pc.total_hari_cuti,
+                pc.status, jc.potong_kuota_tahunan, p.peran AS peran_pemohon
+         FROM pengajuan_cuti pc
+         JOIN jenis_cuti jc ON jc.id = pc.jenis_cuti_id
+         JOIN pengguna p ON p.id = pc.pengguna_id
+         WHERE pc.id = $1 FOR UPDATE OF pc`,
+        [Number(pengajuanId)]
+      );
+
+      if (hasil.rows.length === 0) {
+        throw new Error("Pengajuan cuti tidak ditemukan.");
+      }
+
+      const data = hasil.rows[0];
+      const layakDiproses =
+        (data.peran_pemohon === "karyawan" &&
+          data.status === "Approved by Leader") ||
+        (data.peran_pemohon === "ketua_divisi" && data.status === "Pending");
+
+      if (!layakDiproses) {
+        throw new Error(
+          "Status pengajuan ini tidak lagi menunggu persetujuan final HRD."
+        );
+      }
+
+      if (keputusan === "setuju") {
+        await klien.query(
+          `UPDATE pengajuan_cuti
+           SET status = 'Approved by HRD',
+               hrd_approver_id = $1,
+               catatan_hrd = $2,
+               waktu_verifikasi_hrd = NOW(),
+               diperbarui_pada = NOW()
+           WHERE id = $3`,
+          [sesi.id, catatan || null, data.id]
+        );
+
+        await klien.query(
+          `INSERT INTO notifikasi (pengguna_id, judul, pesan, tautan)
+           VALUES ($1, $2, $3, $4)`,
+          [
+            data.pengguna_id,
+            "Pengajuan Cuti Disetujui HRD",
+            `Pengajuan ${data.nomor_pengajuan} telah mendapatkan persetujuan final HRD. Anda dapat mengunduh Surat Cuti (PDF) sekarang.`,
+            "/riwayat-cuti",
+          ]
+        );
+
+        return { nomor: data.nomor_pengajuan, aksi: "disetujui final" };
+      }
+
+      await klien.query(
+        `UPDATE pengajuan_cuti
+         SET status = 'Rejected by HRD',
+             hrd_approver_id = $1,
+             catatan_hrd = $2,
+             waktu_verifikasi_hrd = NOW(),
+             diperbarui_pada = NOW()
+         WHERE id = $3`,
+        [sesi.id, catatan, data.id]
+      );
+
+      if (data.potong_kuota_tahunan) {
+        await klien.query(
+          `UPDATE pengguna
+           SET sisa_kuota_cuti = LEAST(kuota_cuti_awal, sisa_kuota_cuti + $1),
+               diperbarui_pada = NOW()
+           WHERE id = $2`,
+          [Number(data.total_hari_cuti), data.pengguna_id]
+        );
+      }
+
+      await klien.query(
+        `INSERT INTO notifikasi (pengguna_id, judul, pesan, tautan)
+         VALUES ($1, $2, $3, $4)`,
+        [
+          data.pengguna_id,
+          "Pengajuan Cuti Ditolak HRD",
+          `Pengajuan ${data.nomor_pengajuan} ditolak HRD dengan alasan: ${catatan}`,
+          "/pengajuan-cuti",
+        ]
+      );
+
+      return { nomor: data.nomor_pengajuan, aksi: "ditolak final" };
+    });
+
+    revalidatePath("/persetujuan-hrd");
+    revalidatePath("/verifikasi-divisi");
+    revalidatePath("/pengajuan-cuti");
+    revalidatePath("/riwayat-cuti");
+    revalidatePath("/dasbor");
+    revalidatePath("/profil");
+
+    return {
+      sukses: true,
+      pesan: `Pengajuan ${info.nomor} berhasil ${info.aksi}.`,
+    };
+  } catch (galat) {
+    return {
+      sukses: false,
+      pesan: galat.message || "Gagal memproses persetujuan HRD.",
+    };
+  }
+}
+
+export async function setujuiBanyakCutiHrd(daftarPengajuanId, catatanHrd) {
+  const sesi = await wajibSesiPengguna(["hrd"]);
+  const catatan = String(catatanHrd || "").trim();
+  const ids = (daftarPengajuanId || []).map(Number).filter(Boolean);
+
+  if (ids.length === 0) {
+    return {
+      sukses: false,
+      pesan: "Pilih minimal satu pengajuan cuti untuk disetujui massal.",
+    };
+  }
+
+  try {
+    const jumlahDisetujui = await jalankanTransaksi(async (klien) => {
+      const hasil = await klien.query(
+        `SELECT pc.id, pc.nomor_pengajuan, pc.pengguna_id, pc.status, p.peran
+         FROM pengajuan_cuti pc
+         JOIN pengguna p ON p.id = pc.pengguna_id
+         WHERE pc.id = ANY($1::int[]) FOR UPDATE OF pc`,
+        [ids]
+      );
+
+      let total = 0;
+      for (const data of hasil.rows) {
+        const layak =
+          (data.peran === "karyawan" &&
+            data.status === "Approved by Leader") ||
+          (data.peran === "ketua_divisi" && data.status === "Pending");
+        if (!layak) continue;
+
+        await klien.query(
+          `UPDATE pengajuan_cuti
+           SET status = 'Approved by HRD',
+               hrd_approver_id = $1,
+               catatan_hrd = $2,
+               waktu_verifikasi_hrd = NOW(),
+               diperbarui_pada = NOW()
+           WHERE id = $3`,
+          [sesi.id, catatan || "Disetujui secara massal oleh HRD.", data.id]
+        );
+
+        await klien.query(
+          `INSERT INTO notifikasi (pengguna_id, judul, pesan, tautan)
+           VALUES ($1, $2, $3, $4)`,
+          [
+            data.pengguna_id,
+            "Pengajuan Cuti Disetujui HRD",
+            `Pengajuan ${data.nomor_pengajuan} telah disetujui HRD. Surat cuti PDF sudah dapat diunduh.`,
+            "/riwayat-cuti",
+          ]
+        );
+        total += 1;
+      }
+
+      return total;
+    });
+
+    revalidatePath("/persetujuan-hrd");
+    revalidatePath("/riwayat-cuti");
+    revalidatePath("/dasbor");
+    revalidatePath("/pengajuan-cuti");
+
+    return {
+      sukses: true,
+      pesan: `${jumlahDisetujui} pengajuan cuti berhasil disetujui sekaligus.`,
+    };
+  } catch (galat) {
+    return {
+      sukses: false,
+      pesan: galat.message || "Gagal memproses persetujuan massal.",
+    };
+  }
+}
