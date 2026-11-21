@@ -91,6 +91,9 @@ export async function ambilDaftarDivisi(filter = {}) {
 export async function ambilDetailDivisi(divisiId) {
   await wajibSesiPengguna(["admin"]);
   const id = Number(divisiId);
+  if (!Number.isInteger(id) || id <= 0) {
+    return null;
+  }
 
   const [hasilDivisi, hasilAnggota, hasilKandidatAnggota] = await Promise.all([
     jalankanKueri(
