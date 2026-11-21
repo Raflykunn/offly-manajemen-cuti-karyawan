@@ -101,8 +101,8 @@ export default function PengajuanCutiClient({
           }),
         });
         const data = await res.json();
-        if (!dibatalkan && data?.sukses) {
-          aturSimulasi(data.simulasi);
+        if (!dibatalkan) {
+          aturSimulasi(data?.sukses ? data.simulasi : null);
         }
       } catch {
       } finally {
@@ -289,9 +289,12 @@ export default function PengajuanCutiClient({
                     type="date"
                     value={tanggalMulai}
                     onChange={(e) => {
-                      aturTanggalMulai(e.target.value);
-                      if (!tanggalSelesai || e.target.value > tanggalSelesai) {
-                        aturTanggalSelesai(e.target.value);
+                      const nilaiBaru = e.target.value;
+                      aturTanggalMulai(nilaiBaru);
+                      if (!tanggalSelesai || nilaiBaru > tanggalSelesai) {
+                        aturTanggalSelesai(nilaiBaru);
+                      } else if (nilaiBaru !== tanggalSelesai) {
+                        aturOpsiSetengahHari(false);
                       }
                     }}
                     required
