@@ -38,6 +38,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
+import DialogKonfirmasi from "@/components/tata-letak/DialogKonfirmasi";
 
 function formatLabelBatasHari(batas) {
   const angka = Number(batas);
@@ -53,6 +54,7 @@ export default function KelolaJenisCutiClient({ daftarJenisCuti }) {
 
   const [modalTambah, aturModalTambah] = useState(false);
   const [jenisDiedit, aturJenisDiedit] = useState(null);
+  const [jenisDihapus, aturJenisDihapus] = useState(null);
 
   const [wajibLampiran, aturWajibLampiran] = useState(false);
   const [potongKuota, aturPotongKuota] = useState(false);
@@ -100,10 +102,12 @@ export default function KelolaJenisCutiClient({ daftarJenisCuti }) {
     });
   }
 
-  function tanganiHapus(id) {
+  function tanganiHapus() {
+    if (!jenisDihapus) return;
     mulaiTransisi(async () => {
-      const hasil = await hapusJenisCuti(id);
+      const hasil = await hapusJenisCuti(jenisDihapus.id);
       aturPesanBanner(hasil);
+      aturJenisDihapus(null);
       if (hasil.sukses) {
         router.refresh();
       }
@@ -217,7 +221,7 @@ export default function KelolaJenisCutiClient({ daftarJenisCuti }) {
                       size="icon-sm"
                       variant="destructive"
                       disabled={sedangProses}
-                      onClick={() => tanganiHapus(item.id)}
+                      onClick={() => aturJenisDihapus(item)}
                       aria-label="Hapus jenis cuti"
                     >
                       <Trash2 className="size-3.5" />
@@ -453,6 +457,16 @@ export default function KelolaJenisCutiClient({ daftarJenisCuti }) {
           )}
         </DialogContent>
       </Dialog>
+
+      <DialogKonfirmasi
+        terbuka={Boolean(jenisDihapus)}
+        saatUbahTerbuka={(terbuka) => !terbuka && aturJenisDihapus(null)}
+        judul="Hapus Jenis Cuti?"
+        deskripsi={`Jenis cuti "${jenisDihapus?.nama_cuti}" akan dihapus permanen dari daftar kebijakan perusahaan.`}
+        labelKonfirmasi="Hapus Jenis Cuti"
+        sedangMemproses={sedangProses}
+        saatKonfirmasi={tanganiHapus}
+      />
     </div>
   );
 }

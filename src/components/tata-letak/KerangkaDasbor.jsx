@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Menu, CalendarDays } from "lucide-react";
+import { Menu, CalendarDays, Clock } from "lucide-react";
 import { formatAngkaKuota, labelPeranPengguna } from "@/lib/kalkulasi-cuti";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +19,35 @@ function ambilInisialNama(nama) {
     .slice(0, 2)
     .map((bagian) => bagian[0]?.toUpperCase() || "")
     .join("");
+}
+
+function JamNavbar() {
+  const [waktuTeks, aturWaktuTeks] = useState("");
+
+  useEffect(() => {
+    const pemformat = new Intl.DateTimeFormat("id-ID", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    });
+    const perbarui = () => aturWaktuTeks(pemformat.format(new Date()));
+    perbarui();
+    const pengatur = setInterval(perbarui, 1000);
+    return () => clearInterval(pengatur);
+  }, []);
+
+  if (!waktuTeks) return null;
+
+  return (
+    <span
+      aria-label="Waktu saat ini"
+      className="hidden md:inline-flex items-center gap-1.5 rounded-md border bg-muted/40 px-2.5 h-8 text-xs font-mono tabular-nums text-muted-foreground"
+    >
+      <Clock className="size-3.5 text-primary" aria-hidden="true" />
+      {waktuTeks}
+    </span>
+  );
 }
 
 export default function KerangkaDasbor({
@@ -88,6 +117,8 @@ export default function KerangkaDasbor({
                 </span>
               </Badge>
             )}
+
+            <JamNavbar />
 
             <LoncengNotifikasi
               notifikasi={notifikasi}

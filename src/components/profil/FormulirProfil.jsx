@@ -78,7 +78,7 @@ export default function FormulirProfil({ pengguna }) {
         <div className="lg:col-span-4 space-y-6">
           <Card>
             <CardHeader className="items-center text-center pb-3">
-              <Avatar className="size-20 border-2 border-primary/30">
+              <Avatar className="size-20 mx-auto border-2 border-primary/30">
                 {pratinjauFoto && (
                   <AvatarImage src={pratinjauFoto} alt={pengguna.nama_lengkap} />
                 )}

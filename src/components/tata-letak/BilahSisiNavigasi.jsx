@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useTransition } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -18,10 +19,9 @@ import {
 } from "lucide-react";
 import { keluarAkun } from "@/actions/autentikasi-aksi";
 import { gabungKelas } from "@/lib/utils";
-import { labelPeranPengguna } from "@/lib/kalkulasi-cuti";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import DialogKonfirmasi from "./DialogKonfirmasi";
 
 function dapatkanDaftarMenu(peran) {
   const menuDasar = [
@@ -71,32 +71,26 @@ function dapatkanDaftarMenu(peran) {
 export default function BilahSisiNavigasi({ pengguna, saatPilihMenu }) {
   const lokasi = usePathname();
   const daftarMenu = dapatkanDaftarMenu(pengguna?.peran);
+  const [konfirmasiKeluar, aturKonfirmasiKeluar] = useState(false);
+  const [sedangKeluar, mulaiTransisiKeluar] = useTransition();
+
+  function tanganiKonfirmasiKeluar() {
+    mulaiTransisiKeluar(async () => {
+      await keluarAkun();
+    });
+  }
 
   return (
     <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
       <div className="flex items-center gap-3 px-4 py-5 border-b border-sidebar-border">
         <div className="size-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center shadow-xs">
-          <CalendarCheck2 className="size-5" />
+          <CalendarCheck2 className="size-5" aria-hidden="true" />
         </div>
         <div className="min-w-0">
           <p className="text-base font-bold tracking-tight truncate">Offly</p>
           <p className="text-[11px] text-muted-foreground truncate">
             Manajemen Cuti Karyawan
           </p>
-        </div>
-      </div>
-
-      <div className="px-4 py-3 border-b border-sidebar-border bg-sidebar-accent/40">
-        <p className="text-xs font-semibold truncate">{pengguna?.nama_lengkap}</p>
-        <div className="flex items-center gap-1.5 mt-1">
-          <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 bg-primary/15 text-accent-foreground">
-            {labelPeranPengguna(pengguna?.peran)}
-          </Badge>
-          {pengguna?.nama_divisi && (
-            <span className="text-[11px] text-muted-foreground truncate">
-              {pengguna.nama_divisi}
-            </span>
-          )}
         </div>
       </div>
 
@@ -129,17 +123,26 @@ export default function BilahSisiNavigasi({ pengguna, saatPilihMenu }) {
       <Separator />
 
       <div className="p-3">
-        <form action={keluarAkun}>
-          <Button
-            type="submit"
-            variant="ghost"
-            className="w-full justify-start text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-          >
-            <LogOut className="size-4 mr-2" />
-            Keluar Akun
-          </Button>
-        </form>
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={() => aturKonfirmasiKeluar(true)}
+          className="w-full justify-start text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+        >
+          <LogOut className="size-4 mr-2" aria-hidden="true" />
+          Keluar Akun
+        </Button>
       </div>
+
+      <DialogKonfirmasi
+        terbuka={konfirmasiKeluar}
+        saatUbahTerbuka={aturKonfirmasiKeluar}
+        judul="Keluar dari Offly?"
+        deskripsi="Sesi Anda akan diakhiri dan Anda perlu masuk kembali untuk mengakses dasbor."
+        labelKonfirmasi="Ya, Keluar"
+        sedangMemproses={sedangKeluar}
+        saatKonfirmasi={tanganiKonfirmasiKeluar}
+      />
     </div>
   );
 }

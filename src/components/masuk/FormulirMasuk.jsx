@@ -45,7 +45,7 @@ export default function FormulirMasuk() {
   const [identitas, aturIdentitas] = useState("");
   const [kataSandi, aturKataSandi] = useState("");
   const [tampilkanSandi, aturTampilkanSandi] = useState(false);
-  const [ingatSaya, aturIngatSaya] = useState(true);
+  const [ingatSaya, aturIngatSaya] = useState(false);
 
   function isiAkunDemo(akun) {
     aturIdentitas(akun.identitas);

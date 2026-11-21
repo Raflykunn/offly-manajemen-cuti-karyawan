@@ -49,6 +49,7 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import DialogKonfirmasi from "@/components/tata-letak/DialogKonfirmasi";
 
 export default function KelolaKalenderClient({
   hariLibur,
@@ -59,6 +60,7 @@ export default function KelolaKalenderClient({
   const [sedangProses, mulaiTransisi] = useTransition();
   const [pesanBanner, aturPesanBanner] = useState(null);
   const [jenisLibur, aturJenisLibur] = useState("Libur Nasional");
+  const [targetHapus, aturTargetHapus] = useState(null);
   const [nilaiKapasitas, aturNilaiKapasitas] = useState(() => {
     const awal = {};
     for (const d of daftarDivisi) {
@@ -81,10 +83,15 @@ export default function KelolaKalenderClient({
     });
   }
 
-  function tanganiHapusLibur(id) {
+  function tanganiKonfirmasiHapus() {
+    if (!targetHapus) return;
     mulaiTransisi(async () => {
-      const hasil = await hapusHariLibur(id);
+      const hasil =
+        targetHapus.jenis === "libur"
+          ? await hapusHariLibur(targetHapus.id)
+          : await hapusPeriodeBlackout(targetHapus.id);
       aturPesanBanner(hasil);
+      aturTargetHapus(null);
       router.refresh();
     });
   }
@@ -106,14 +113,6 @@ export default function KelolaKalenderClient({
   function tanganiToggleBlackout(id, statusSaatIni) {
     mulaiTransisi(async () => {
       const hasil = await ubahStatusBlackout(id, !statusSaatIni);
-      aturPesanBanner(hasil);
-      router.refresh();
-    });
-  }
-
-  function tanganiHapusBlackout(id) {
-    mulaiTransisi(async () => {
-      const hasil = await hapusPeriodeBlackout(id);
       aturPesanBanner(hasil);
       router.refresh();
     });
@@ -252,7 +251,13 @@ export default function KelolaKalenderClient({
                             size="icon-sm"
                             variant="destructive"
                             disabled={sedangProses}
-                            onClick={() => tanganiHapusLibur(item.id)}
+                            onClick={() =>
+                              aturTargetHapus({
+                                jenis: "libur",
+                                id: item.id,
+                                label: item.nama_libur,
+                              })
+                            }
                           >
                             <Trash2 className="size-3.5" />
                           </Button>
@@ -380,7 +385,13 @@ export default function KelolaKalenderClient({
                             size="icon-sm"
                             variant="destructive"
                             disabled={sedangProses}
-                            onClick={() => tanganiHapusBlackout(item.id)}
+                            onClick={() =>
+                              aturTargetHapus({
+                                jenis: "blackout",
+                                id: item.id,
+                                label: item.judul || "periode blackout ini",
+                              })
+                            }
                           >
                             <Trash2 className="size-3.5" />
                           </Button>
@@ -460,6 +471,20 @@ export default function KelolaKalenderClient({
           </Card>
         </TabsContent>
       </Tabs>
+
+      <DialogKonfirmasi
+        terbuka={Boolean(targetHapus)}
+        saatUbahTerbuka={(terbuka) => !terbuka && aturTargetHapus(null)}
+        judul={
+          targetHapus?.jenis === "libur"
+            ? "Hapus Hari Libur?"
+            : "Hapus Periode Blackout?"
+        }
+        deskripsi={`Data "${targetHapus?.label}" akan dihapus dari pengaturan kalender perusahaan.`}
+        labelKonfirmasi="Ya, Hapus"
+        sedangMemproses={sedangProses}
+        saatKonfirmasi={tanganiKonfirmasiHapus}
+      />
     </div>
   );
 }

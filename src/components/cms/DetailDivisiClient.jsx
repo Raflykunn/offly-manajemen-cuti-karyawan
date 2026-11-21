@@ -22,6 +22,7 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import DialogKonfirmasi from "@/components/tata-letak/DialogKonfirmasi";
 import {
   Card,
   CardContent,
@@ -56,6 +57,7 @@ export default function DetailDivisiClient({
     kandidatAnggota[0] ? String(kandidatAnggota[0].id) : ""
   );
   const [pesanBanner, aturPesanBanner] = useState(null);
+  const [anggotaDikeluarkan, aturAnggotaDikeluarkan] = useState(null);
 
   const petaKandidat = useMemo(() => {
     const peta = new Map();
@@ -82,10 +84,12 @@ export default function DetailDivisiClient({
     });
   }
 
-  function tanganiKeluarkanAnggota(penggunaId) {
+  function tanganiKeluarkanAnggota() {
+    if (!anggotaDikeluarkan) return;
     mulaiTransisi(async () => {
-      const hasil = await keluarkanAnggotaDivisi(divisi.id, penggunaId);
+      const hasil = await keluarkanAnggotaDivisi(divisi.id, anggotaDikeluarkan.id);
       aturPesanBanner(hasil);
+      aturAnggotaDikeluarkan(null);
       if (hasil.sukses) {
         router.refresh();
       }
@@ -270,7 +274,7 @@ export default function DetailDivisiClient({
                           size="sm"
                           variant="outline"
                           disabled={sedangMemproses}
-                          onClick={() => tanganiKeluarkanAnggota(item.id)}
+                          onClick={() => aturAnggotaDikeluarkan(item)}
                         >
                           <UserMinus className="size-3.5 mr-1 text-destructive" />
                           Keluarkan
@@ -284,6 +288,16 @@ export default function DetailDivisiClient({
           )}
         </CardContent>
       </Card>
+
+      <DialogKonfirmasi
+        terbuka={Boolean(anggotaDikeluarkan)}
+        saatUbahTerbuka={(terbuka) => !terbuka && aturAnggotaDikeluarkan(null)}
+        judul="Keluarkan Anggota dari Divisi?"
+        deskripsi={`${anggotaDikeluarkan?.nama_lengkap} akan dilepas dari divisi ${divisi.nama_divisi} tanpa menghapus akunnya.`}
+        labelKonfirmasi="Keluarkan Anggota"
+        sedangMemproses={sedangMemproses}
+        saatKonfirmasi={tanganiKeluarkanAnggota}
+      />
     </div>
   );
 }
