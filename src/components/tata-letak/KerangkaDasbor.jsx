@@ -25,13 +25,24 @@ function JamNavbar() {
   const [waktuTeks, aturWaktuTeks] = useState("");
 
   useEffect(() => {
-    const pemformat = new Intl.DateTimeFormat("id-ID", {
+    const formatTanggal = new Intl.DateTimeFormat("id-ID", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+    const formatJam = new Intl.DateTimeFormat("id-ID", {
       hour: "2-digit",
       minute: "2-digit",
       second: "2-digit",
       hour12: false,
     });
-    const perbarui = () => aturWaktuTeks(pemformat.format(new Date()));
+    const perbarui = () => {
+      const sekarang = new Date();
+      aturWaktuTeks(
+        `${formatTanggal.format(sekarang)} ${formatJam.format(sekarang).replaceAll(".", ":")}`
+      );
+    };
     perbarui();
     const pengatur = setInterval(perbarui, 1000);
     return () => clearInterval(pengatur);
@@ -42,9 +53,9 @@ function JamNavbar() {
   return (
     <span
       aria-label="Waktu saat ini"
-      className="hidden md:inline-flex items-center gap-1.5 rounded-md border bg-muted/40 px-2.5 h-8 text-xs font-mono tabular-nums text-muted-foreground"
+      className="hidden xl:inline-flex items-center gap-1.5 rounded-md border bg-muted/40 px-2.5 h-8 text-xs font-mono tabular-nums text-muted-foreground whitespace-nowrap"
     >
-      <Clock className="size-3.5 text-primary" aria-hidden="true" />
+      <Clock className="size-3.5 text-primary shrink-0" aria-hidden="true" />
       {waktuTeks}
     </span>
   );
