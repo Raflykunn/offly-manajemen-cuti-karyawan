@@ -11,7 +11,7 @@ import DasborKaryawan from "@/components/dasbor/DasborKaryawan";
 import DasborKetuaDivisi from "@/components/dasbor/DasborKetuaDivisi";
 
 export const metadata = {
-  title: "Dasbor — Offly",
+  title: "Dasbor | Offly",
 };
 
 export default async function HalamanDasbor() {

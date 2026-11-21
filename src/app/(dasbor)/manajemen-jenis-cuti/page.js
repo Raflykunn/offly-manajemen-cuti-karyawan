@@ -3,7 +3,7 @@ import { wajibSesiPengguna } from "@/lib/autentikasi";
 import KelolaJenisCutiClient from "@/components/cms/KelolaJenisCutiClient";
 
 export const metadata = {
-  title: "Jenis Cuti Dinamis — Offly",
+  title: "Jenis Cuti Dinamis | Offly",
 };
 
 export default async function HalamanManajemenJenisCuti() {

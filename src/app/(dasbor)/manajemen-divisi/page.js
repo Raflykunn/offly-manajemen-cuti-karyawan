@@ -3,7 +3,7 @@ import { wajibSesiPengguna } from "@/lib/autentikasi";
 import KelolaDivisiClient from "@/components/cms/KelolaDivisiClient";
 
 export const metadata = {
-  title: "Manajemen Divisi — Offly",
+  title: "Manajemen Divisi | Offly",
 };
 
 export default async function HalamanManajemenDivisi() {

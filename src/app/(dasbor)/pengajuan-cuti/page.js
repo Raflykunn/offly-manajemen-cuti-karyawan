@@ -3,7 +3,7 @@ import { wajibSesiPengguna } from "@/lib/autentikasi";
 import PengajuanCutiClient from "@/components/cuti/PengajuanCutiClient";
 
 export const metadata = {
-  title: "Pengajuan Cuti — Offly",
+  title: "Pengajuan Cuti | Offly",
 };
 
 export default async function HalamanPengajuanCuti() {

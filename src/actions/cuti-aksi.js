@@ -636,7 +636,7 @@ export async function verifikasiCutiKetuaDivisi(
              VALUES ($1, $2, $3, $4)`,
             [
               hrd.id,
-              "Verifikasi Atasan Selesai — Menunggu HRD",
+              "Verifikasi Atasan Selesai - Menunggu HRD",
               `Pengajuan ${data.nomor_pengajuan} atas nama ${data.nama_pemohon} telah disetujui Ketua Divisi.`,
               "/persetujuan-hrd",
             ]

@@ -3,7 +3,7 @@ import { wajibSesiPengguna } from "@/lib/autentikasi";
 import PersetujuanHrdClient from "@/components/cuti/PersetujuanHrdClient";
 
 export const metadata = {
-  title: "Persetujuan Final HRD — Offly",
+  title: "Persetujuan Final HRD | Offly",
 };
 
 export default async function HalamanPersetujuanHrd() {

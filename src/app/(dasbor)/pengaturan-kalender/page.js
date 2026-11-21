@@ -3,7 +3,7 @@ import { wajibSesiPengguna } from "@/lib/autentikasi";
 import KelolaKalenderClient from "@/components/cms/KelolaKalenderClient";
 
 export const metadata = {
-  title: "Kalender & Kapasitas Tim — Offly",
+  title: "Kalender & Kapasitas Tim | Offly",
 };
 
 export default async function HalamanPengaturanKalender() {

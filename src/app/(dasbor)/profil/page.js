@@ -3,7 +3,7 @@ import { ambilProfilLengkap } from "@/actions/pengguna-aksi";
 import FormulirProfil from "@/components/profil/FormulirProfil";
 
 export const metadata = {
-  title: "Profil & Kuota Cuti — Offly",
+  title: "Profil & Kuota Cuti | Offly",
 };
 
 export default async function HalamanProfil() {

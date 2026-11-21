@@ -3,7 +3,7 @@ import { wajibSesiPengguna } from "@/lib/autentikasi";
 import VerifikasiKetuaDivisiClient from "@/components/cuti/VerifikasiKetuaDivisiClient";
 
 export const metadata = {
-  title: "Verifikasi Divisi — Offly",
+  title: "Verifikasi Divisi | Offly",
 };
 
 export default async function HalamanVerifikasiDivisi() {

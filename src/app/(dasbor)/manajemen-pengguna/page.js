@@ -3,7 +3,7 @@ import { wajibSesiPengguna } from "@/lib/autentikasi";
 import KelolaPenggunaClient from "@/components/cms/KelolaPenggunaClient";
 
 export const metadata = {
-  title: "Manajemen Pengguna — Offly",
+  title: "Manajemen Pengguna | Offly",
 };
 
 export default async function HalamanManajemenPengguna() {
