@@ -245,8 +245,8 @@ export default function KelolaPenggunaClient({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
-            <div className="lg:col-span-2 relative">
+          <div className="flex flex-wrap gap-2.5">
+            <div className="flex-1 min-w-[220px] relative">
               <Search className="size-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
               <Input
                 placeholder="Cari nama, email, username..."
@@ -257,7 +257,7 @@ export default function KelolaPenggunaClient({
             </div>
 
             <Select value={filterPeran} onValueChange={aturFilterPeran}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full sm:w-auto">
                 <SelectValue>
                   {(v) =>
                     v === "semua" ? "Semua Peran" : labelPeranPengguna(v)
@@ -274,7 +274,7 @@ export default function KelolaPenggunaClient({
             </Select>
 
             <Select value={filterDivisi} onValueChange={aturFilterDivisi}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full sm:w-auto">
                 <SelectValue>
                   {(v) => {
                     if (v === "semua") return "Semua Divisi";
@@ -295,7 +295,7 @@ export default function KelolaPenggunaClient({
             </Select>
 
             <Select value={filterStatus} onValueChange={aturFilterStatus}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full sm:w-auto">
                 <SelectValue>
                   {(v) =>
                     v === "semua"
@@ -314,7 +314,7 @@ export default function KelolaPenggunaClient({
             </Select>
 
             <Select value={filterMasaKerja} onValueChange={aturFilterMasaKerja}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full sm:w-auto">
                 <SelectValue>
                   {(v) => {
                     if (v === "kurang_1_tahun") return "Masa Kerja < 1 Thn";
@@ -331,7 +331,7 @@ export default function KelolaPenggunaClient({
             </Select>
           </div>
 
-          <div className="flex items-center justify-between gap-2 pt-1">
+          <div className="flex flex-wrap items-center justify-end gap-2 pt-1">
             <span className="text-xs text-muted-foreground">Urutkan berdasarkan:</span>
             <Select value={urutkan} onValueChange={aturUrutkan}>
               <SelectTrigger className="w-56">
