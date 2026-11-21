@@ -1,12 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { Download, Eye, History, Search } from "lucide-react";
+import { useMemo, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { Ban, Download, Eye, History, Search } from "lucide-react";
+import { batalkanPengajuanCuti } from "@/actions/cuti-aksi";
 import {
   formatAngkaKuota,
   formatTanggalIndo,
   labelPeranPengguna,
 } from "@/lib/kalkulasi-cuti";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,7 +19,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -32,6 +44,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Textarea } from "@/components/ui/textarea";
 import LencanaStatusCuti from "./LencanaStatusCuti";
 import ModalDetailCuti from "./ModalDetailCuti";
 
@@ -42,12 +55,33 @@ export default function RiwayatCutiClient({
   daftarJenisCuti,
   daftarDivisi,
 }) {
+  const router = useRouter();
+  const [sedangProses, mulaiTransisi] = useTransition();
   const [cari, aturCari] = useState("");
   const [filterStatus, aturFilterStatus] = useState("semua");
   const [filterJenis, aturFilterJenis] = useState("semua");
   const [filterDivisi, aturFilterDivisi] = useState("semua");
   const [urutkan, aturUrutkan] = useState("terbaru");
   const [detailDipilih, aturDetailDipilih] = useState(null);
+  const [pengajuanDibatalkan, aturPengajuanDibatalkan] = useState(null);
+  const [alasanBatal, aturAlasanBatal] = useState("");
+  const [pesanBanner, aturPesanBanner] = useState(null);
+
+  function tanganiEksekusiBatal() {
+    if (!pengajuanDibatalkan) return;
+    mulaiTransisi(async () => {
+      const hasil = await batalkanPengajuanCuti(
+        pengajuanDibatalkan.id,
+        alasanBatal
+      );
+      aturPesanBanner(hasil);
+      if (hasil.sukses) {
+        aturPengajuanDibatalkan(null);
+        aturAlasanBatal("");
+        router.refresh();
+      }
+    });
+  }
 
   const petaJenis = useMemo(() => {
     const peta = new Map();
@@ -119,6 +153,19 @@ export default function RiwayatCutiClient({
               : "Riwayat pengajuan cuti pribadi serta penugasan sebagai rekan pengganti."}
         </p>
       </div>
+
+      {pesanBanner && (
+        <Alert
+          variant={pesanBanner.sukses ? "default" : "destructive"}
+          className={
+            pesanBanner.sukses
+              ? "border-emerald-300 bg-emerald-50 text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-200"
+              : ""
+          }
+        >
+          <AlertDescription>{pesanBanner.pesan}</AlertDescription>
+        </Alert>
+      )}
 
       <Card>
         <CardHeader className="pb-4">
@@ -289,6 +336,20 @@ export default function RiwayatCutiClient({
                           <Eye className="size-3.5 mr-1" />
                           Detail
                         </Button>
+                        {item.pengguna_id === sesiPenggunaId &&
+                          item.status === "Pending" && (
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => {
+                                aturAlasanBatal("");
+                                aturPengajuanDibatalkan(item);
+                              }}
+                            >
+                              <Ban className="size-3.5 mr-1" />
+                              Batalkan
+                            </Button>
+                          )}
                         {item.status === "Approved by HRD" && (
                           <Button
                             size="sm"
@@ -320,6 +381,50 @@ export default function RiwayatCutiClient({
         pengajuan={detailDipilih}
         saatTutup={() => aturDetailDipilih(null)}
       />
+
+      <Dialog
+        open={Boolean(pengajuanDibatalkan)}
+        onOpenChange={(terbuka) => !terbuka && aturPengajuanDibatalkan(null)}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Batalkan Pengajuan Cuti</DialogTitle>
+            <DialogDescription>
+              Pengajuan{" "}
+              <span className="font-mono font-semibold text-foreground">
+                {pengajuanDibatalkan?.nomor_pengajuan}
+              </span>{" "}
+              akan dibatalkan dan kuota cuti tahunan Anda akan dikembalikan otomatis.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="alasan_batal">Alasan Pembatalan (Wajib)</Label>
+            <Textarea
+              id="alasan_batal"
+              rows={3}
+              value={alasanBatal}
+              onChange={(e) => aturAlasanBatal(e.target.value)}
+              placeholder="Tuliskan alasan pembatalan cuti"
+              required
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => aturPengajuanDibatalkan(null)}
+            >
+              Tutup
+            </Button>
+            <Button
+              variant="destructive"
+              disabled={sedangProses || !alasanBatal.trim()}
+              onClick={tanganiEksekusiBatal}
+            >
+              {sedangProses ? "Membatalkan..." : "Konfirmasi Batalkan"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

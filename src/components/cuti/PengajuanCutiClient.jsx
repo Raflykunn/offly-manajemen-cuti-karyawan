@@ -1,18 +1,16 @@
 "use client";
 
 import { useEffect, useMemo, useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  Ban,
   CalendarPlus,
-  Download,
-  Eye,
+  History,
   RotateCcw,
   Send,
   Upload,
 } from "lucide-react";
-import { ajukanCutiBaru, batalkanPengajuanCuti } from "@/actions/cuti-aksi";
-import { formatAngkaKuota, formatTanggalIndo } from "@/lib/kalkulasi-cuti";
+import { ajukanCutiBaru } from "@/actions/cuti-aksi";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,14 +22,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -41,24 +31,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
-import LencanaStatusCuti from "./LencanaStatusCuti";
-import ModalDetailCuti from "./ModalDetailCuti";
 import PanelSimulasiWhatIf from "./PanelSimulasiWhatIf";
 
 export default function PengajuanCutiClient({
   pengguna,
   daftarJenisCuti,
   daftarRekanPengganti,
-  daftarPengajuanSaya,
 }) {
   const router = useRouter();
   const [sedangProses, mulaiTransisi] = useTransition();
@@ -77,12 +56,6 @@ export default function PengajuanCutiClient({
 
   const [simulasi, aturSimulasi] = useState(null);
   const [sedangSimulasi, aturSedangSimulasi] = useState(false);
-
-  const [filterStatus, aturFilterStatus] = useState("semua");
-  const [urutkan, aturUrutkan] = useState("terbaru");
-  const [detailDipilih, aturDetailDipilih] = useState(null);
-  const [pengajuanDibatalkan, aturPengajuanDibatalkan] = useState(null);
-  const [alasanBatal, aturAlasanBatal] = useState("");
 
   const jenisAktif = useMemo(
     () => daftarJenisCuti.find((j) => String(j.id) === jenisCutiId) || null,
@@ -200,52 +173,29 @@ export default function PengajuanCutiClient({
     });
   }
 
-  function tanganiEksekusiBatal() {
-    if (!pengajuanDibatalkan) return;
-    mulaiTransisi(async () => {
-      const hasil = await batalkanPengajuanCuti(
-        pengajuanDibatalkan.id,
-        alasanBatal
-      );
-      aturPesanBanner(hasil);
-      if (hasil.sukses) {
-        aturPengajuanDibatalkan(null);
-        aturAlasanBatal("");
-        router.refresh();
-      }
-    });
-  }
-
-  const daftarTersaring = useMemo(() => {
-    const hasil = daftarPengajuanSaya.filter((item) => {
-      if (filterStatus !== "semua" && item.status !== filterStatus) {
-        return false;
-      }
-      return true;
-    });
-    return [...hasil].sort((a, b) => {
-      if (urutkan === "terlama") {
-        return a.tanggal_mulai.localeCompare(b.tanggal_mulai);
-      }
-      if (urutkan === "durasi_terbesar") {
-        return b.total_hari_cuti - a.total_hari_cuti;
-      }
-      return (b.dibuat_pada || "").localeCompare(a.dibuat_pada || "");
-    });
-  }, [daftarPengajuanSaya, filterStatus, urutkan]);
-
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-          <CalendarPlus className="size-6 text-primary" />
-          Pengajuan Cuti
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {pengguna.peran === "ketua_divisi"
-            ? "Sebagai Ketua Divisi, pengajuan cuti Anda dikirim langsung ke HRD."
-            : "Lengkapi formulir di bawah untuk mengajukan cuti melalui persetujuan Ketua Divisi dan HRD."}
-        </p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+            <CalendarPlus className="size-6 text-primary" />
+            Pengajuan Cuti
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {pengguna.peran === "ketua_divisi"
+              ? "Sebagai Ketua Divisi, pengajuan cuti Anda dikirim langsung ke HRD."
+              : "Lengkapi formulir di bawah untuk mengajukan cuti melalui persetujuan Ketua Divisi dan HRD."}
+          </p>
+        </div>
+        <Button
+          nativeButton={false}
+          render={<Link href="/riwayat-cuti" />}
+          variant="outline"
+          size="sm"
+        >
+          <History className="size-4 mr-1.5" />
+          Lihat Riwayat &amp; Surat Cuti
+        </Button>
       </div>
 
       {pesanBanner && (
@@ -499,193 +449,6 @@ export default function PengajuanCutiClient({
           />
         </div>
       </div>
-
-      <Card>
-        <CardHeader className="pb-3 flex flex-wrap flex-row items-center justify-between gap-3">
-          <div>
-            <CardTitle className="text-base">Daftar Pengajuan Cuti Saya</CardTitle>
-            <CardDescription>
-              Pantau status persetujuan, lihat detail timeline, atau batalkan pengajuan yang masih Pending.
-            </CardDescription>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Select value={filterStatus} onValueChange={aturFilterStatus}>
-              <SelectTrigger className="w-44">
-                <SelectValue>
-                  {(v) => (v === "semua" ? "Semua Status" : v)}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="semua">Semua Status</SelectItem>
-                <SelectItem value="Pending">Pending</SelectItem>
-                <SelectItem value="Approved by Leader">
-                  Approved by Leader
-                </SelectItem>
-                <SelectItem value="Approved by HRD">Approved by HRD</SelectItem>
-                <SelectItem value="Rejected by Leader">
-                  Rejected by Leader
-                </SelectItem>
-                <SelectItem value="Rejected by HRD">Rejected by HRD</SelectItem>
-                <SelectItem value="Cancelled">Cancelled</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Select value={urutkan} onValueChange={aturUrutkan}>
-              <SelectTrigger className="w-44">
-                <SelectValue>
-                  {(v) => {
-                    if (v === "terlama") return "Tanggal Mulai Terlama";
-                    if (v === "durasi_terbesar") return "Durasi Terlama";
-                    return "Pengajuan Terbaru";
-                  }}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="terbaru">Pengajuan Terbaru</SelectItem>
-                <SelectItem value="terlama">Tanggal Mulai Terlama</SelectItem>
-                <SelectItem value="durasi_terbesar">Durasi Terlama</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nomor &amp; Jenis</TableHead>
-                <TableHead>Periode</TableHead>
-                <TableHead>Durasi</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Aksi</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {daftarTersaring.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={5}
-                    className="text-center py-8 text-muted-foreground"
-                  >
-                    Belum ada pengajuan cuti yang sesuai filter.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                daftarTersaring.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell>
-                      <div className="font-mono text-xs font-semibold">
-                        {item.nomor_pengajuan}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {item.nama_cuti}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-xs">
-                      {formatTanggalIndo(item.tanggal_mulai)} –{" "}
-                      {formatTanggalIndo(item.tanggal_selesai)}
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {formatAngkaKuota(item.total_hari_cuti)} Hari
-                    </TableCell>
-                    <TableCell>
-                      <LencanaStatusCuti status={item.status} />
-                    </TableCell>
-                    <TableCell className="text-right space-x-1">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => aturDetailDipilih(item)}
-                      >
-                        <Eye className="size-3.5 mr-1" />
-                        Detail
-                      </Button>
-                      {item.status === "Pending" && (
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => {
-                            aturAlasanBatal("");
-                            aturPengajuanDibatalkan(item);
-                          }}
-                        >
-                          <Ban className="size-3.5 mr-1" />
-                          Batalkan
-                        </Button>
-                      )}
-                      {item.status === "Approved by HRD" && (
-                        <Button
-                          size="sm"
-                          variant="default"
-                          nativeButton={false}
-                          render={
-                            <a
-                              href={`/api/cuti/${item.id}/surat`}
-                              target="_blank"
-                              rel="noreferrer"
-                            />
-                          }
-                        >
-                          <Download className="size-3.5 mr-1" />
-                          PDF
-                        </Button>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-
-      <ModalDetailCuti
-        pengajuan={detailDipilih}
-        saatTutup={() => aturDetailDipilih(null)}
-      />
-
-      <Dialog
-        open={Boolean(pengajuanDibatalkan)}
-        onOpenChange={(terbuka) => !terbuka && aturPengajuanDibatalkan(null)}
-      >
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Batalkan Pengajuan Cuti</DialogTitle>
-            <DialogDescription>
-              Pengajuan{" "}
-              <span className="font-mono font-semibold text-foreground">
-                {pengajuanDibatalkan?.nomor_pengajuan}
-              </span>{" "}
-              akan dibatalkan dan kuota cuti tahunan Anda akan dikembalikan otomatis.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-2">
-            <Label htmlFor="alasan_batal">Alasan Pembatalan (Wajib)</Label>
-            <Textarea
-              id="alasan_batal"
-              rows={3}
-              value={alasanBatal}
-              onChange={(e) => aturAlasanBatal(e.target.value)}
-              placeholder="Tuliskan alasan pembatalan cuti"
-              required
-            />
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => aturPengajuanDibatalkan(null)}
-            >
-              Tutup
-            </Button>
-            <Button
-              variant="destructive"
-              disabled={sedangProses || !alasanBatal.trim()}
-              onClick={tanganiEksekusiBatal}
-            >
-              {sedangProses ? "Membatalkan..." : "Konfirmasi Batalkan"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
