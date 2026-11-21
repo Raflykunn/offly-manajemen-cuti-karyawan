@@ -491,7 +491,7 @@ export default function PengajuanCutiClient({
           </CardContent>
         </Card>
 
-        <div className="lg:col-span-5">
+        <div className="lg:col-span-5 lg:sticky lg:top-20 self-start">
           <PanelSimulasiWhatIf
             simulasi={tanggalLengkap ? simulasi : null}
             sedangMemuat={sedangSimulasi}

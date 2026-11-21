@@ -45,17 +45,29 @@ export default function PanelSimulasiWhatIf({
       </CardHeader>
       <CardContent className="space-y-4 text-sm">
         {!simulasi ? (
-          <div className="rounded-lg border bg-background p-4 text-center space-y-2">
-            <CalendarDays className="size-6 text-primary mx-auto" />
-            <p className="text-xs text-muted-foreground">
-              Pilih jenis cuti, tanggal mulai, dan tanggal selesai untuk melihat simulasi kuota &amp; kalender tim secara real-time.
-            </p>
-            <p className="text-sm font-semibold">
-              Sisa Kuota Saat Ini:{" "}
-              <span className="text-primary">
-                {formatAngkaKuota(sisaKuotaAwal)} Hari
-              </span>
-            </p>
+          <div className="space-y-4">
+            <div className="rounded-lg border bg-background p-4 text-center space-y-2">
+              <CalendarDays className="size-6 text-primary mx-auto" />
+              <p className="text-xs text-muted-foreground">
+                Pilih jenis cuti, tanggal mulai, dan tanggal selesai untuk melihat simulasi kuota &amp; kalender tim secara real-time.
+              </p>
+              <p className="text-sm font-semibold">
+                Sisa Kuota Saat Ini:{" "}
+                <span className="text-primary">
+                  {formatAngkaKuota(sisaKuotaAwal)} Hari
+                </span>
+              </p>
+            </div>
+
+            <div className="rounded-lg border bg-background/80 p-4 space-y-2.5 text-xs">
+              <p className="font-semibold text-foreground">Ketentuan Ringkas Pengajuan</p>
+              <ul className="space-y-1.5 text-muted-foreground list-disc pl-4 leading-relaxed">
+                <li>Akhir pekan dan hari libur nasional otomatis dilewati dari hitungan kuota.</li>
+                <li>Cuti setengah hari (0.5) hanya aktif bila tanggal mulai dan selesai sama.</li>
+                <li>Cuti sakit dapat diajukan maksimal H-3 hingga H+3 dari tanggal izin.</li>
+                <li>Pengajuan akan diteruskan berjenjang ke Ketua Divisi dan HRD.</li>
+              </ul>
+            </div>
           </div>
         ) : (
           <>
