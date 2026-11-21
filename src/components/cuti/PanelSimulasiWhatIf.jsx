@@ -65,7 +65,7 @@ export default function PanelSimulasiWhatIf({
                 <li>Akhir pekan dan hari libur nasional otomatis dilewati dari hitungan kuota.</li>
                 <li>Cuti setengah hari (0.5) hanya aktif bila tanggal mulai dan selesai sama.</li>
                 <li>Cuti sakit dapat diajukan maksimal H-3 hingga H+3 dari tanggal izin.</li>
-                <li>Pengajuan akan diteruskan berjenjang ke Ketua Divisi dan HRD.</li>
+                <li>Pengajuan akan diteruskan ke Ketua Divisi dan/atau HRD sesuai peran pemohon.</li>
               </ul>
             </div>
           </div>

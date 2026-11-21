@@ -42,7 +42,7 @@ export async function GET(_request, context) {
 
   const { id } = await context.params;
   const pengajuanId = Number(id);
-  if (!pengajuanId) {
+  if (!Number.isInteger(pengajuanId) || pengajuanId <= 0) {
     return NextResponse.json(
       { sukses: false, pesan: "ID pengajuan tidak valid." },
       { status: 400 }
