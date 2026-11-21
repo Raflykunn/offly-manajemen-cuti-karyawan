@@ -424,6 +424,13 @@ export default function PengajuanCutiClient({
 
               <div className="flex flex-wrap items-center justify-end gap-2 pt-2">
                 <Button
+                  nativeButton={false}
+                  render={<Link href="/dasbor" />}
+                  variant="ghost"
+                >
+                  Batal
+                </Button>
+                <Button
                   type="button"
                   variant="outline"
                   onClick={(e) => resetFormulir(e.currentTarget.form)}
