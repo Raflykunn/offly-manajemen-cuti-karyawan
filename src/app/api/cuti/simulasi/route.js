@@ -31,6 +31,16 @@ export async function POST(request) {
       );
     }
 
+    if (tanggalSelesai < tanggalMulai) {
+      return NextResponse.json(
+        {
+          sukses: false,
+          pesan: "Tanggal selesai harus sama dengan atau setelah tanggal mulai.",
+        },
+        { status: 400 }
+      );
+    }
+
     const [
       hasilPengguna,
       hasilJenisCuti,

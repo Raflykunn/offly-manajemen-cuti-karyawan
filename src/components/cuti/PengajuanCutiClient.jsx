@@ -78,7 +78,9 @@ export default function PengajuanCutiClient({
     return peta;
   }, [daftarRekanPengganti]);
 
-  const tanggalLengkap = Boolean(jenisCutiId && tanggalMulai && tanggalSelesai);
+  const tanggalLengkap = Boolean(
+    jenisCutiId && tanggalMulai && tanggalSelesai && tanggalSelesai >= tanggalMulai
+  );
 
   useEffect(() => {
     if (!tanggalLengkap) {
