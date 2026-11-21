@@ -129,6 +129,9 @@ export default function RiwayatCutiClient({
     });
 
     return [...hasil].sort((a, b) => {
+      if (urutkan === "terlama") {
+        return (a.dibuat_pada || "").localeCompare(b.dibuat_pada || "");
+      }
       if (urutkan === "mulai_terawal") {
         return a.tanggal_mulai.localeCompare(b.tanggal_mulai);
       }
@@ -182,8 +185,8 @@ export default function RiwayatCutiClient({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-            <div className="relative">
+          <div className="flex flex-wrap gap-2.5">
+            <div className="w-full sm:flex-1 sm:min-w-[220px] relative">
               <Search className="size-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
               <Input
                 placeholder="Cari nomor, nama, alasan..."
@@ -194,7 +197,7 @@ export default function RiwayatCutiClient({
             </div>
 
             <Select value={filterStatus} onValueChange={aturFilterStatus}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full sm:w-auto">
                 <SelectValue>
                   {(v) => (v === "semua" ? "Semua Status" : v)}
                 </SelectValue>
@@ -215,7 +218,7 @@ export default function RiwayatCutiClient({
             </Select>
 
             <Select value={filterJenis} onValueChange={aturFilterJenis}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full sm:w-auto">
                 <SelectValue>
                   {(v) =>
                     v === "semua"
@@ -236,7 +239,7 @@ export default function RiwayatCutiClient({
 
             {(sesiPeran === "admin" || sesiPeran === "hrd") && (
               <Select value={filterDivisi} onValueChange={aturFilterDivisi}>
-                <SelectTrigger className="w-full">
+                <SelectTrigger className="w-full sm:w-auto">
                   <SelectValue>
                     {(v) =>
                       v === "semua"
@@ -257,19 +260,21 @@ export default function RiwayatCutiClient({
             )}
 
             <Select value={urutkan} onValueChange={aturUrutkan}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full sm:w-auto md:hidden">
                 <SelectValue>
                   {(v) => {
-                    if (v === "mulai_terawal") return "Tanggal Mulai Terawal";
-                    if (v === "mulai_terakhir") return "Tanggal Mulai Terakhir";
-                    if (v === "durasi_tersingkat") return "Durasi Tersingkat";
-                    if (v === "durasi_terlama") return "Durasi Terlama";
-                    return "Terbaru Diajukan";
+                    if (v === "terlama") return "Urut: Terlama Diajukan";
+                    if (v === "mulai_terawal") return "Urut: Mulai Terawal";
+                    if (v === "mulai_terakhir") return "Urut: Mulai Terakhir";
+                    if (v === "durasi_tersingkat") return "Urut: Durasi Tersingkat";
+                    if (v === "durasi_terlama") return "Urut: Durasi Terlama";
+                    return "Urut: Terbaru Diajukan";
                   }}
                 </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="terbaru">Terbaru Diajukan</SelectItem>
+                <SelectItem value="terlama">Terlama Diajukan</SelectItem>
                 <SelectItem value="mulai_terawal">
                   Tanggal Mulai Terawal
                 </SelectItem>
@@ -287,7 +292,13 @@ export default function RiwayatCutiClient({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nomor &amp; Pemohon</TableHead>
+                <KepalaTabelSortir
+                  label="Nomor & Pemohon"
+                  nilaiAktif={urutkan}
+                  nilaiNaik="terlama"
+                  nilaiTurun="terbaru"
+                  saatUbah={aturUrutkan}
+                />
                 <TableHead>Jenis Cuti</TableHead>
                 <KepalaTabelSortir
                   label="Periode"

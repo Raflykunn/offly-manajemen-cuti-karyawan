@@ -331,7 +331,7 @@ export default function KelolaPenggunaClient({
             </Select>
 
             <Select value={urutkan} onValueChange={aturUrutkan}>
-              <SelectTrigger className="w-full sm:w-auto">
+              <SelectTrigger className="w-full sm:w-auto md:hidden">
                 <SelectValue>
                   {(v) => {
                     const label = {

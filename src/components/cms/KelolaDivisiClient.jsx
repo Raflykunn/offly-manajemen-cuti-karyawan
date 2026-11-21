@@ -242,8 +242,8 @@ export default function KelolaDivisiClient({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <div className="relative">
+          <div className="flex flex-wrap gap-2.5">
+            <div className="w-full sm:flex-1 sm:min-w-[220px] relative">
               <Search className="size-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
               <Input
                 placeholder="Cari nama divisi atau ketua..."
@@ -254,7 +254,7 @@ export default function KelolaDivisiClient({
             </div>
 
             <Select value={filterKetua} onValueChange={aturFilterKetua}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full sm:w-auto">
                 <SelectValue>
                   {(v) =>
                     v === "semua"
@@ -274,7 +274,7 @@ export default function KelolaDivisiClient({
             </Select>
 
             <Select value={filterAnggota} onValueChange={aturFilterAnggota}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full sm:w-auto">
                 <SelectValue>
                   {(v) => {
                     if (v === "kosong") return "0 Anggota";
@@ -293,18 +293,18 @@ export default function KelolaDivisiClient({
             </Select>
 
             <Select value={urutkan} onValueChange={aturUrutkan}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full sm:w-auto md:hidden">
                 <SelectValue>
                   {(v) => {
                     const label = {
-                      nama_asc: "Nama Divisi (A–Z)",
-                      nama_desc: "Nama Divisi (Z–A)",
-                      anggota_banyak: "Anggota Terbanyak",
-                      anggota_sedikit: "Anggota Tersedikit",
-                      tgl_baru: "Dibentuk Terbaru",
-                      tgl_lama: "Dibentuk Terlama",
+                      nama_asc: "Urut: Nama Divisi (A–Z)",
+                      nama_desc: "Urut: Nama Divisi (Z–A)",
+                      anggota_banyak: "Urut: Anggota Terbanyak",
+                      anggota_sedikit: "Urut: Anggota Tersedikit",
+                      tgl_baru: "Urut: Dibentuk Terbaru",
+                      tgl_lama: "Urut: Dibentuk Terlama",
                     };
-                    return label[v] || "Nama Divisi (A–Z)";
+                    return label[v] || "Urut: Nama Divisi (A–Z)";
                   }}
                 </SelectValue>
               </SelectTrigger>
