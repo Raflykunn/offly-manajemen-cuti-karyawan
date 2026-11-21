@@ -31,6 +31,10 @@ export default function TombolTema() {
   function gantiTema() {
     const berikutnya = !modeGelap;
     document.documentElement.classList.toggle("dark", berikutnya);
+    const metaSkema = document.querySelector('meta[name="color-scheme"]');
+    if (metaSkema) {
+      metaSkema.setAttribute("content", berikutnya ? "dark" : "light");
+    }
     try {
       localStorage.setItem("offly-tema", berikutnya ? "dark" : "light");
     } catch {}

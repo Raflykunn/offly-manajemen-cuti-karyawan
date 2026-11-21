@@ -185,6 +185,15 @@
 }
 
 @layer base {
+  :root {
+    color-scheme: light dark;
+  }
+  :root:has(> head > meta[name="color-scheme"][content="dark"]) {
+    color-scheme: dark;
+  }
+  :root:has(> head > meta[name="color-scheme"][content="light"]) {
+    color-scheme: light;
+  }
   * {
     @apply border-border outline-ring/50;
   }
@@ -194,5 +203,26 @@
   }
   html {
     @apply font-sans;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports ((animation-timeline: view()) and (animation-range: entry)) {
+    @keyframes ungkapMasukGulir {
+      from {
+        opacity: 0;
+        translate: 0 1.25rem;
+      }
+      to {
+        opacity: 1;
+        translate: 0 0;
+      }
+    }
+
+    .ungkap-gulir {
+      animation: ungkapMasukGulir linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 25%;
+    }
   }
 }

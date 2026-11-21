@@ -19,6 +19,7 @@ import { jalankanKueri } from "@/lib/db";
 import { formatTanggalIndo, labelPeranPengguna } from "@/lib/kalkulasi-cuti";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import TombolTema from "@/components/tata-letak/TombolTema";
 
 async function ambilDataPublikBeranda() {
   try {
@@ -84,7 +85,7 @@ export default async function HalamanUtama() {
   const { daftarJenisCuti, daftarHariLibur, ringkasan } = dataPublik;
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary/25">
+    <div className="min-h-dvh flex flex-col bg-background text-foreground selection:bg-primary/25">
       <div className="border-b bg-muted/50 text-[11px] font-mono text-muted-foreground">
         <div className="max-w-6xl mx-auto px-4 md:px-6 h-8 flex items-center justify-between gap-4 overflow-x-auto whitespace-nowrap">
           <div className="flex items-center gap-4">
@@ -157,6 +158,7 @@ export default async function HalamanUtama() {
                 Masuk
               </Button>
             )}
+            <TombolTema />
           </div>
         </div>
       </header>
@@ -170,9 +172,9 @@ export default async function HalamanUtama() {
                 Portal Informasi &amp; Pengajuan Cuti Terpadu
               </div>
 
-              <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-[1.06]">
+              <h1 className="text-[clamp(2.15rem,1.4rem+3vw,3.75rem)] font-bold tracking-tight leading-[1.06]">
                 Cuti tanpa drama.{" "}
-                <span className="inline-block bg-primary/20 text-foreground px-2 rounded-md border-b-2 border-primary">
+                <span className="inline-block bg-primary/20 dark:bg-primary/25 text-foreground dark:text-amber-200 px-2 rounded-md border-b-2 border-primary">
                   Persetujuan
                 </span>{" "}
                 tanpa tunggu.
@@ -273,7 +275,7 @@ export default async function HalamanUtama() {
                   <div className="space-y-2.5 border-y border-dashed py-4">
                     <div className="flex items-center justify-between text-xs">
                       <span className="flex items-center gap-2 font-medium">
-                        <span className="size-5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center">
+                        <span className="size-5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 flex items-center justify-center">
                           <Check className="size-3" />
                         </span>
                         1. Pengajuan Karyawan
@@ -284,7 +286,7 @@ export default async function HalamanUtama() {
                     </div>
                     <div className="flex items-center justify-between text-xs">
                       <span className="flex items-center gap-2 font-medium">
-                        <span className="size-5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center">
+                        <span className="size-5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 flex items-center justify-center">
                           <Check className="size-3" />
                         </span>
                         2. Verifikasi Ketua Divisi
@@ -295,7 +297,7 @@ export default async function HalamanUtama() {
                     </div>
                     <div className="flex items-center justify-between text-xs">
                       <span className="flex items-center gap-2 font-medium">
-                        <span className="size-5 rounded-full bg-primary/20 text-accent-foreground flex items-center justify-center">
+                        <span className="size-5 rounded-full bg-primary/20 text-accent-foreground dark:bg-primary/25 dark:text-amber-300 flex items-center justify-center">
                           <Check className="size-3" />
                         </span>
                         3. Pengesahan Final HRD
@@ -326,7 +328,7 @@ export default async function HalamanUtama() {
         </section>
 
         <section id="alur" className="border-b bg-muted/20">
-          <div className="max-w-6xl mx-auto px-4 md:px-6 py-14 space-y-8">
+          <div className="max-w-6xl mx-auto px-4 md:px-6 py-14 space-y-8 ungkap-gulir">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div className="space-y-1">
                 <p className="text-xs font-mono uppercase tracking-wider text-primary font-semibold">
@@ -342,14 +344,14 @@ export default async function HalamanUtama() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="rounded-xl border bg-card p-6 space-y-5">
+              <div className="@container rounded-xl border bg-card p-6 space-y-5">
                 <div className="flex items-center justify-between">
                   <Badge variant="outline" className="font-mono">
                     ALUR 01 — KARYAWAN
                   </Badge>
                   <span className="text-xs text-muted-foreground">3 Tahap</span>
                 </div>
-                <div className="grid grid-cols-3 gap-2 text-xs">
+                <div className="grid grid-cols-1 @sm:grid-cols-3 gap-2 text-xs">
                   <div className="rounded-lg border bg-muted/30 p-3 space-y-1">
                     <p className="font-mono text-primary font-bold">STEP 1</p>
                     <p className="font-semibold">Karyawan</p>
@@ -364,7 +366,7 @@ export default async function HalamanUtama() {
                       Verifikasi tugas &amp; beban tim
                     </p>
                   </div>
-                  <div className="rounded-lg border bg-accent/50 border-primary/30 p-3 space-y-1">
+                  <div className="rounded-lg border bg-accent/50 dark:bg-accent/40 border-primary/30 p-3 space-y-1">
                     <p className="font-mono text-primary font-bold">STEP 3</p>
                     <p className="font-semibold">HRD Final</p>
                     <p className="text-muted-foreground">
@@ -374,14 +376,14 @@ export default async function HalamanUtama() {
                 </div>
               </div>
 
-              <div className="rounded-xl border bg-card p-6 space-y-5">
+              <div className="@container rounded-xl border bg-card p-6 space-y-5">
                 <div className="flex items-center justify-between">
                   <Badge variant="outline" className="font-mono">
                     ALUR 02 — KETUA DIVISI
                   </Badge>
                   <span className="text-xs text-muted-foreground">2 Tahap</span>
                 </div>
-                <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="grid grid-cols-1 @xs:grid-cols-2 gap-3 text-xs">
                   <div className="rounded-lg border bg-muted/30 p-3.5 space-y-1">
                     <p className="font-mono text-primary font-bold">STEP 1</p>
                     <p className="font-semibold text-sm">Ketua Divisi</p>
@@ -389,7 +391,7 @@ export default async function HalamanUtama() {
                       Mengajukan cuti pribadi langsung menuju antrean HRD
                     </p>
                   </div>
-                  <div className="rounded-lg border bg-accent/50 border-primary/30 p-3.5 space-y-1">
+                  <div className="rounded-lg border bg-accent/50 dark:bg-accent/40 border-primary/30 p-3.5 space-y-1">
                     <p className="font-mono text-primary font-bold">STEP 2</p>
                     <p className="font-semibold text-sm">HRD Final</p>
                     <p className="text-muted-foreground">
@@ -404,7 +406,7 @@ export default async function HalamanUtama() {
 
         <section
           id="keunggulan"
-          className="max-w-6xl mx-auto px-4 md:px-6 py-14 space-y-8"
+          className="max-w-6xl mx-auto px-4 md:px-6 py-14 space-y-8 ungkap-gulir"
         >
           <div className="space-y-1">
             <p className="text-xs font-mono uppercase tracking-wider text-primary font-semibold">
@@ -498,8 +500,8 @@ export default async function HalamanUtama() {
         </section>
 
         <section id="kebijakan" className="border-t bg-muted/20">
-          <div className="max-w-6xl mx-auto px-4 md:px-6 py-14 grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div className="lg:col-span-7 space-y-5">
+          <div className="max-w-6xl mx-auto px-4 md:px-6 py-14 grid grid-cols-1 lg:grid-cols-12 gap-8 ungkap-gulir">
+            <div className="@container lg:col-span-7 space-y-5">
               <div>
                 <p className="text-xs font-mono uppercase tracking-wider text-primary font-semibold">
                   03 / KEBIJAKAN PERUSAHAAN
@@ -517,7 +519,7 @@ export default async function HalamanUtama() {
                   Data jenis cuti akan tampil setelah koneksi PostgreSQL aktif.
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 @sm:grid-cols-2 gap-3">
                   {daftarJenisCuti.map((item) => (
                     <div
                       key={item.id}
@@ -582,11 +584,11 @@ export default async function HalamanUtama() {
                         className="flex items-center justify-between gap-3 rounded-lg border bg-muted/20 p-2.5"
                       >
                         <div className="flex items-center gap-3 min-w-0">
-                          <div className="size-11 rounded-lg bg-accent border border-primary/20 flex flex-col items-center justify-center shrink-0 leading-none">
+                          <div className="size-11 rounded-lg bg-accent dark:bg-accent/50 border border-primary/20 flex flex-col items-center justify-center shrink-0 leading-none">
                             <span className="text-sm font-bold font-mono text-foreground">
                               {hari}
                             </span>
-                            <span className="text-[9px] font-mono text-accent-foreground mt-0.5">
+                            <span className="text-[9px] font-mono text-accent-foreground dark:text-amber-300 mt-0.5">
                               {bulan}
                             </span>
                           </div>
@@ -612,7 +614,7 @@ export default async function HalamanUtama() {
           </div>
         </section>
 
-        <section className="max-w-6xl mx-auto px-4 md:px-6 py-12">
+        <section className="max-w-6xl mx-auto px-4 md:px-6 py-12 ungkap-gulir">
           <div className="rounded-2xl border bg-primary text-primary-foreground p-8 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div className="space-y-2 max-w-xl">
               <h2 className="text-2xl md:text-3xl font-bold tracking-tight">

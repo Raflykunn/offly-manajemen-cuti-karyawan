@@ -25,10 +25,11 @@ export default function TataLetakAkar({ children }) {
       className={`${fontInter.variable} ${fontJetbrainsMono.variable} h-full antialiased`}
     >
       <head>
+        <meta name="color-scheme" content="light dark" />
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "try{if(localStorage.getItem('offly-tema')==='dark'){document.documentElement.classList.add('dark')}}catch{}",
+              "try{var t=localStorage.getItem('offly-tema');var m=document.querySelector('meta[name=\"color-scheme\"]');if(t==='dark'){document.documentElement.classList.add('dark');if(m)m.setAttribute('content','dark');}else if(t==='light'){if(m)m.setAttribute('content','light');}}catch{}",
           }}
         />
       </head>
