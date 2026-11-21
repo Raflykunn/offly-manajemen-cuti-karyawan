@@ -4,16 +4,15 @@ import { useEffect, useState } from "react";
 
 const DAFTAR_TAUTAN = [
   { href: "#alur", label: "Alur Cuti" },
-  { href: "#keunggulan", label: "Keunggulan" },
-  { href: "#kebijakan", label: "Kebijakan" },
-  { href: "#kalender", label: "Hari Libur" },
+  { href: "#keunggulan", label: "Fitur" },
+  { href: "#kebijakan", label: "Kebijakan & Libur" },
 ];
 
 export default function NavigasiBeranda() {
   const [bagianAktif, pasangBagianAktif] = useState("");
 
   useEffect(() => {
-    const daftarId = ["alur", "keunggulan", "kebijakan", "kalender"];
+    const daftarId = ["alur", "keunggulan", "kebijakan"];
     const elemenDaftar = daftarId
       .map((id) => document.getElementById(id))
       .filter(Boolean);
@@ -58,7 +57,7 @@ export default function NavigasiBeranda() {
           <a
             key={item.href}
             href={item.href}
-            aria-current={aktif ? "true" : undefined}
+            aria-current={aktif ? "location" : undefined}
             className={`px-3 py-1.5 rounded-full transition-colors ${
               aktif
                 ? "bg-background text-foreground font-semibold shadow-xs"

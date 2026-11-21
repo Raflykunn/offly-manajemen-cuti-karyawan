@@ -1,7 +1,6 @@
 import Link from "next/link";
 import {
   ArrowRight,
-  ArrowUpRight,
   Building2,
   CalendarCheck2,
   CalendarDays,
@@ -11,7 +10,6 @@ import {
   FileText,
   LogIn,
   ShieldAlert,
-  Sparkles,
   Users,
 } from "lucide-react";
 import { ambilSesiPengguna } from "@/lib/autentikasi";
@@ -90,24 +88,8 @@ export default async function HalamanUtama() {
       >
         Lewati ke konten utama
       </a>
-      <div className="border-b bg-muted/50 text-[11px] font-mono text-muted-foreground">
-        <div className="max-w-6xl mx-auto px-4 md:px-6 h-8 flex items-center justify-between gap-4 overflow-x-auto whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <div className="flex items-center gap-4">
-            <span className="inline-flex items-center gap-1.5 text-foreground font-medium">
-              <span className="size-1.5 rounded-full bg-primary" />
-              OFFLY LEAVE ENGINE
-            </span>
-            <span>KUOTA STANDAR: 12 HARI KERJA</span>
-            <span className="hidden sm:inline">PRESISI: 0.5 HARI</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <span>{ringkasan.total_divisi} DIVISI</span>
-            <span>{ringkasan.total_karyawan} PENGGUNA AKTIF</span>
-          </div>
-        </div>
-      </div>
 
-      <header className="sticky top-0 z-30 border-b bg-background/85 backdrop-blur-md supports-[backdrop-filter]:bg-background/80">
+      <header className="sticky top-0 z-30 border-b bg-background/90 backdrop-blur-sm supports-[backdrop-filter]:bg-background/85">
         <div className="max-w-6xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2.5 rounded-lg">
             <div className="size-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center">
@@ -146,21 +128,16 @@ export default async function HalamanUtama() {
         <section className="border-b">
           <div className="max-w-6xl mx-auto px-4 md:px-6 py-12 md:py-20 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
             <div className="lg:col-span-7 space-y-6">
-              <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-accent px-3 py-1 text-xs font-medium text-accent-foreground">
-                <Sparkles className="size-3.5 text-primary" />
-                Portal Informasi &amp; Pengajuan Cuti Terpadu
-              </div>
-
-              <h1 className="judul-seimbang text-[clamp(2.15rem,1.4rem+3vw,3.75rem)] font-bold tracking-tight leading-[1.06]">
-                Cuti tanpa drama.{" "}
-                <span className="inline-block bg-primary/20 dark:bg-primary/25 text-foreground dark:text-amber-200 px-2 rounded-md border-b-2 border-primary">
-                  Persetujuan
-                </span>{" "}
-                tanpa tunggu.
+              <h1 className="judul-seimbang text-[clamp(2.1rem,1.4rem+2.8vw,3.35rem)] font-bold tracking-tight leading-[1.15]">
+                Ajukan dan setujui cuti tim{" "}
+                <span className="text-primary underline decoration-primary/40 decoration-2 underline-offset-4">
+                  tanpa rekap manual
+                </span>
+                .
               </h1>
 
               <p className="paragraf-rapi text-base md:text-lg text-muted-foreground leading-relaxed max-w-xl">
-                Satu portal ringan untuk Karyawan, Ketua Divisi, HRD, dan Admin. Hitung hari kerja otomatis, jaga kapasitas tim, dan terbitkan surat cuti PDF dalam hitungan detik.
+                Portal internal untuk Karyawan, Ketua Divisi, HRD, dan Admin. Hari kerja dan sisa kuota dihitung otomatis, kapasitas tim tetap terjaga, dan surat izin cuti terbit langsung sebagai berkas PDF.
               </p>
 
               <div className="flex flex-wrap items-center gap-3 pt-1">
@@ -179,8 +156,8 @@ export default async function HalamanUtama() {
                     render={<Link href="/masuk" />}
                     size="lg"
                   >
-                    Mulai Masuk ke Akun
-                    <ArrowUpRight className="size-4 ml-1.5" />
+                    <LogIn className="size-4 mr-1.5" />
+                    Masuk ke Akun
                   </Button>
                 )}
                 <Button
@@ -189,14 +166,14 @@ export default async function HalamanUtama() {
                   variant="outline"
                   size="lg"
                 >
-                  Jelajahi Kebijakan Cuti
+                  Lihat Kebijakan Cuti
                 </Button>
               </div>
 
-              <div className="grid grid-cols-3 gap-4 pt-4 border-t max-w-lg tabular-nums">
+              <div className="grid grid-cols-3 gap-4 pt-5 border-t max-w-lg tabular-nums">
                 <div>
                   <p className="text-2xl font-bold font-mono">12</p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-sm text-muted-foreground">
                     Hari Kerja / Tahun
                   </p>
                 </div>
@@ -204,7 +181,7 @@ export default async function HalamanUtama() {
                   <p className="text-2xl font-bold font-mono text-primary">
                     {ringkasan.total_divisi}
                   </p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-sm text-muted-foreground">
                     Divisi Terdaftar
                   </p>
                 </div>
@@ -212,7 +189,7 @@ export default async function HalamanUtama() {
                   <p className="text-2xl font-bold font-mono">
                     {daftarJenisCuti.length}
                   </p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-sm text-muted-foreground">
                     Jenis Cuti Aktif
                   </p>
                 </div>
@@ -221,68 +198,68 @@ export default async function HalamanUtama() {
 
             <div className="lg:col-span-5">
               <div className="rounded-xl border bg-card shadow-md dark:shadow-none ring-1 ring-border/50 overflow-hidden motion-safe:transition-transform motion-safe:duration-200 motion-safe:hover:-translate-y-0.5">
-                <div className="bg-primary px-5 py-4 text-primary-foreground flex items-center justify-between">
+                <div className="bg-primary px-5 py-4 text-primary-foreground flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-[11px] font-mono uppercase tracking-wider opacity-85">
-                      PRATINJAU TIKET CUTI
+                    <p className="text-xs font-medium opacity-90">
+                      Pratinjau Tiket Cuti
                     </p>
                     <p className="text-base font-bold font-mono">
                       OFFLY-2026-0001
                     </p>
                   </div>
-                  <Badge className="bg-background text-foreground hover:bg-background font-mono text-[11px]">
-                    Approved by HRD
+                  <Badge className="bg-background text-foreground hover:bg-background text-xs font-medium">
+                    Disetujui HRD
                   </Badge>
                 </div>
 
                 <div className="p-5 space-y-4">
-                  <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div className="grid grid-cols-2 gap-3 text-sm">
                     <div className="rounded-lg border bg-muted/30 p-3">
-                      <p className="text-muted-foreground">Jenis Cuti</p>
-                      <p className="font-semibold text-sm mt-0.5">
+                      <p className="text-xs text-muted-foreground">Jenis Cuti</p>
+                      <p className="font-semibold mt-0.5">
                         Cuti Tahunan
                       </p>
                     </div>
                     <div className="rounded-lg border bg-muted/30 p-3">
-                      <p className="text-muted-foreground">Presisi Durasi</p>
-                      <p className="font-semibold text-sm mt-0.5 text-primary">
+                      <p className="text-xs text-muted-foreground">Presisi Durasi</p>
+                      <p className="font-semibold mt-0.5 text-primary">
                         0.5 Hari Kerja
                       </p>
                     </div>
                   </div>
 
                   <div className="space-y-2.5 border-y border-dashed py-4">
-                    <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center justify-between text-sm">
                       <span className="flex items-center gap-2 font-medium">
                         <span className="size-5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 flex items-center justify-center">
-                          <Check className="size-3" />
+                          <Check className="size-3" aria-hidden="true" />
                         </span>
                         1. Pengajuan Karyawan
                       </span>
-                      <span className="font-mono text-muted-foreground">
-                        Handover OK
+                      <span className="text-xs text-muted-foreground">
+                        Serah terima siap
                       </span>
                     </div>
-                    <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center justify-between text-sm">
                       <span className="flex items-center gap-2 font-medium">
                         <span className="size-5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 flex items-center justify-center">
-                          <Check className="size-3" />
+                          <Check className="size-3" aria-hidden="true" />
                         </span>
                         2. Verifikasi Ketua Divisi
                       </span>
-                      <span className="font-mono text-muted-foreground">
-                        Approved
+                      <span className="text-xs text-muted-foreground">
+                        Disetujui
                       </span>
                     </div>
-                    <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center justify-between text-sm">
                       <span className="flex items-center gap-2 font-medium">
-                        <span className="size-5 rounded-full bg-primary/20 text-accent-foreground dark:bg-primary/25 dark:text-amber-300 flex items-center justify-center">
-                          <Check className="size-3" />
+                        <span className="size-5 rounded-full bg-primary/15 text-primary dark:bg-primary/25 dark:text-amber-300 flex items-center justify-center">
+                          <Check className="size-3" aria-hidden="true" />
                         </span>
-                        3. Pengesahan Final HRD
+                        3. Pengesahan Akhir HRD
                       </span>
-                      <span className="font-mono text-primary font-semibold">
-                        PDF Siap
+                      <span className="text-xs text-primary font-semibold">
+                        Berkas PDF siap
                       </span>
                     </div>
                   </div>
@@ -292,7 +269,7 @@ export default async function HalamanUtama() {
                       <span className="text-muted-foreground">
                         Simulasi Sisa Kuota
                       </span>
-                      <span className="font-mono font-semibold">
+                      <span className="font-mono font-semibold tabular-nums">
                         11.0 → 10.5 Hari
                       </span>
                     </div>
@@ -310,71 +287,67 @@ export default async function HalamanUtama() {
           <div className="max-w-6xl mx-auto px-4 md:px-6 py-14 space-y-8 ungkap-gulir">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div className="space-y-1">
-                <p className="text-xs font-mono uppercase tracking-wider text-primary font-semibold">
-                  01 / OTOMATISASI PERSETUJUAN
+                <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+                  Alur Persetujuan
                 </p>
                 <h2 className="judul-seimbang text-2xl md:text-3xl font-bold tracking-tight">
-                  Dua jalur persetujuan tanpa birokrasi berbelit
+                  Verifikasi berjenjang sesuai peran di divisi
                 </h2>
               </div>
-              <p className="paragraf-rapi text-xs text-muted-foreground max-w-sm">
-                Kuota tahunan otomatis kembali ke saldo karyawan apabila pengajuan dibatalkan atau ditolak di tahap mana pun.
+              <p className="paragraf-rapi text-sm text-muted-foreground max-w-sm">
+                Kuota tahunan otomatis kembali ke saldo karyawan apabila pengajuan dibatalkan atau ditolak.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
-              <div className="@container rounded-xl border bg-card p-6 flex flex-col justify-between gap-5 h-full">
+              <div className="@container rounded-xl border bg-card p-6 flex flex-col gap-5 h-full">
                 <div className="flex items-center justify-between">
-                  <Badge variant="outline" className="font-mono">
-                    ALUR 01 — KARYAWAN
-                  </Badge>
+                  <h3 className="text-sm font-semibold">Alur Karyawan</h3>
                   <span className="text-xs text-muted-foreground">3 Tahap</span>
                 </div>
-                <div className="grid grid-cols-1 @sm:grid-cols-3 gap-2 text-xs">
+                <div className="grid grid-cols-1 @sm:grid-cols-3 gap-2.5 text-sm">
                   <div className="rounded-lg border bg-muted/30 p-3 space-y-1">
-                    <p className="font-mono text-primary font-bold">STEP 1</p>
+                    <p className="text-xs font-mono text-primary font-bold">Tahap 1</p>
                     <p className="font-semibold">Karyawan</p>
-                    <p className="text-muted-foreground">
-                      Ajukan cuti &amp; isi rekan handover
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Mengajukan cuti dan menunjuk rekan serah terima tugas.
                     </p>
                   </div>
                   <div className="rounded-lg border bg-muted/30 p-3 space-y-1">
-                    <p className="font-mono text-primary font-bold">STEP 2</p>
+                    <p className="text-xs font-mono text-primary font-bold">Tahap 2</p>
                     <p className="font-semibold">Ketua Divisi</p>
-                    <p className="text-muted-foreground">
-                      Verifikasi tugas &amp; beban tim
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Memeriksa kesiapan tugas dan beban tim di divisi.
                     </p>
                   </div>
                   <div className="rounded-lg border bg-accent/50 dark:bg-accent/40 border-primary/30 p-3 space-y-1">
-                    <p className="font-mono text-primary font-bold">STEP 3</p>
-                    <p className="font-semibold">HRD Final</p>
-                    <p className="text-muted-foreground">
-                      Pengesahan &amp; surat PDF resmi
+                    <p className="text-xs font-mono text-primary font-bold">Tahap 3</p>
+                    <p className="font-semibold">HRD</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Pengesahan akhir dan penerbitan surat cuti PDF.
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="@container rounded-xl border bg-card p-6 flex flex-col justify-between gap-5 h-full">
+              <div className="@container rounded-xl border bg-card p-6 flex flex-col gap-5 h-full">
                 <div className="flex items-center justify-between">
-                  <Badge variant="outline" className="font-mono">
-                    ALUR 02 — KETUA DIVISI
-                  </Badge>
+                  <h3 className="text-sm font-semibold">Alur Ketua Divisi</h3>
                   <span className="text-xs text-muted-foreground">2 Tahap</span>
                 </div>
-                <div className="grid grid-cols-1 @sm:grid-cols-2 gap-3 text-xs">
+                <div className="grid grid-cols-1 @sm:grid-cols-2 gap-3 text-sm">
                   <div className="rounded-lg border bg-muted/30 p-3.5 space-y-1">
-                    <p className="font-mono text-primary font-bold">STEP 1</p>
-                    <p className="font-semibold text-sm">Ketua Divisi</p>
-                    <p className="text-muted-foreground">
-                      Mengajukan cuti pribadi langsung menuju antrean HRD
+                    <p className="text-xs font-mono text-primary font-bold">Tahap 1</p>
+                    <p className="font-semibold">Ketua Divisi</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Mengajukan cuti pribadi langsung menuju antrean HRD.
                     </p>
                   </div>
                   <div className="rounded-lg border bg-accent/50 dark:bg-accent/40 border-primary/30 p-3.5 space-y-1">
-                    <p className="font-mono text-primary font-bold">STEP 2</p>
-                    <p className="font-semibold text-sm">HRD Final</p>
-                    <p className="text-muted-foreground">
-                      Validasi kapasitas divisi &amp; terbitkan surat izin cuti
+                    <p className="text-xs font-mono text-primary font-bold">Tahap 2</p>
+                    <p className="font-semibold">HRD</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Memvalidasi kapasitas divisi dan menerbitkan surat izin cuti.
                     </p>
                   </div>
                 </div>
@@ -389,11 +362,11 @@ export default async function HalamanUtama() {
           className="max-w-6xl mx-auto px-4 md:px-6 py-14 space-y-8 ungkap-gulir scroll-mt-20 outline-none"
         >
           <div className="space-y-1">
-            <p className="text-xs font-mono uppercase tracking-wider text-primary font-semibold">
-              02 / ARSITEKTUR BENTO FITUR
+            <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+              Fitur Utama
             </p>
             <h2 className="judul-seimbang text-2xl md:text-3xl font-bold tracking-tight">
-              Cepat, presisi, dan siap audit
+              Alat kerja harian untuk karyawan dan HRD
             </h2>
           </div>
 
@@ -401,24 +374,19 @@ export default async function HalamanUtama() {
             <div className="md:col-span-7 rounded-xl border bg-card p-6 flex flex-col justify-between gap-5 hover:border-primary/40 transition-colors">
               <div className="space-y-2">
                 <div className="size-9 rounded-lg bg-accent dark:bg-accent/60 text-accent-foreground flex items-center justify-center">
-                  <Clock3 className="size-4 text-primary" />
+                  <Clock3 className="size-4 text-primary" aria-hidden="true" />
                 </div>
                 <h3 className="text-lg font-semibold">
-                  Simulasi Kuota What-If &amp; Cuti Setengah Hari
+                  Simulasi Kuota dan Cuti Setengah Hari
                 </h3>
                 <p className="paragraf-rapi text-sm text-muted-foreground leading-relaxed">
-                  Sebelum menekan kirim, karyawan dapat melihat proyeksi sisa kuota, daftar akhir pekan serta hari libur nasional yang dilewati, sekaligus melihat rekan satu divisi yang cuti di tanggal yang sama.
+                  Sebelum mengirim permohonan, karyawan dapat melihat proyeksi sisa kuota, akhir pekan serta hari libur nasional yang dilewati, dan rekan satu divisi yang cuti di tanggal yang sama.
                 </p>
               </div>
-              <div className="flex flex-wrap gap-2 text-xs font-mono">
-                <span className="rounded border bg-muted/40 px-2.5 py-1">
-                  0.5 HARI DIDUKUNG
-                </span>
-                <span className="rounded border bg-muted/40 px-2.5 py-1">
-                  VALIDASI OVERLAP OTOMATIS
-                </span>
-                <span className="rounded border bg-muted/40 px-2.5 py-1">
-                  ATURAN H-3 &amp; H+3 SAKIT
+              <div className="rounded-lg border bg-muted/30 p-3 flex flex-wrap items-center justify-between gap-2 text-xs">
+                <span className="font-medium">Aturan pengajuan otomatis</span>
+                <span className="text-muted-foreground">
+                  Dukungan 0.5 hari · Validasi tanggal bentrok · Aturan H-3 dan H+3 sakit
                 </span>
               </div>
             </div>
@@ -426,13 +394,13 @@ export default async function HalamanUtama() {
             <div className="md:col-span-5 rounded-xl border bg-card p-6 flex flex-col justify-between gap-5 hover:border-primary/40 transition-colors">
               <div className="space-y-2">
                 <div className="size-9 rounded-lg bg-accent dark:bg-accent/60 text-accent-foreground flex items-center justify-center">
-                  <ShieldAlert className="size-4 text-primary" />
+                  <ShieldAlert className="size-4 text-primary" aria-hidden="true" />
                 </div>
                 <h3 className="text-lg font-semibold">
-                  Kapasitas Tim &amp; Periode Blackout
+                  Kapasitas Tim dan Tanggal Sibuk
                 </h3>
                 <p className="paragraf-rapi text-sm text-muted-foreground leading-relaxed">
-                  Cegah kekosongan operasional divisi dengan batas persentase cuti bersamaan dan penguncian tanggal sibuk perusahaan.
+                  Mencegah kekosongan operasional divisi dengan batas persentase cuti bersamaan dan penguncian tanggal sibuk perusahaan.
                 </p>
               </div>
               <div className="rounded-lg border bg-muted/30 p-3 flex items-center justify-between text-xs">
@@ -446,11 +414,11 @@ export default async function HalamanUtama() {
             <div className="md:col-span-5 rounded-xl border bg-card p-6 flex flex-col justify-between gap-5 hover:border-primary/40 transition-colors">
               <div className="space-y-2">
                 <div className="size-9 rounded-lg bg-accent dark:bg-accent/60 text-accent-foreground flex items-center justify-center">
-                  <FileText className="size-4 text-primary" />
+                  <FileText className="size-4 text-primary" aria-hidden="true" />
                 </div>
                 <h3 className="text-lg font-semibold">Surat Cuti Resmi PDF</h3>
                 <p className="paragraf-rapi text-sm text-muted-foreground leading-relaxed">
-                  Pengajuan berstatus Approved by HRD otomatis menghasilkan surat izin cuti berstempel digital yang siap diunduh oleh Karyawan maupun Ketua Divisi.
+                  Pengajuan yang telah disetujui HRD otomatis menghasilkan surat izin cuti berstempel digital yang siap diunduh oleh Karyawan maupun Ketua Divisi.
                 </p>
               </div>
               <div className="rounded-lg border bg-muted/30 p-3 flex items-center justify-between text-xs">
@@ -464,81 +432,70 @@ export default async function HalamanUtama() {
             <div className="md:col-span-7 rounded-xl border bg-card p-6 flex flex-col justify-between gap-4 hover:border-primary/40 transition-colors">
               <div className="space-y-2">
                 <div className="size-9 rounded-lg bg-accent dark:bg-accent/60 text-accent-foreground flex items-center justify-center">
-                  <FileCheck2 className="size-4 text-primary" />
+                  <FileCheck2 className="size-4 text-primary" aria-hidden="true" />
                 </div>
                 <h3 className="text-lg font-semibold">
-                  Multi-Approve HRD &amp; Peringatan Kuota Hangus
+                  Persetujuan Massal HRD dan Pengingat Kuota
                 </h3>
                 <p className="paragraf-rapi text-sm text-muted-foreground leading-relaxed">
-                  HRD dapat menyetujui banyak pengajuan sekaligus dalam satu transaksi serta mengirim pengingat satu klik kepada karyawan yang jarang mengambil cuti menjelang akhir tahun.
+                  HRD dapat menyetujui beberapa pengajuan sekaligus dalam satu transaksi serta mengirim pengingat kepada karyawan yang belum mengambil hak cuti tahunan.
                 </p>
               </div>
-              <div className="grid grid-cols-2 gap-3 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 <div className="rounded-lg border bg-muted/30 p-2.5 flex items-center gap-2">
-                  <Building2 className="size-4 text-primary shrink-0" />
-                  <span>Manajemen Divisi &amp; Anggota</span>
+                  <Building2 className="size-4 text-primary shrink-0" aria-hidden="true" />
+                  <span>Manajemen Divisi dan Anggota</span>
                 </div>
                 <div className="rounded-lg border bg-muted/30 p-2.5 flex items-center gap-2">
-                  <Users className="size-4 text-primary shrink-0" />
-                  <span>Deteksi Masa Kerja &lt; 1 Thn</span>
+                  <Users className="size-4 text-primary shrink-0" aria-hidden="true" />
+                  <span>Deteksi Masa Kerja di Bawah 1 Tahun</span>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        <section id="kebijakan" tabIndex={-1} className="border-t bg-muted/20 scroll-mt-20 outline-none bagian-tunda">
+        <section id="kebijakan" tabIndex={-1} className="border-t bg-muted/20 scroll-mt-20 outline-none">
           <div className="max-w-6xl mx-auto px-4 md:px-6 py-14 grid grid-cols-1 lg:grid-cols-12 gap-8 ungkap-gulir">
             <div className="@container lg:col-span-7 space-y-5">
               <div>
-                <p className="text-xs font-mono uppercase tracking-wider text-primary font-semibold">
-                  03 / KEBIJAKAN PERUSAHAAN
+                <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+                  Kebijakan Perusahaan
                 </p>
                 <h2 className="judul-seimbang text-2xl font-bold tracking-tight mt-1">
                   Jenis Cuti Aktif
                 </h2>
                 <p className="paragraf-rapi text-sm text-muted-foreground">
-                  Dikelola dinamis langsung dari database oleh Admin.
+                  Ketentuan dan kuota cuti yang berlaku di perusahaan.
                 </p>
               </div>
 
               {daftarJenisCuti.length === 0 ? (
                 <div className="rounded-xl border bg-card p-8 text-center text-sm text-muted-foreground">
-                  Data jenis cuti akan tampil setelah koneksi PostgreSQL aktif.
+                  Data jenis cuti belum tersedia.
                 </div>
               ) : (
                 <div className="grid grid-cols-1 @sm:grid-cols-2 gap-3">
                   {daftarJenisCuti.map((item) => (
                     <div
                       key={item.id}
-                      className="rounded-xl border bg-card p-4 space-y-2.5 hover:border-primary/40 transition-colors"
+                      className="rounded-xl border bg-card p-4 flex flex-col justify-between gap-2.5 hover:border-primary/40 transition-colors"
                     >
-                      <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <p className="text-[11px] font-mono text-primary font-semibold">
-                            {item.kode_cuti}
-                          </p>
+                      <div className="space-y-1.5">
+                        <div className="flex items-start justify-between gap-2">
                           <h3 className="text-sm font-bold">{item.nama_cuti}</h3>
+                          <Badge variant="secondary" className="font-mono text-xs shrink-0 tabular-nums">
+                            {item.kuota_default} Hari
+                          </Badge>
                         </div>
-                        <Badge variant="secondary" className="font-mono text-xs">
-                          {item.kuota_default} Hari
-                        </Badge>
+                        <p className="text-xs text-muted-foreground leading-relaxed">
+                          {item.deskripsi || "Mengikuti ketentuan perusahaan."}
+                        </p>
                       </div>
-                      <p className="text-xs text-muted-foreground leading-relaxed">
-                        {item.deskripsi || "Mengikuti ketentuan perusahaan."}
+                      <p className="text-[11px] font-medium text-muted-foreground pt-1 border-t">
+                        {item.wajib_lampiran ? "Wajib lampiran" : "Tanpa lampiran"} ·{" "}
+                        {item.potong_kuota_tahunan ? "Potong kuota tahunan" : "Non-kuota"}
                       </p>
-                      <div className="flex flex-wrap gap-1.5 pt-1">
-                        <Badge variant="outline" className="text-[10px]">
-                          {item.wajib_lampiran
-                            ? "Wajib Lampiran"
-                            : "Tanpa Lampiran"}
-                        </Badge>
-                        <Badge variant="outline" className="text-[10px]">
-                          {item.potong_kuota_tahunan
-                            ? "Potong Kuota"
-                            : "Non-Kuota"}
-                        </Badge>
-                      </div>
                     </div>
                   ))}
                 </div>
@@ -547,8 +504,8 @@ export default async function HalamanUtama() {
 
             <div id="kalender" tabIndex={-1} className="lg:col-span-5 space-y-5 scroll-mt-20 outline-none">
               <div>
-                <p className="text-xs font-mono uppercase tracking-wider text-primary font-semibold">
-                  04 / KALENDER RESMI
+                <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+                  Kalender Resmi
                 </p>
                 <h2 className="judul-seimbang text-2xl font-bold tracking-tight mt-1">
                   Hari Libur &amp; Cuti Bersama
@@ -576,7 +533,7 @@ export default async function HalamanUtama() {
                             <span className="text-sm font-bold font-mono text-foreground">
                               {hari}
                             </span>
-                            <span className="text-[9px] font-mono text-accent-foreground dark:text-amber-300 mt-0.5">
+                            <span className="text-[10px] font-mono text-accent-foreground dark:text-amber-300 mt-0.5">
                               {bulan}
                             </span>
                           </div>
@@ -585,12 +542,12 @@ export default async function HalamanUtama() {
                               {libur.nama_libur}
                             </p>
                             <p className="text-xs text-muted-foreground flex items-center gap-1">
-                              <CalendarDays className="size-3" />
+                              <CalendarDays className="size-3" aria-hidden="true" />
                               {formatTanggalIndo(libur.tanggal)}
                             </p>
                           </div>
                         </div>
-                        <Badge variant="outline" className="text-[10px] shrink-0">
+                        <Badge variant="outline" className="text-[11px] shrink-0">
                           {libur.jenis}
                         </Badge>
                       </div>
@@ -602,14 +559,14 @@ export default async function HalamanUtama() {
           </div>
         </section>
 
-        <section className="max-w-6xl mx-auto px-4 md:px-6 py-12 ungkap-gulir bagian-tunda">
+        <section className="max-w-6xl mx-auto px-4 md:px-6 py-12 ungkap-gulir">
           <div className="rounded-2xl border bg-primary text-primary-foreground p-8 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div className="space-y-2 max-w-xl">
               <h2 className="judul-seimbang text-2xl md:text-3xl font-bold tracking-tight">
-                Siap mengelola cuti tim dengan lebih tertib?
+                Mulai kelola cuti tim kerja Anda dengan lebih teratur
               </h2>
-              <p className="paragraf-rapi text-sm opacity-90">
-                Masuk menggunakan akun Karyawan, Ketua Divisi, HRD, atau Admin. Peran Anda dideteksi otomatis saat masuk.
+              <p className="paragraf-rapi text-sm opacity-95">
+                Masuk menggunakan akun Karyawan, Ketua Divisi, HRD, atau Admin. Tampilan dasbor menyesuaikan peran Anda secara otomatis.
               </p>
             </div>
             {sesi ? (
@@ -642,14 +599,17 @@ export default async function HalamanUtama() {
       <footer className="border-t bg-muted/30">
         <div className="max-w-6xl mx-auto px-4 md:px-6 py-6 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
           <span className="font-medium text-foreground">
-            Offly — Sistem Manajemen Cuti Karyawan
+            Offly | Sistem Manajemen Cuti Karyawan
           </span>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4">
             <a href="#alur" className="hover:text-foreground">
-              Alur
+              Alur Cuti
+            </a>
+            <a href="#keunggulan" className="hover:text-foreground">
+              Fitur
             </a>
             <a href="#kebijakan" className="hover:text-foreground">
-              Kebijakan
+              Kebijakan &amp; Libur
             </a>
             <Link
               href={sesi ? "/dasbor" : "/masuk"}

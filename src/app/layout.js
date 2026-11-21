@@ -1,18 +1,21 @@
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Roboto, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const fontInter = Inter({
-  variable: "--font-inter",
+const fontRoboto = Roboto({
+  variable: "--font-roboto",
+  weight: ["400", "500", "700"],
   subsets: ["latin"],
+  display: "swap",
 });
 
 const fontJetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata = {
-  title: "Offly — Sistem Manajemen Cuti Karyawan",
+  title: "Offly | Sistem Manajemen Cuti Karyawan",
   description:
     "Platform manajemen pengajuan, verifikasi berjenjang, dan persetujuan cuti karyawan.",
 };
@@ -22,7 +25,7 @@ export default function TataLetakAkar({ children }) {
     <html
       lang="id"
       suppressHydrationWarning
-      className={`${fontInter.variable} ${fontJetbrainsMono.variable} h-full antialiased`}
+      className={`${fontRoboto.variable} ${fontJetbrainsMono.variable} h-full antialiased`}
     >
       <head>
         <meta name="color-scheme" content="light dark" />
