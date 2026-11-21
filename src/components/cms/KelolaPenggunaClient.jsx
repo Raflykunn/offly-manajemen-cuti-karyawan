@@ -246,7 +246,7 @@ export default function KelolaPenggunaClient({
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex flex-wrap gap-2.5">
-            <div className="flex-1 min-w-[220px] relative">
+            <div className="w-full sm:flex-1 sm:min-w-[220px] relative">
               <Search className="size-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
               <Input
                 placeholder="Cari nama, email, username..."
@@ -329,23 +329,20 @@ export default function KelolaPenggunaClient({
                 <SelectItem value="lebih_1_tahun">Masa Kerja &ge; 1 Thn</SelectItem>
               </SelectContent>
             </Select>
-          </div>
 
-          <div className="flex flex-wrap items-center justify-end gap-2 pt-1">
-            <span className="text-xs text-muted-foreground">Urutkan berdasarkan:</span>
             <Select value={urutkan} onValueChange={aturUrutkan}>
-              <SelectTrigger className="w-56">
+              <SelectTrigger className="w-full sm:w-auto">
                 <SelectValue>
                   {(v) => {
                     const label = {
-                      nama_asc: "Nama (A–Z)",
-                      nama_desc: "Nama (Z–A)",
-                      gabung_baru: "Tanggal Bergabung (Terbaru)",
-                      gabung_lama: "Tanggal Bergabung (Terlama)",
-                      divisi_asc: "Divisi (A–Z)",
-                      divisi_desc: "Divisi (Z–A)",
+                      nama_asc: "Urut: Nama (A–Z)",
+                      nama_desc: "Urut: Nama (Z–A)",
+                      gabung_baru: "Urut: Bergabung Terbaru",
+                      gabung_lama: "Urut: Bergabung Terlama",
+                      divisi_asc: "Urut: Divisi (A–Z)",
+                      divisi_desc: "Urut: Divisi (Z–A)",
                     };
-                    return label[v] || "Nama (A–Z)";
+                    return label[v] || "Urut: Nama (A–Z)";
                   }}
                 </SelectValue>
               </SelectTrigger>
