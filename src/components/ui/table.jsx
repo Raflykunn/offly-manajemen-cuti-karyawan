@@ -28,7 +28,7 @@ function TableHeader({
   return (
     <thead
       data-slot="table-header"
-      className={cn("bg-muted/80 [&_tr]:border-b [&_tr]:hover:bg-transparent", className)}
+      className={cn("bg-zinc-100/90 dark:bg-muted/80 [&_tr]:border-b [&_tr]:hover:bg-transparent", className)}
       {...props}
     />
   )
@@ -71,7 +71,7 @@ function TableRow({
     <tr
       data-slot="table-row"
       className={cn(
-        "border-b border-border/80 transition-colors even:bg-muted/25 hover:bg-accent/40 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted",
+        "border-b border-border/80 transition-colors even:bg-zinc-50/90 dark:even:bg-muted/25 hover:bg-amber-50/90 dark:hover:bg-accent/40 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted",
         className
       )}
       {...props}
