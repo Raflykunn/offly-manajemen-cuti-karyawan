@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 
 const DAFTAR_TAUTAN = [
   { href: "#alur", label: "Alur Cuti" },
@@ -10,80 +10,65 @@ const DAFTAR_TAUTAN = [
 ];
 
 export default function NavigasiBeranda() {
-  const refNav = useRef(null);
+  const [bagianAktif, pasangBagianAktif] = useState("");
 
   useEffect(() => {
-    const elemenNav = refNav.current;
-    if (!elemenNav) return;
-
-    const tautan = Array.from(elemenNav.querySelectorAll("a[href^='#']"));
-    if (tautan.length === 0) return;
-
-    const dukungScrollTarget =
-      typeof CSS !== "undefined" &&
-      CSS.supports("scroll-target-group: auto");
-
-    if (dukungScrollTarget) {
-      const sinkronkanAria = () => {
-        const aktif = elemenNav.querySelector("a:target-current");
-        tautan.forEach((item) => {
-          item.setAttribute("aria-current", item === aktif ? "true" : "false");
-        });
-      };
-
-      sinkronkanAria();
-      document.addEventListener("scrollend", sinkronkanAria, { passive: true });
-      return () => {
-        document.removeEventListener("scrollend", sinkronkanAria);
-      };
-    }
-
-    const daftarBagian = tautan
-      .map((item) => {
-        const id = item.getAttribute("href")?.slice(1);
-        return id ? document.getElementById(id) : null;
-      })
+    const daftarId = ["alur", "keunggulan", "kebijakan", "kalender"];
+    const elemenDaftar = daftarId
+      .map((id) => document.getElementById(id))
       .filter(Boolean);
 
-    if (daftarBagian.length === 0) return;
+    if (elemenDaftar.length === 0) return;
 
-    const pengamat = new IntersectionObserver(
-      (entri) => {
-        entri.forEach((item) => {
-          if (item.isIntersecting) {
-            const idAktif = item.target.getAttribute("id");
-            tautan.forEach((link) => {
-              const aktif = link.getAttribute("href") === `#${idAktif}`;
-              link.classList.toggle("target-current", aktif);
-              link.setAttribute("aria-current", aktif ? "true" : "false");
-            });
-          }
-        });
-      },
-      { rootMargin: "-45% 0px -45% 0px", threshold: 0 }
-    );
+    const tanganiGulir = () => {
+      const posisiGaris = window.innerHeight * 0.35;
+      let terpilih = "";
 
-    daftarBagian.forEach((bagian) => pengamat.observe(bagian));
+      for (const el of elemenDaftar) {
+        const batas = el.getBoundingClientRect();
+        if (batas.top <= posisiGaris && batas.bottom >= posisiGaris) {
+          terpilih = `#${el.id}`;
+          break;
+        }
+      }
+
+      if (terpilih) {
+        pasangBagianAktif(terpilih);
+      } else if (window.scrollY < 200) {
+        pasangBagianAktif("");
+      }
+    };
+
+    window.addEventListener("scroll", tanganiGulir, { passive: true });
+    tanganiGulir();
+
     return () => {
-      pengamat.disconnect();
+      window.removeEventListener("scroll", tanganiGulir);
     };
   }, []);
 
   return (
     <nav
-      ref={refNav}
       aria-label="Navigasi bagian halaman"
-      className="navigasi-beranda hidden md:flex items-center gap-1 rounded-full border bg-muted/50 p-1 text-xs font-medium"
+      className="hidden md:flex items-center gap-1 rounded-full border bg-muted/50 p-1 text-xs font-medium"
     >
-      {DAFTAR_TAUTAN.map((item) => (
-        <a
-          key={item.href}
-          href={item.href}
-          className="px-3 py-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-background/70 transition-colors"
-        >
-          {item.label}
-        </a>
-      ))}
+      {DAFTAR_TAUTAN.map((item) => {
+        const aktif = bagianAktif === item.href;
+        return (
+          <a
+            key={item.href}
+            href={item.href}
+            aria-current={aktif ? "true" : undefined}
+            className={`px-3 py-1.5 rounded-full transition-colors ${
+              aktif
+                ? "bg-background text-foreground font-semibold shadow-xs"
+                : "text-muted-foreground hover:text-foreground hover:bg-background/60"
+            }`}
+          >
+            {item.label}
+          </a>
+        );
+      })}
     </nav>
   );
 }

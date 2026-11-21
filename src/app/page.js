@@ -33,7 +33,7 @@ async function ambilDataPublikBeranda() {
          ORDER BY id ASC`
       ),
       jalankanKueri(
-        `SELECT id, tanggal, nama_libur, jenis
+        `SELECT id, TO_CHAR(tanggal, 'YYYY-MM-DD') AS tanggal, nama_libur, jenis
          FROM hari_libur
          ORDER BY tanggal ASC
          LIMIT 6`
@@ -47,10 +47,7 @@ async function ambilDataPublikBeranda() {
 
     return {
       daftarJenisCuti: hasilJenis.rows,
-      daftarHariLibur: hasilLibur.rows.map((h) => ({
-        ...h,
-        tanggal: new Date(h.tanggal).toISOString().slice(0, 10),
-      })),
+      daftarHariLibur: hasilLibur.rows,
       ringkasan: hasilRingkasan.rows[0] || {
         total_divisi: 0,
         total_karyawan: 0,
@@ -94,7 +91,7 @@ export default async function HalamanUtama() {
         Lewati ke konten utama
       </a>
       <div className="border-b bg-muted/50 text-[11px] font-mono text-muted-foreground">
-        <div className="max-w-6xl mx-auto px-4 md:px-6 h-8 flex items-center justify-between gap-4 overflow-x-auto whitespace-nowrap">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 h-8 flex items-center justify-between gap-4 overflow-x-auto whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <div className="flex items-center gap-4">
             <span className="inline-flex items-center gap-1.5 text-foreground font-medium">
               <span className="size-1.5 rounded-full bg-primary" />
@@ -325,8 +322,8 @@ export default async function HalamanUtama() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="@container rounded-xl border bg-card p-6 space-y-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+              <div className="@container rounded-xl border bg-card p-6 flex flex-col justify-between gap-5 h-full">
                 <div className="flex items-center justify-between">
                   <Badge variant="outline" className="font-mono">
                     ALUR 01 — KARYAWAN
@@ -358,14 +355,14 @@ export default async function HalamanUtama() {
                 </div>
               </div>
 
-              <div className="@container rounded-xl border bg-card p-6 space-y-5">
+              <div className="@container rounded-xl border bg-card p-6 flex flex-col justify-between gap-5 h-full">
                 <div className="flex items-center justify-between">
                   <Badge variant="outline" className="font-mono">
                     ALUR 02 — KETUA DIVISI
                   </Badge>
                   <span className="text-xs text-muted-foreground">2 Tahap</span>
                 </div>
-                <div className="grid grid-cols-1 @xs:grid-cols-2 gap-3 text-xs">
+                <div className="grid grid-cols-1 @sm:grid-cols-2 gap-3 text-xs">
                   <div className="rounded-lg border bg-muted/30 p-3.5 space-y-1">
                     <p className="font-mono text-primary font-bold">STEP 1</p>
                     <p className="font-semibold text-sm">Ketua Divisi</p>
@@ -446,14 +443,22 @@ export default async function HalamanUtama() {
               </div>
             </div>
 
-            <div className="md:col-span-5 rounded-xl border bg-card p-6 space-y-3 hover:border-primary/40 transition-colors">
-              <div className="size-9 rounded-lg bg-accent dark:bg-accent/60 text-accent-foreground flex items-center justify-center">
-                <FileText className="size-4 text-primary" />
+            <div className="md:col-span-5 rounded-xl border bg-card p-6 flex flex-col justify-between gap-5 hover:border-primary/40 transition-colors">
+              <div className="space-y-2">
+                <div className="size-9 rounded-lg bg-accent dark:bg-accent/60 text-accent-foreground flex items-center justify-center">
+                  <FileText className="size-4 text-primary" />
+                </div>
+                <h3 className="text-lg font-semibold">Surat Cuti Resmi PDF</h3>
+                <p className="paragraf-rapi text-sm text-muted-foreground leading-relaxed">
+                  Pengajuan berstatus Approved by HRD otomatis menghasilkan surat izin cuti berstempel digital yang siap diunduh oleh Karyawan maupun Ketua Divisi.
+                </p>
               </div>
-              <h3 className="text-lg font-semibold">Surat Cuti Resmi PDF</h3>
-              <p className="paragraf-rapi text-sm text-muted-foreground leading-relaxed">
-                Pengajuan berstatus Approved by HRD otomatis menghasilkan surat izin cuti berstempel digital yang siap diunduh oleh Karyawan maupun Ketua Divisi.
-              </p>
+              <div className="rounded-lg border bg-muted/30 p-3 flex items-center justify-between text-xs">
+                <span className="font-medium">Validasi Berkas</span>
+                <span className="font-mono font-bold text-primary">
+                  Stempel Digital Resmi
+                </span>
+              </div>
             </div>
 
             <div className="md:col-span-7 rounded-xl border bg-card p-6 flex flex-col justify-between gap-4 hover:border-primary/40 transition-colors">
@@ -576,7 +581,7 @@ export default async function HalamanUtama() {
                             </span>
                           </div>
                           <div className="min-w-0">
-                            <p className="text-sm font-medium truncate">
+                            <p className="text-sm font-medium leading-snug">
                               {libur.nama_libur}
                             </p>
                             <p className="text-xs text-muted-foreground flex items-center gap-1">
