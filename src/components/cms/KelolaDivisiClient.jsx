@@ -5,6 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   AlertTriangle,
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
   Building2,
   Eye,
   Pencil,
@@ -128,6 +131,49 @@ export default function KelolaDivisiClient({
       return a.nama_divisi.localeCompare(b.nama_divisi);
     });
   }, [daftarDivisiAwal, cari, filterKetua, filterAnggota, urutkan]);
+
+  const petaSortirKolom = {
+    nama: { asc: "nama_asc", desc: "nama_desc" },
+    anggota: { asc: "anggota_sedikit", desc: "anggota_banyak" },
+    tanggal: { asc: "tgl_lama", desc: "tgl_baru" },
+  };
+
+  function arahSortirKolom(kolom) {
+    const aturan = petaSortirKolom[kolom];
+    if (urutkan === aturan.asc) return "ascending";
+    if (urutkan === aturan.desc) return "descending";
+    return undefined;
+  }
+
+  function toggleSortirKolom(kolom) {
+    const aturan = petaSortirKolom[kolom];
+    aturUrutkan(urutkan === aturan.asc ? aturan.desc : aturan.asc);
+  }
+
+  function renderHeaderSortir(kolom, label) {
+    const arah = arahSortirKolom(kolom);
+    const Ikon =
+      arah === "ascending"
+        ? ArrowUp
+        : arah === "descending"
+          ? ArrowDown
+          : ArrowUpDown;
+    return (
+      <TableHead scope="col" aria-sort={arah}>
+        <button
+          type="button"
+          onClick={() => toggleSortirKolom(kolom)}
+          className="inline-flex items-center gap-1.5 min-h-6 w-full text-left font-medium hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm cursor-pointer"
+        >
+          <span>{label}</span>
+          <Ikon
+            aria-hidden="true"
+            className={`size-3.5 shrink-0 ${arah ? "text-primary" : "text-muted-foreground/70"}`}
+          />
+        </button>
+      </TableHead>
+    );
+  }
 
   function bukaModalTambah() {
     aturKetuaForm(
@@ -321,11 +367,11 @@ export default function KelolaDivisiClient({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nama Divisi</TableHead>
+                {renderHeaderSortir("nama", "Nama Divisi")}
                 <TableHead>Ketua Divisi</TableHead>
-                <TableHead>Anggota</TableHead>
+                {renderHeaderSortir("anggota", "Anggota")}
                 <TableHead>Batas Cuti</TableHead>
-                <TableHead>Tanggal Dibentuk</TableHead>
+                {renderHeaderSortir("tanggal", "Tanggal Dibentuk")}
                 <TableHead className="text-right">Aksi</TableHead>
               </TableRow>
             </TableHeader>
