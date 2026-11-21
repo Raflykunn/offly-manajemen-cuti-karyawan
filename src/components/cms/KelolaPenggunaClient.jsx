@@ -49,6 +49,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  KepalaTabelSortir,
   Table,
   TableBody,
   TableCell,
@@ -137,6 +138,9 @@ export default function KelolaPenggunaClient({
       }
       if (urutkan === "divisi_asc") {
         return (a.nama_divisi || "ZZZ").localeCompare(b.nama_divisi || "ZZZ");
+      }
+      if (urutkan === "divisi_desc") {
+        return (b.nama_divisi || "").localeCompare(a.nama_divisi || "");
       }
       return a.nama_lengkap.localeCompare(b.nama_lengkap);
     });
@@ -339,6 +343,7 @@ export default function KelolaPenggunaClient({
                       gabung_baru: "Tanggal Bergabung (Terbaru)",
                       gabung_lama: "Tanggal Bergabung (Terlama)",
                       divisi_asc: "Divisi (A–Z)",
+                      divisi_desc: "Divisi (Z–A)",
                     };
                     return label[v] || "Nama (A–Z)";
                   }}
@@ -350,6 +355,7 @@ export default function KelolaPenggunaClient({
                 <SelectItem value="gabung_baru">Tanggal Bergabung (Terbaru)</SelectItem>
                 <SelectItem value="gabung_lama">Tanggal Bergabung (Terlama)</SelectItem>
                 <SelectItem value="divisi_asc">Divisi (A–Z)</SelectItem>
+                <SelectItem value="divisi_desc">Divisi (Z–A)</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -357,10 +363,28 @@ export default function KelolaPenggunaClient({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Pengguna</TableHead>
+                <KepalaTabelSortir
+                  label="Pengguna"
+                  nilaiAktif={urutkan}
+                  nilaiNaik="nama_asc"
+                  nilaiTurun="nama_desc"
+                  saatUbah={aturUrutkan}
+                />
                 <TableHead>Peran</TableHead>
-                <TableHead>Divisi</TableHead>
-                <TableHead>Bergabung</TableHead>
+                <KepalaTabelSortir
+                  label="Divisi"
+                  nilaiAktif={urutkan}
+                  nilaiNaik="divisi_asc"
+                  nilaiTurun="divisi_desc"
+                  saatUbah={aturUrutkan}
+                />
+                <KepalaTabelSortir
+                  label="Bergabung"
+                  nilaiAktif={urutkan}
+                  nilaiNaik="gabung_lama"
+                  nilaiTurun="gabung_baru"
+                  saatUbah={aturUrutkan}
+                />
                 <TableHead>Sisa Kuota</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Aksi</TableHead>

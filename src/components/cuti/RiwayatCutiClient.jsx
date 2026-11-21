@@ -37,6 +37,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  KepalaTabelSortir,
   Table,
   TableBody,
   TableCell,
@@ -130,6 +131,12 @@ export default function RiwayatCutiClient({
     return [...hasil].sort((a, b) => {
       if (urutkan === "mulai_terawal") {
         return a.tanggal_mulai.localeCompare(b.tanggal_mulai);
+      }
+      if (urutkan === "mulai_terakhir") {
+        return b.tanggal_mulai.localeCompare(a.tanggal_mulai);
+      }
+      if (urutkan === "durasi_tersingkat") {
+        return a.total_hari_cuti - b.total_hari_cuti;
       }
       if (urutkan === "durasi_terlama") {
         return b.total_hari_cuti - a.total_hari_cuti;
@@ -254,6 +261,8 @@ export default function RiwayatCutiClient({
                 <SelectValue>
                   {(v) => {
                     if (v === "mulai_terawal") return "Tanggal Mulai Terawal";
+                    if (v === "mulai_terakhir") return "Tanggal Mulai Terakhir";
+                    if (v === "durasi_tersingkat") return "Durasi Tersingkat";
                     if (v === "durasi_terlama") return "Durasi Terlama";
                     return "Terbaru Diajukan";
                   }}
@@ -263,6 +272,12 @@ export default function RiwayatCutiClient({
                 <SelectItem value="terbaru">Terbaru Diajukan</SelectItem>
                 <SelectItem value="mulai_terawal">
                   Tanggal Mulai Terawal
+                </SelectItem>
+                <SelectItem value="mulai_terakhir">
+                  Tanggal Mulai Terakhir
+                </SelectItem>
+                <SelectItem value="durasi_tersingkat">
+                  Durasi Tersingkat
                 </SelectItem>
                 <SelectItem value="durasi_terlama">Durasi Terlama</SelectItem>
               </SelectContent>
@@ -274,8 +289,20 @@ export default function RiwayatCutiClient({
               <TableRow>
                 <TableHead>Nomor &amp; Pemohon</TableHead>
                 <TableHead>Jenis Cuti</TableHead>
-                <TableHead>Periode</TableHead>
-                <TableHead>Durasi</TableHead>
+                <KepalaTabelSortir
+                  label="Periode"
+                  nilaiAktif={urutkan}
+                  nilaiNaik="mulai_terawal"
+                  nilaiTurun="mulai_terakhir"
+                  saatUbah={aturUrutkan}
+                />
+                <KepalaTabelSortir
+                  label="Durasi"
+                  nilaiAktif={urutkan}
+                  nilaiNaik="durasi_tersingkat"
+                  nilaiTurun="durasi_terlama"
+                  saatUbah={aturUrutkan}
+                />
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Aksi</TableHead>
               </TableRow>

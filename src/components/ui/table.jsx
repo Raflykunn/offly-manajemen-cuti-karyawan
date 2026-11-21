@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react"
 import { cn } from "cn"
 
 function Table({
@@ -124,12 +125,56 @@ function TableCaption({
   )
 }
 
+function KepalaTabelSortir({
+  label,
+  nilaiAktif,
+  nilaiNaik,
+  nilaiTurun,
+  saatUbah,
+  className,
+}) {
+  const arah =
+    nilaiAktif === nilaiNaik
+      ? "ascending"
+      : nilaiAktif === nilaiTurun
+        ? "descending"
+        : undefined
+  const Ikon =
+    arah === "ascending"
+      ? ArrowUp
+      : arah === "descending"
+        ? ArrowDown
+        : ArrowUpDown
+
+  return (
+    <TableHead scope="col" aria-sort={arah} className={className}>
+      <button
+        type="button"
+        onClick={() =>
+          saatUbah(nilaiTurun && nilaiAktif === nilaiNaik ? nilaiTurun : nilaiNaik)
+        }
+        className="inline-flex items-center gap-1.5 min-h-6 w-full text-left font-semibold uppercase tracking-wide hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm cursor-pointer"
+      >
+        <span>{label}</span>
+        <Ikon
+          aria-hidden="true"
+          className={cn(
+            "size-3.5 shrink-0",
+            arah ? "text-primary" : "text-muted-foreground/70"
+          )}
+        />
+      </button>
+    </TableHead>
+  )
+}
+
 export {
   Table,
   TableHeader,
   TableBody,
   TableFooter,
   TableHead,
+  KepalaTabelSortir,
   TableRow,
   TableCell,
   TableCaption,
