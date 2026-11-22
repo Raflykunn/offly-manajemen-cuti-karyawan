@@ -1,5 +1,6 @@
 "use server";
 
+import crypto from "crypto";
 import { revalidatePath } from "next/cache";
 import { jalankanKueri, jalankanTransaksi } from "@/lib/db";
 import { wajibSesiPengguna } from "@/lib/autentikasi";
@@ -215,7 +216,12 @@ export async function ajukanCutiBaru(formData) {
         );
       }
 
-      const hariIniStr = formatTanggalIso(new Date());
+      const waktuDbRes = await klien.query(
+        `SELECT TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD') AS hari_ini,
+                EXTRACT(YEAR FROM CURRENT_DATE)::int AS tahun_ini`
+      );
+      const hariIniStr = waktuDbRes.rows[0].hari_ini;
+      const tahunIni = waktuDbRes.rows[0].tahun_ini;
       const cekBatasWaktu = validasiBatasWaktuPengajuan(
         jenisCuti,
         hariIniStr,
@@ -282,7 +288,35 @@ export async function ajukanCutiBaru(formData) {
         );
       }
 
+      if (rekanPenggantiId !== null) {
+        if (!Number.isInteger(rekanPenggantiId) || rekanPenggantiId <= 0 || rekanPenggantiId === sesi.id) {
+          throw new Error("Rekan pengganti tidak valid atau tidak boleh diri sendiri.");
+        }
+        const rekanRes = await klien.query(
+          `SELECT id, peran, status_aktif FROM pengguna WHERE id = $1`,
+          [rekanPenggantiId]
+        );
+        const rekan = rekanRes.rows[0];
+        if (!rekan || !rekan.status_aktif || !["karyawan", "ketua_divisi"].includes(rekan.peran)) {
+          throw new Error("Rekan pengganti tidak aktif atau tidak memenuhi syarat.");
+        }
+        const rekanCutiRes = await klien.query(
+          `SELECT 1 FROM pengajuan_cuti
+           WHERE pengguna_id = $1
+             AND status IN ('Pending', 'Approved by Leader', 'Approved by HRD')
+             AND daterange(tanggal_mulai, tanggal_selesai, '[]') && daterange($2::date, $3::date, '[]')
+           LIMIT 1`,
+          [rekanPenggantiId, tanggalMulai, tanggalSelesai]
+        );
+        if (rekanCutiRes.rows.length > 0) {
+          throw new Error("Rekan pengganti yang dipilih sedang memiliki jadwal cuti pada tanggal tersebut.");
+        }
+      }
+
       if (pengguna.divisi_id) {
+        await klien.query(`SELECT id FROM divisi WHERE id = $1 FOR UPDATE`, [
+          pengguna.divisi_id,
+        ]);
         const anggotaAktifRes = await klien.query(
           `SELECT COUNT(*)::int AS total
            FROM pengguna
@@ -295,7 +329,7 @@ export async function ajukanCutiBaru(formData) {
            JOIN pengguna p ON p.id = pc.pengguna_id
            WHERE p.divisi_id = $1
              AND p.id <> $2
-             AND pc.status IN ('Approved by Leader', 'Approved by HRD')
+             AND pc.status IN ('Pending', 'Approved by Leader', 'Approved by HRD')
              AND daterange(pc.tanggal_mulai, pc.tanggal_selesai, '[]') && daterange($3::date, $4::date, '[]')`,
           [pengguna.divisi_id, sesi.id, tanggalMulai, tanggalSelesai]
         );
@@ -327,24 +361,26 @@ export async function ajukanCutiBaru(formData) {
            WHERE id = $2`,
           [hasilHitung.totalHari, sesi.id]
         );
-      } else if (
-        jenisCuti.kuota_default > 0 &&
-        hasilHitung.totalHari > jenisCuti.kuota_default
-      ) {
-        throw new Error(
-          `Durasi ${hasilHitung.totalHari} hari melebihi batas maksimal ${jenisCuti.nama_cuti} (${jenisCuti.kuota_default} hari).`
+      } else if (jenisCuti.kuota_default > 0) {
+        const akumulasiRes = await klien.query(
+          `SELECT COALESCE(SUM(total_hari_cuti), 0) AS total_terpakai
+           FROM pengajuan_cuti
+           WHERE pengguna_id = $1
+             AND jenis_cuti_id = $2
+             AND EXTRACT(YEAR FROM tanggal_mulai) = EXTRACT(YEAR FROM $3::date)
+             AND status IN ('Pending', 'Approved by Leader', 'Approved by HRD')`,
+          [sesi.id, jenisCutiId, tanggalMulai]
         );
+        const sudahDipakai = Number(akumulasiRes.rows[0]?.total_terpakai ?? 0);
+        if (sudahDipakai + hasilHitung.totalHari > jenisCuti.kuota_default) {
+          throw new Error(
+            `Total durasi ${jenisCuti.nama_cuti} pada tahun tersebut (${sudahDipakai + hasilHitung.totalHari} hari) melebihi batas maksimal ${jenisCuti.kuota_default} hari per tahun.`
+          );
+        }
       }
 
-      const seqRes = await klien.query(
-        `SELECT COALESCE(MAX(id), 0) + 1 AS berikutnya FROM pengajuan_cuti`
-      );
-      const tahunIni = new Date().getFullYear();
-      const nomorPengajuan = `OFFLY-${tahunIni}-${String(
-        seqRes.rows[0].berikutnya
-      ).padStart(4, "0")}-${Math.floor(10 + Math.random() * 89)}`;
-
-      await klien.query(
+      const nomorSementara = `TMP-${crypto.randomUUID()}`;
+      const insertRes = await klien.query(
         `INSERT INTO pengajuan_cuti (
            nomor_pengajuan, pengguna_id, jenis_cuti_id, opsi_setengah_hari,
            tanggal_pengajuan, tanggal_mulai, tanggal_selesai, total_hari_cuti,
@@ -352,9 +388,10 @@ export async function ajukanCutiBaru(formData) {
            alamat_selama_cuti, nomor_darurat, status
          ) VALUES (
            $1, $2, $3, $4, CURRENT_DATE, $5, $6, $7, $8, $9, $10, $11, $12, $13, 'Pending'
-         )`,
+         )
+         RETURNING id`,
         [
-          nomorPengajuan,
+          nomorSementara,
           sesi.id,
           jenisCutiId,
           opsiSetengahHari,
@@ -368,6 +405,16 @@ export async function ajukanCutiBaru(formData) {
           alamatSelamaCuti,
           nomorDarurat,
         ]
+      );
+
+      const idBaru = insertRes.rows[0].id;
+      const nomorPengajuan = `OFFLY-${tahunIni}-${String(idBaru).padStart(
+        4,
+        "0"
+      )}`;
+      await klien.query(
+        `UPDATE pengajuan_cuti SET nomor_pengajuan = $1 WHERE id = $2`,
+        [nomorPengajuan, idBaru]
       );
 
       if (rekanPenggantiId) {
@@ -1053,7 +1100,23 @@ export async function ambilRiwayatCutiLengkap() {
   return {
     sesiPeran: sesi.peran,
     sesiPenggunaId: sesi.id,
-    daftarRiwayat: hasilRiwayat.rows.map(normalisasiBarisPengajuan),
+    daftarRiwayat: hasilRiwayat.rows.map((baris) => {
+      const normal = normalisasiBarisPengajuan(baris);
+      if (
+        sesi.peran === "karyawan" &&
+        normal.rekan_pengganti_id === sesi.id &&
+        normal.pengguna_id !== sesi.id
+      ) {
+        return {
+          ...normal,
+          alasan_cuti: "Disembunyikan (privasi pemohon)",
+          alamat_selama_cuti: "-",
+          nomor_darurat: "-",
+          lampiran_url: null,
+        };
+      }
+      return normal;
+    }),
     daftarJenisCuti: hasilJenis.rows,
     daftarDivisi: hasilDivisi.rows,
   };
