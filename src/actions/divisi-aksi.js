@@ -196,8 +196,8 @@ export async function buatDivisiBaru(formData) {
       sukses: true,
       pesan: `Divisi ${namaDivisi} berhasil dibuat.`,
     };
-  } catch (galat) {
-    if (galat.code === "23505") {
+  } catch (kesalahan) {
+    if (kesalahan.code === "23505") {
       return {
         sukses: false,
         pesan: "Nama divisi sudah digunakan atau ketua divisi telah terikat.",
@@ -205,7 +205,7 @@ export async function buatDivisiBaru(formData) {
     }
     return {
       sukses: false,
-      pesan: galat.message || "Gagal membuat divisi baru.",
+      pesan: kesalahan.message || "Gagal membuat divisi baru.",
     };
   }
 }
@@ -276,8 +276,8 @@ export async function ubahDataDivisi(formData) {
       sukses: true,
       pesan: `Divisi ${namaDivisi} berhasil diperbarui.`,
     };
-  } catch (galat) {
-    if (galat.code === "23505") {
+  } catch (kesalahan) {
+    if (kesalahan.code === "23505") {
       return {
         sukses: false,
         pesan: "Nama divisi sudah ada atau ketua divisi merangkap.",
@@ -285,7 +285,7 @@ export async function ubahDataDivisi(formData) {
     }
     return {
       sukses: false,
-      pesan: galat.message || "Gagal memperbarui divisi.",
+      pesan: kesalahan.message || "Gagal memperbarui divisi.",
     };
   }
 }
@@ -330,10 +330,10 @@ export async function hapusDivisiDenganKonfirmasi(divisiId, teksKonfirmasi) {
       sukses: true,
       pesan: `Divisi ${namaTerhapus} berhasil dihapus dan seluruh anggotanya telah dilepaskan dari divisi.`,
     };
-  } catch (galat) {
+  } catch (kesalahan) {
     return {
       sukses: false,
-      pesan: galat.message || "Gagal menghapus divisi.",
+      pesan: kesalahan.message || "Gagal menghapus divisi.",
     };
   }
 }

@@ -9,6 +9,30 @@ import {
   verifikasiKataSandi,
 } from "@/lib/autentikasi";
 
+const percobaanGagalMasuk = new Map();
+const BATAS_GAGAL_MASUK = 10;
+const JENDELA_BLOKIR_MS = 15 * 60 * 1000;
+
+function cekBatasMasuk(kunci) {
+  const entri = percobaanGagalMasuk.get(kunci);
+  if (!entri) return false;
+  if (Date.now() > entri.kadaluarsa) {
+    percobaanGagalMasuk.delete(kunci);
+    return false;
+  }
+  return entri.jumlah >= BATAS_GAGAL_MASUK;
+}
+
+function catatGagalMasuk(kunci) {
+  const sekarang = Date.now();
+  const entri = percobaanGagalMasuk.get(kunci);
+  if (!entri || sekarang > entri.kadaluarsa) {
+    percobaanGagalMasuk.set(kunci, { jumlah: 1, kadaluarsa: sekarang + JENDELA_BLOKIR_MS });
+    return;
+  }
+  entri.jumlah += 1;
+}
+
 export async function masukAkun(statusSebelumnya, formData) {
   const identitas = String(formData.get("identitas") || "").trim();
   const kataSandi = String(formData.get("kata_sandi") || "");
@@ -21,6 +45,14 @@ export async function masukAkun(statusSebelumnya, formData) {
     };
   }
 
+  const kunciBatas = identitas.toLowerCase();
+  if (cekBatasMasuk(kunciBatas)) {
+    return {
+      sukses: false,
+      pesan: "Terlalu banyak percobaan masuk gagal. Coba lagi dalam 15 menit.",
+    };
+  }
+
   let hasil;
   try {
     hasil = await jalankanKueri(
@@ -30,7 +62,7 @@ export async function masukAkun(statusSebelumnya, formData) {
        LIMIT 1`,
       [identitas]
     );
-  } catch (galat) {
+  } catch (kesalahan) {
     return {
       sukses: false,
       pesan:
@@ -39,6 +71,7 @@ export async function masukAkun(statusSebelumnya, formData) {
   }
 
   if (hasil.rows.length === 0) {
+    catatGagalMasuk(kunciBatas);
     return {
       sukses: false,
       pesan: "Email/username atau kata sandi salah.",
@@ -51,11 +84,14 @@ export async function masukAkun(statusSebelumnya, formData) {
     pengguna.kata_sandi_hash
   );
   if (!kataSandiCocok) {
+    catatGagalMasuk(kunciBatas);
     return {
       sukses: false,
       pesan: "Email/username atau kata sandi salah.",
     };
   }
+
+  percobaanGagalMasuk.delete(kunciBatas);
 
   if (!pengguna.status_aktif) {
     return {

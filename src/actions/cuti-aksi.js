@@ -481,12 +481,26 @@ export async function ajukanCutiBaru(formData) {
       sukses: true,
       pesan: `Pengajuan cuti ${nomorBaru} berhasil dikirim dan menunggu persetujuan.`,
     };
-  } catch (galat) {
+  } catch (kesalahan) {
     return {
       sukses: false,
-      pesan: galat.message || "Gagal mengirimkan pengajuan cuti.",
+      pesan: kesalahan.message || "Gagal mengirimkan pengajuan cuti.",
     };
   }
+}
+
+async function kirimNotifRekanBatalAtauTolak(klien, rekanId, nomorPengajuan, keterangan) {
+  if (!rekanId) return;
+  await klien.query(
+    `INSERT INTO notifikasi (pengguna_id, judul, pesan, tautan)
+     VALUES ($1, $2, $3, $4)`,
+    [
+      rekanId,
+      "Pembaruan Tugas Pengganti Cuti",
+      `Pengajuan cuti ${nomorPengajuan} yang menunjuk Anda sebagai pengganti telah ${keterangan}.`,
+      "/riwayat-cuti",
+    ]
+  );
 }
 
 export async function batalkanPengajuanCuti(pengajuanId, alasanPembatalan) {
@@ -503,8 +517,8 @@ export async function batalkanPengajuanCuti(pengajuanId, alasanPembatalan) {
   try {
     const nomorDibatalkan = await jalankanTransaksi(async (klien) => {
       const hasil = await klien.query(
-        `SELECT pc.id, pc.nomor_pengajuan, pc.pengguna_id, pc.total_hari_cuti,
-                pc.status, jc.potong_kuota_tahunan
+        `SELECT pc.id, pc.nomor_pengajuan, pc.pengguna_id, pc.rekan_pengganti_id,
+                pc.total_hari_cuti, pc.status, jc.potong_kuota_tahunan
          FROM pengajuan_cuti pc
          JOIN jenis_cuti jc ON jc.id = pc.jenis_cuti_id
          WHERE pc.id = $1 FOR UPDATE OF pc`,
@@ -545,6 +559,13 @@ export async function batalkanPengajuanCuti(pengajuanId, alasanPembatalan) {
         );
       }
 
+      await kirimNotifRekanBatalAtauTolak(
+        klien,
+        pengajuan.rekan_pengganti_id,
+        pengajuan.nomor_pengajuan,
+        "dibatalkan oleh pemohon"
+      );
+
       return pengajuan.nomor_pengajuan;
     });
 
@@ -559,10 +580,10 @@ export async function batalkanPengajuanCuti(pengajuanId, alasanPembatalan) {
       sukses: true,
       pesan: `Pengajuan ${nomorDibatalkan} berhasil dibatalkan dan kuota cuti telah dikembalikan.`,
     };
-  } catch (galat) {
+  } catch (kesalahan) {
     return {
       sukses: false,
-      pesan: galat.message || "Gagal membatalkan pengajuan cuti.",
+      pesan: kesalahan.message || "Gagal membatalkan pengajuan cuti.",
     };
   }
 }
@@ -666,8 +687,8 @@ export async function verifikasiCutiKetuaDivisi(
   try {
     const info = await jalankanTransaksi(async (klien) => {
       const hasil = await klien.query(
-        `SELECT pc.id, pc.nomor_pengajuan, pc.pengguna_id, pc.total_hari_cuti,
-                pc.status, jc.potong_kuota_tahunan, jc.nama_cuti,
+        `SELECT pc.id, pc.nomor_pengajuan, pc.pengguna_id, pc.rekan_pengganti_id,
+                pc.total_hari_cuti, pc.status, jc.potong_kuota_tahunan, jc.nama_cuti,
                 p.nama_lengkap AS nama_pemohon, p.peran AS peran_pemohon,
                 d.ketua_divisi_id
          FROM pengajuan_cuti pc
@@ -771,6 +792,13 @@ export async function verifikasiCutiKetuaDivisi(
         ]
       );
 
+      await kirimNotifRekanBatalAtauTolak(
+        klien,
+        data.rekan_pengganti_id,
+        data.nomor_pengajuan,
+        "ditolak oleh Ketua Divisi"
+      );
+
       return { nomor: data.nomor_pengajuan, aksi: "ditolak" };
     });
 
@@ -785,10 +813,10 @@ export async function verifikasiCutiKetuaDivisi(
       sukses: true,
       pesan: `Pengajuan ${info.nomor} berhasil ${info.aksi}.`,
     };
-  } catch (galat) {
+  } catch (kesalahan) {
     return {
       sukses: false,
-      pesan: galat.message || "Gagal memproses verifikasi pengajuan cuti.",
+      pesan: kesalahan.message || "Gagal memproses verifikasi pengajuan cuti.",
     };
   }
 }
@@ -881,8 +909,8 @@ export async function verifikasiFinalHrd(pengajuanId, keputusan, catatanHrd) {
   try {
     const info = await jalankanTransaksi(async (klien) => {
       const hasil = await klien.query(
-        `SELECT pc.id, pc.nomor_pengajuan, pc.pengguna_id, pc.total_hari_cuti,
-                pc.status, jc.potong_kuota_tahunan, p.peran AS peran_pemohon,
+        `SELECT pc.id, pc.nomor_pengajuan, pc.pengguna_id, pc.rekan_pengganti_id,
+                pc.total_hari_cuti, pc.status, jc.potong_kuota_tahunan, p.peran AS peran_pemohon,
                 p.divisi_id, d.ketua_divisi_id, k.status_aktif AS ketua_aktif
          FROM pengajuan_cuti pc
          JOIN jenis_cuti jc ON jc.id = pc.jenis_cuti_id
@@ -962,6 +990,13 @@ export async function verifikasiFinalHrd(pengajuanId, keputusan, catatanHrd) {
         ]
       );
 
+      await kirimNotifRekanBatalAtauTolak(
+        klien,
+        data.rekan_pengganti_id,
+        data.nomor_pengajuan,
+        "ditolak oleh HRD"
+      );
+
       return { nomor: data.nomor_pengajuan, aksi: "ditolak final" };
     });
 
@@ -976,10 +1011,10 @@ export async function verifikasiFinalHrd(pengajuanId, keputusan, catatanHrd) {
       sukses: true,
       pesan: `Pengajuan ${info.nomor} berhasil ${info.aksi}.`,
     };
-  } catch (galat) {
+  } catch (kesalahan) {
     return {
       sukses: false,
-      pesan: galat.message || "Gagal memproses persetujuan HRD.",
+      pesan: kesalahan.message || "Gagal memproses persetujuan HRD.",
     };
   }
 }
@@ -1050,10 +1085,10 @@ export async function setujuiBanyakCutiHrd(daftarPengajuanId, catatanHrd) {
       sukses: true,
       pesan: `${jumlahDisetujui} pengajuan cuti berhasil disetujui sekaligus.`,
     };
-  } catch (galat) {
+  } catch (kesalahan) {
     return {
       sukses: false,
-      pesan: galat.message || "Gagal memproses persetujuan massal.",
+      pesan: kesalahan.message || "Gagal memproses persetujuan massal.",
     };
   }
 }

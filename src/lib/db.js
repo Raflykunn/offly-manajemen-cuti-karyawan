@@ -33,9 +33,9 @@ export async function jalankanTransaksi(fungsiCallback) {
     const hasil = await fungsiCallback(klien);
     await klien.query("COMMIT");
     return hasil;
-  } catch (galat) {
+  } catch (kesalahan) {
     await klien.query("ROLLBACK");
-    throw galat;
+    throw kesalahan;
   } finally {
     klien.release();
   }

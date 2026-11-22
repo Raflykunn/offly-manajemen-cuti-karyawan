@@ -7,16 +7,16 @@ export default async function TataLetakDasbor({ children }) {
   await wajibSesiPengguna();
 
   let dataProfil = null;
-  let pesanGalatDb = "";
+  let pesanKesalahanDb = "";
 
   try {
     dataProfil = await ambilProfilLengkap();
   } catch {
-    pesanGalatDb =
+    pesanKesalahanDb =
       "Koneksi ke PostgreSQL belum tersambung. Pastikan database sudah dibuat, skrip database/offly_database.sql sudah dijalankan, dan DATABASE_URL pada .env sudah benar.";
   }
 
-  if (pesanGalatDb) {
+  if (pesanKesalahanDb) {
     return (
       <div className="min-h-screen flex items-center justify-center p-6 bg-muted/30">
         <div className="max-w-lg w-full rounded-xl border bg-card p-6 space-y-3 shadow-sm">
@@ -24,7 +24,7 @@ export default async function TataLetakDasbor({ children }) {
             Gagal Terhubung ke Database Offly
           </h1>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            {pesanGalatDb}
+            {pesanKesalahanDb}
           </p>
         </div>
       </div>

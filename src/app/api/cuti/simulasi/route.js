@@ -53,7 +53,7 @@ export async function POST(request) {
                 d.nama_divisi, d.batas_kapasitas_persen
          FROM pengguna p
          LEFT JOIN divisi d ON d.id = p.divisi_id
-         WHERE p.id = $1`,
+         WHERE p.id = $1 AND p.status_aktif = TRUE`,
         [sesi.id]
       ),
       jalankanKueri(`SELECT * FROM jenis_cuti WHERE id = $1`, [jenisCutiId]),

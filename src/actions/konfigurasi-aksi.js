@@ -78,8 +78,8 @@ export async function tambahJenisCutiBaru(formData) {
       sukses: true,
       pesan: `Jenis cuti "${namaCuti}" berhasil ditambahkan.`,
     };
-  } catch (galat) {
-    if (galat.code === "23505") {
+  } catch (kesalahan) {
+    if (kesalahan.code === "23505") {
       return {
         sukses: false,
         pesan: "Kode atau nama jenis cuti sudah ada di database.",
@@ -144,8 +144,8 @@ export async function ubahJenisCuti(formData) {
       sukses: true,
       pesan: `Jenis cuti "${namaCuti}" berhasil diperbarui.`,
     };
-  } catch (galat) {
-    if (galat.code === "23505") {
+  } catch (kesalahan) {
+    if (kesalahan.code === "23505") {
       return {
         sukses: false,
         pesan: "Kode atau nama jenis cuti sudah digunakan.",
@@ -232,8 +232,8 @@ export async function tambahHariLibur(formData) {
     revalidatePath("/pengaturan-kalender");
     revalidatePath("/pengajuan-cuti");
     return { sukses: true, pesan: "Hari libur berhasil ditambahkan." };
-  } catch (galat) {
-    if (galat.code === "23505") {
+  } catch (kesalahan) {
+    if (kesalahan.code === "23505") {
       return { sukses: false, pesan: "Tanggal libur tersebut sudah terdaftar." };
     }
     return { sukses: false, pesan: "Gagal menambahkan hari libur." };
@@ -273,8 +273,8 @@ export async function ubahHariLibur(formData) {
     revalidatePath("/pengaturan-kalender");
     revalidatePath("/pengajuan-cuti");
     return { sukses: true, pesan: "Hari libur berhasil diperbarui." };
-  } catch (galat) {
-    if (galat.code === "23505") {
+  } catch (kesalahan) {
+    if (kesalahan.code === "23505") {
       return { sukses: false, pesan: "Tanggal libur tersebut sudah terdaftar." };
     }
     return { sukses: false, pesan: "Gagal memperbarui hari libur." };
@@ -283,10 +283,14 @@ export async function ubahHariLibur(formData) {
 
 export async function hapusHariLibur(id) {
   await wajibSesiPengguna(["admin", "hrd"]);
-  await jalankanKueri(`DELETE FROM hari_libur WHERE id = $1`, [Number(id)]);
-  revalidatePath("/pengaturan-kalender");
-  revalidatePath("/pengajuan-cuti");
-  return { sukses: true, pesan: "Hari libur berhasil dihapus." };
+  try {
+    await jalankanKueri(`DELETE FROM hari_libur WHERE id = $1`, [Number(id)]);
+    revalidatePath("/pengaturan-kalender");
+    revalidatePath("/pengajuan-cuti");
+    return { sukses: true, pesan: "Hari libur berhasil dihapus." };
+  } catch {
+    return { sukses: false, pesan: "Gagal menghapus hari libur." };
+  }
 }
 
 export async function tambahPeriodeBlackout(formData) {
@@ -327,23 +331,31 @@ export async function tambahPeriodeBlackout(formData) {
 
 export async function ubahStatusBlackout(id, statusAktif) {
   await wajibSesiPengguna(["admin", "hrd"]);
-  await jalankanKueri(
-    `UPDATE periode_blackout SET status_aktif = $1 WHERE id = $2`,
-    [Boolean(statusAktif), Number(id)]
-  );
-  revalidatePath("/pengaturan-kalender");
-  revalidatePath("/pengajuan-cuti");
-  return { sukses: true, pesan: "Status periode blackout diperbarui." };
+  try {
+    await jalankanKueri(
+      `UPDATE periode_blackout SET status_aktif = $1 WHERE id = $2`,
+      [Boolean(statusAktif), Number(id)]
+    );
+    revalidatePath("/pengaturan-kalender");
+    revalidatePath("/pengajuan-cuti");
+    return { sukses: true, pesan: "Status periode blackout diperbarui." };
+  } catch {
+    return { sukses: false, pesan: "Gagal memperbarui status periode blackout." };
+  }
 }
 
 export async function hapusPeriodeBlackout(id) {
   await wajibSesiPengguna(["admin", "hrd"]);
-  await jalankanKueri(`DELETE FROM periode_blackout WHERE id = $1`, [
-    Number(id),
-  ]);
-  revalidatePath("/pengaturan-kalender");
-  revalidatePath("/pengajuan-cuti");
-  return { sukses: true, pesan: "Periode blackout berhasil dihapus." };
+  try {
+    await jalankanKueri(`DELETE FROM periode_blackout WHERE id = $1`, [
+      Number(id),
+    ]);
+    revalidatePath("/pengaturan-kalender");
+    revalidatePath("/pengajuan-cuti");
+    return { sukses: true, pesan: "Periode blackout berhasil dihapus." };
+  } catch {
+    return { sukses: false, pesan: "Gagal menghapus periode blackout." };
+  }
 }
 
 export async function perbaruiBatasKapasitasDivisi(divisiId, batasPersen) {
@@ -356,15 +368,22 @@ export async function perbaruiBatasKapasitasDivisi(divisiId, batasPersen) {
     };
   }
 
-  await jalankanKueri(
-    `UPDATE divisi SET batas_kapasitas_persen = $1, diperbarui_pada = NOW() WHERE id = $2`,
-    [nilai, Number(divisiId)]
-  );
-  revalidatePath("/pengaturan-kalender");
-  revalidatePath("/persetujuan-hrd");
-  revalidatePath("/dasbor");
-  return {
-    sukses: true,
-    pesan: "Batas maksimal kapasitas cuti divisi berhasil diperbarui.",
-  };
+  try {
+    await jalankanKueri(
+      `UPDATE divisi SET batas_kapasitas_persen = $1, diperbarui_pada = NOW() WHERE id = $2`,
+      [nilai, Number(divisiId)]
+    );
+    revalidatePath("/pengaturan-kalender");
+    revalidatePath("/persetujuan-hrd");
+    revalidatePath("/dasbor");
+    return {
+      sukses: true,
+      pesan: "Batas maksimal kapasitas cuti divisi berhasil diperbarui.",
+    };
+  } catch {
+    return {
+      sukses: false,
+      pesan: "Gagal memperbarui batas kapasitas cuti divisi.",
+    };
+  }
 }

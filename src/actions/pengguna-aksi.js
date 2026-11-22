@@ -308,8 +308,8 @@ export async function tambahPenggunaBaru(formData) {
       sukses: true,
       pesan: `Pengguna ${namaLengkap} berhasil ditambahkan.`,
     };
-  } catch (galat) {
-    if (galat.code === "23505") {
+  } catch (kesalahan) {
+    if (kesalahan.code === "23505") {
       return {
         sukses: false,
         pesan: "Username atau email sudah terdaftar pada sistem.",
@@ -445,8 +445,8 @@ export async function ubahDataPengguna(formData) {
       sukses: true,
       pesan: `Data pengguna ${namaLengkap} berhasil diperbarui.`,
     };
-  } catch (galat) {
-    if (galat.code === "23505") {
+  } catch (kesalahan) {
+    if (kesalahan.code === "23505") {
       return {
         sukses: false,
         pesan: "Username atau email sudah digunakan pengguna lain.",
@@ -454,7 +454,7 @@ export async function ubahDataPengguna(formData) {
     }
     return {
       sukses: false,
-      pesan: galat.message || "Gagal memperbarui data pengguna.",
+      pesan: kesalahan.message || "Gagal memperbarui data pengguna.",
     };
   }
 }
