@@ -6,6 +6,7 @@ import {
   Ban,
   CalendarCog,
   CalendarOff,
+  Pencil,
   Plus,
   Save,
   Trash2,
@@ -17,6 +18,7 @@ import {
   perbaruiBatasKapasitasDivisi,
   tambahHariLibur,
   tambahPeriodeBlackout,
+  ubahHariLibur,
   ubahStatusBlackout,
 } from "@/actions/konfigurasi-aksi";
 import { formatTanggalIndo } from "@/lib/kalkulasi-cuti";
@@ -30,6 +32,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -61,6 +71,7 @@ export default function KelolaKalenderClient({
   const [pesanBanner, aturPesanBanner] = useState(null);
   const [jenisLibur, aturJenisLibur] = useState("Libur Nasional");
   const [targetHapus, aturTargetHapus] = useState(null);
+  const [liburDiedit, aturLiburDiedit] = useState(null);
   const [nilaiKapasitas, aturNilaiKapasitas] = useState(() => {
     const awal = {};
     for (const d of daftarDivisi) {
@@ -78,6 +89,19 @@ export default function KelolaKalenderClient({
       aturPesanBanner(hasil);
       if (hasil.sukses) {
         form.reset();
+        router.refresh();
+      }
+    });
+  }
+
+  function tanganiUbahLibur(event) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    mulaiTransisi(async () => {
+      const hasil = await ubahHariLibur(formData);
+      aturPesanBanner(hasil);
+      if (hasil.sukses) {
+        aturLiburDiedit(null);
         router.refresh();
       }
     });
@@ -246,7 +270,15 @@ export default function KelolaKalenderClient({
                         <TableCell>
                           <Badge variant="outline">{item.jenis}</Badge>
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="text-right space-x-1">
+                          <Button
+                            size="icon-sm"
+                            variant="outline"
+                            disabled={sedangProses}
+                            onClick={() => aturLiburDiedit({ ...item })}
+                          >
+                            <Pencil className="size-3.5" />
+                          </Button>
                           <Button
                             size="icon-sm"
                             variant="destructive"
@@ -471,6 +503,78 @@ export default function KelolaKalenderClient({
           </Card>
         </TabsContent>
       </Tabs>
+
+      <Dialog
+        open={Boolean(liburDiedit)}
+        onOpenChange={(terbuka) => !terbuka && aturLiburDiedit(null)}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Hari Libur</DialogTitle>
+            <DialogDescription>
+              Perbarui tanggal, keterangan, atau jenis hari libur.
+            </DialogDescription>
+          </DialogHeader>
+          {liburDiedit && (
+            <form onSubmit={tanganiUbahLibur} className="space-y-3">
+              <input type="hidden" name="id" value={liburDiedit.id} />
+              <div className="space-y-1.5">
+                <Label htmlFor="edit_tgl_libur">Tanggal</Label>
+                <Input
+                  id="edit_tgl_libur"
+                  name="tanggal"
+                  type="date"
+                  defaultValue={liburDiedit.tanggal}
+                  required
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="edit_nama_libur">Keterangan Hari Libur</Label>
+                <Input
+                  id="edit_nama_libur"
+                  name="nama_libur"
+                  defaultValue={liburDiedit.nama_libur}
+                  required
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Jenis Hari Libur</Label>
+                <Select
+                  name="jenis"
+                  value={liburDiedit.jenis}
+                  onValueChange={(nilai) =>
+                    aturLiburDiedit((lama) =>
+                      lama ? { ...lama, jenis: nilai } : lama
+                    )
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue>{(v) => v}</SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Libur Nasional">
+                      Libur Nasional
+                    </SelectItem>
+                    <SelectItem value="Cuti Bersama">Cuti Bersama</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <DialogFooter className="pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => aturLiburDiedit(null)}
+                >
+                  Batal
+                </Button>
+                <Button type="submit" disabled={sedangProses}>
+                  {sedangProses ? "Menyimpan..." : "Simpan Perubahan"}
+                </Button>
+              </DialogFooter>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <DialogKonfirmasi
         terbuka={Boolean(targetHapus)}

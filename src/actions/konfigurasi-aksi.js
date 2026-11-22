@@ -218,6 +218,47 @@ export async function tambahHariLibur(formData) {
   }
 }
 
+export async function ubahHariLibur(formData) {
+  await wajibSesiPengguna(["admin", "hrd"]);
+
+  const id = Number(formData.get("id"));
+  const tanggal = String(formData.get("tanggal") || "").trim();
+  const namaLibur = String(formData.get("nama_libur") || "").trim();
+  const jenis = String(formData.get("jenis") || "Libur Nasional").trim();
+
+  if (!id || !tanggal || !namaLibur) {
+    return {
+      sukses: false,
+      pesan: "ID, tanggal, dan nama hari libur wajib diisi.",
+    };
+  }
+
+  if (!["Libur Nasional", "Cuti Bersama"].includes(jenis)) {
+    return { sukses: false, pesan: "Jenis hari libur tidak valid." };
+  }
+
+  try {
+    const hasil = await jalankanKueri(
+      `UPDATE hari_libur
+       SET tanggal = $1, nama_libur = $2, jenis = $3
+       WHERE id = $4
+       RETURNING id`,
+      [tanggal, namaLibur, jenis, id]
+    );
+    if (hasil.rows.length === 0) {
+      return { sukses: false, pesan: "Hari libur tidak ditemukan." };
+    }
+    revalidatePath("/pengaturan-kalender");
+    revalidatePath("/pengajuan-cuti");
+    return { sukses: true, pesan: "Hari libur berhasil diperbarui." };
+  } catch (galat) {
+    if (galat.code === "23505") {
+      return { sukses: false, pesan: "Tanggal libur tersebut sudah terdaftar." };
+    }
+    return { sukses: false, pesan: "Gagal memperbarui hari libur." };
+  }
+}
+
 export async function hapusHariLibur(id) {
   await wajibSesiPengguna(["admin", "hrd"]);
   await jalankanKueri(`DELETE FROM hari_libur WHERE id = $1`, [Number(id)]);

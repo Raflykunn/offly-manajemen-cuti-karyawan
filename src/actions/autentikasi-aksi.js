@@ -41,19 +41,11 @@ export async function masukAkun(statusSebelumnya, formData) {
   if (hasil.rows.length === 0) {
     return {
       sukses: false,
-      pesan: "Akun tidak ditemukan. Periksa kembali email atau username Anda.",
+      pesan: "Email/username atau kata sandi salah.",
     };
   }
 
   const pengguna = hasil.rows[0];
-
-  if (!pengguna.status_aktif) {
-    return {
-      sukses: false,
-      pesan: "Akun Anda sedang berstatus nonaktif. Silakan hubungi Admin.",
-    };
-  }
-
   const kataSandiCocok = await verifikasiKataSandi(
     kataSandi,
     pengguna.kata_sandi_hash
@@ -61,7 +53,14 @@ export async function masukAkun(statusSebelumnya, formData) {
   if (!kataSandiCocok) {
     return {
       sukses: false,
-      pesan: "Kata sandi yang Anda masukkan salah.",
+      pesan: "Email/username atau kata sandi salah.",
+    };
+  }
+
+  if (!pengguna.status_aktif) {
+    return {
+      sukses: false,
+      pesan: "Akun Anda sedang berstatus nonaktif. Silakan hubungi Admin.",
     };
   }
 

@@ -334,8 +334,11 @@ export async function ubahDataPengguna(formData) {
   const divisiId =
     divisiMentah && divisiMentah !== "kosong" ? Number(divisiMentah) : null;
   const statusAktif = formData.get("status_aktif") === "true";
-  const kuotaAwal = Number(formData.get("kuota_cuti_awal") || 12);
-  const sisaKuota = Number(formData.get("sisa_kuota_cuti") ?? kuotaAwal);
+  const kuotaAwalMentah = String(formData.get("kuota_cuti_awal") ?? "").trim();
+  const kuotaAwal = kuotaAwalMentah === "" ? 12 : Number(kuotaAwalMentah);
+  const sisaKuotaMentah = String(formData.get("sisa_kuota_cuti") ?? "").trim();
+  const sisaKuota =
+    sisaKuotaMentah === "" ? kuotaAwal : Number(sisaKuotaMentah);
   const tanggalBergabung = String(formData.get("tanggal_bergabung") || "").trim();
   const kataSandiBaru = String(formData.get("kata_sandi") || "");
 
@@ -351,15 +354,40 @@ export async function ubahDataPengguna(formData) {
     return { sukses: false, pesan: "Format email tidak valid." };
   }
 
+  if (!["admin", "karyawan", "ketua_divisi", "hrd"].includes(peran)) {
+    return { sukses: false, pesan: "Peran pengguna tidak valid." };
+  }
+
+  if (Number.isNaN(kuotaAwal) || kuotaAwal < 0 || kuotaAwal > 30) {
+    return {
+      sukses: false,
+      pesan: "Kuota cuti awal harus antara 0 hingga 30 hari.",
+    };
+  }
+
+  if (Number.isNaN(sisaKuota) || sisaKuota < 0 || sisaKuota > kuotaAwal) {
+    return {
+      sukses: false,
+      pesan: "Sisa kuota cuti harus antara 0 hingga kuota cuti awal.",
+    };
+  }
+
+  if (kataSandiBaru && kataSandiBaru.length < 6) {
+    return {
+      sukses: false,
+      pesan: "Kata sandi baru minimal terdiri dari 6 karakter.",
+    };
+  }
+
   try {
     await jalankanTransaksi(async (klien) => {
       const cekKetua = await klien.query(
         `SELECT id, nama_divisi FROM divisi WHERE ketua_divisi_id = $1`,
         [id]
       );
-      if (cekKetua.rows.length > 0 && peran !== "ketua_divisi") {
+      if (cekKetua.rows.length > 0 && (peran !== "ketua_divisi" || !statusAktif)) {
         throw new Error(
-          `Pengguna sedang menjabat Ketua Divisi ${cekKetua.rows[0].nama_divisi}. Ubah ketua divisi terlebih dahulu sebelum mengganti perannya.`
+          `Pengguna sedang menjabat Ketua Divisi ${cekKetua.rows[0].nama_divisi}. Ubah ketua divisi terlebih dahulu sebelum mengganti peran atau menonaktifkan akun.`
         );
       }
 
@@ -427,6 +455,33 @@ export async function ubahDataPengguna(formData) {
     return {
       sukses: false,
       pesan: galat.message || "Gagal memperbarui data pengguna.",
+    };
+  }
+}
+
+export async function resetKuotaTahunanSemua() {
+  await wajibSesiPengguna(["admin"]);
+
+  try {
+    const hasil = await jalankanKueri(
+      `UPDATE pengguna
+       SET sisa_kuota_cuti = kuota_cuti_awal, diperbarui_pada = NOW()
+       WHERE status_aktif = TRUE`
+    );
+
+    revalidatePath("/manajemen-pengguna");
+    revalidatePath("/dasbor");
+    revalidatePath("/pengajuan-cuti");
+    revalidatePath("/profil");
+
+    return {
+      sukses: true,
+      pesan: `Kuota cuti tahunan berhasil direset untuk ${hasil.rowCount} pengguna aktif.`,
+    };
+  } catch {
+    return {
+      sukses: false,
+      pesan: "Gagal mereset kuota cuti tahunan.",
     };
   }
 }

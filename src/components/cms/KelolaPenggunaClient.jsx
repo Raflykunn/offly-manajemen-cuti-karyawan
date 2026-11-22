@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   Pencil,
   Plus,
+  RotateCcw,
   Search,
   Trash2,
   UserCheck,
@@ -13,6 +14,7 @@ import {
 } from "lucide-react";
 import {
   hapusDataPengguna,
+  resetKuotaTahunanSemua,
   tambahPenggunaBaru,
   ubahDataPengguna,
 } from "@/actions/pengguna-aksi";
@@ -77,6 +79,7 @@ export default function KelolaPenggunaClient({
   const [modalTambahTerbuka, aturModalTambahTerbuka] = useState(false);
   const [penggunaDiedit, aturPenggunaDiedit] = useState(null);
   const [penggunaDihapus, aturPenggunaDihapus] = useState(null);
+  const [modalResetKuota, aturModalResetKuota] = useState(false);
 
   const [peranForm, aturPeranForm] = useState("karyawan");
   const [divisiForm, aturDivisiForm] = useState("kosong");
@@ -207,6 +210,17 @@ export default function KelolaPenggunaClient({
     });
   }
 
+  function tanganiResetKuotaTahunan() {
+    mulaiTransisi(async () => {
+      const hasil = await resetKuotaTahunanSemua();
+      aturPesanBanner(hasil);
+      aturModalResetKuota(false);
+      if (hasil.sukses) {
+        router.refresh();
+      }
+    });
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -218,10 +232,20 @@ export default function KelolaPenggunaClient({
             Kelola akun Admin, Karyawan, Ketua Divisi, dan HRD beserta kuota cutinya.
           </p>
         </div>
-        <Button onClick={bukaModalTambah} size="sm">
-          <UserPlus className="size-4 mr-1.5" />
-          Tambah Pengguna
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            onClick={() => aturModalResetKuota(true)}
+            size="sm"
+            variant="outline"
+          >
+            <RotateCcw className="size-4 mr-1.5" />
+            Reset Kuota Tahunan
+          </Button>
+          <Button onClick={bukaModalTambah} size="sm">
+            <UserPlus className="size-4 mr-1.5" />
+            Tambah Pengguna
+          </Button>
+        </div>
       </div>
 
       {pesanBanner && (
@@ -800,6 +824,35 @@ export default function KelolaPenggunaClient({
               disabled={sedangMemproses}
             >
               {sedangMemproses ? "Menghapus..." : "Hapus Pengguna"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={modalResetKuota}
+        onOpenChange={(terbuka) => !terbuka && aturModalResetKuota(false)}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Reset Kuota Cuti Tahunan</DialogTitle>
+            <DialogDescription>
+              Sisa kuota cuti seluruh pengguna aktif akan dikembalikan sama
+              dengan kuota cuti awal masing-masing. Lanjutkan?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => aturModalResetKuota(false)}
+            >
+              Batal
+            </Button>
+            <Button
+              onClick={tanganiResetKuotaTahunan}
+              disabled={sedangMemproses}
+            >
+              {sedangMemproses ? "Mereset..." : "Ya, Reset Kuota"}
             </Button>
           </DialogFooter>
         </DialogContent>
