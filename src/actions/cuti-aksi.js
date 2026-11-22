@@ -170,6 +170,16 @@ export async function ajukanCutiBaru(formData) {
     };
   }
 
+  if (
+    lampiranUrl &&
+    !/^\/api\/lampiran\/[a-zA-Z0-9._-]+$/.test(lampiranUrl)
+  ) {
+    return {
+      sukses: false,
+      pesan: "URL berkas lampiran tidak valid.",
+    };
+  }
+
   try {
     const nomorBaru = await jalankanTransaksi(async (klien) => {
       const penggunaRes = await klien.query(

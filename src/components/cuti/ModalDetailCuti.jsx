@@ -11,6 +11,7 @@ import {
   XCircle,
 } from "lucide-react";
 import {
+  apakahUrlLampiranAman,
   formatAngkaKuota,
   formatTanggalIndo,
   labelPeranPengguna,
@@ -109,7 +110,7 @@ export default function ModalDetailCuti({ pengajuan, saatTutup }) {
             </div>
           </div>
 
-          {pengajuan.lampiran_url && (
+          {apakahUrlLampiranAman(pengajuan.lampiran_url) && (
             <div className="rounded-lg border p-3 flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 text-xs">
                 <FileText className="size-4 text-primary" />

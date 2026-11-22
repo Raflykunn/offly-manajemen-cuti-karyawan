@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { jalankanKueri } from "@/lib/db";
 import {
   NAMA_COOKIE_SESI,
   buatTokenSesi,
@@ -19,7 +20,27 @@ export async function ambilSesiPengguna() {
   const penyimpananCookie = await cookies();
   const token = penyimpananCookie.get(NAMA_COOKIE_SESI)?.value;
   if (!token) return null;
-  return verifikasiTokenSesi(token);
+
+  const muatan = await verifikasiTokenSesi(token);
+  if (!muatan?.id) return null;
+
+  const hasil = await jalankanKueri(
+    `SELECT id, username, email, nama_lengkap, peran, divisi_id
+     FROM pengguna
+     WHERE id = $1 AND status_aktif = TRUE`,
+    [muatan.id]
+  );
+  const pengguna = hasil.rows[0];
+  if (!pengguna) return null;
+
+  return {
+    id: pengguna.id,
+    username: pengguna.username,
+    email: pengguna.email,
+    nama_lengkap: pengguna.nama_lengkap,
+    peran: pengguna.peran,
+    divisi_id: pengguna.divisi_id,
+  };
 }
 
 export async function wajibSesiPengguna(daftarPeranDiizinkan = null) {

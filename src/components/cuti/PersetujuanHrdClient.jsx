@@ -18,6 +18,7 @@ import {
   verifikasiFinalHrd,
 } from "@/actions/cuti-aksi";
 import {
+  apakahUrlLampiranAman,
   formatAngkaKuota,
   formatTanggalIndo,
   labelPeranPengguna,
@@ -311,7 +312,7 @@ export default function PersetujuanHrdClient({ daftarMenunggu }) {
                     </div>
                   </div>
 
-                  {item.lampiran_url && (
+                  {apakahUrlLampiranAman(item.lampiran_url) && (
                     <Button
                       size="sm"
                       variant="outline"

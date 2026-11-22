@@ -230,3 +230,10 @@ export function hitungKapasitasCutiDivisi(
     melebihiBatas: jumlahAnggota >= 2 && jumlahCuti > maksOrang,
   };
 }
+
+export function apakahUrlLampiranAman(url) {
+  if (!url) return false;
+  return /^\/(api\/lampiran|uploads\/lampiran)\/[a-zA-Z0-9._-]+$/.test(
+    String(url).trim()
+  );
+}

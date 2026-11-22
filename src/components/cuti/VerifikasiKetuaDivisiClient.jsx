@@ -11,7 +11,11 @@ import {
   X,
 } from "lucide-react";
 import { verifikasiCutiKetuaDivisi } from "@/actions/cuti-aksi";
-import { formatAngkaKuota, formatTanggalIndo } from "@/lib/kalkulasi-cuti";
+import {
+  apakahUrlLampiranAman,
+  formatAngkaKuota,
+  formatTanggalIndo,
+} from "@/lib/kalkulasi-cuti";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -177,7 +181,7 @@ export default function VerifikasiKetuaDivisiClient({
                     )}
                   </div>
 
-                  {item.lampiran_url && (
+                  {apakahUrlLampiranAman(item.lampiran_url) && (
                     <Button
                       size="sm"
                       variant="outline"

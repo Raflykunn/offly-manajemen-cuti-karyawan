@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 import { NextResponse } from "next/server";
@@ -5,6 +6,21 @@ import { ambilSesiPengguna } from "@/lib/autentikasi";
 
 const EKSTENSI_DIIZINKAN = new Set([".pdf", ".jpg", ".jpeg", ".png"]);
 const UKURAN_MAKS_BYTE = 5 * 1024 * 1024;
+
+function apakahIsiBerkasValid(ekstensi, buffer) {
+  if (!buffer || buffer.length < 4) return false;
+  if (ekstensi === ".pdf") {
+    return buffer.subarray(0, 5).toString("ascii") === "%PDF-";
+  }
+  if (ekstensi === ".png") {
+    const tandaPng = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+    return buffer.length >= 8 && buffer.subarray(0, 8).equals(tandaPng);
+  }
+  if (ekstensi === ".jpg" || ekstensi === ".jpeg") {
+    return buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;
+  }
+  return false;
+}
 
 export async function POST(request) {
   const sesi = await ambilSesiPengguna();
@@ -44,25 +60,26 @@ export async function POST(request) {
       );
     }
 
-    const namaDasar = path
-      .basename(berkas.name, ekstensi)
-      .replace(/[^a-zA-Z0-9_-]/g, "-")
-      .slice(0, 40);
-    const namaBerkasAkhir = `${Date.now()}-${sesi.id}-${namaDasar}${ekstensi}`;
-    const folderTujuan = path.join(
-      process.cwd(),
-      "public",
-      "uploads",
-      "lampiran"
-    );
+    const namaBerkasAkhir = `${crypto.randomUUID()}${ekstensi}`;
+    const folderTujuan = path.join(process.cwd(), "storage", "lampiran");
+
+    const buffer = Buffer.from(await berkas.arrayBuffer());
+    if (!apakahIsiBerkasValid(ekstensi, buffer)) {
+      return NextResponse.json(
+        {
+          sukses: false,
+          pesan: "Isi berkas tidak sesuai dengan format PDF, JPG, JPEG, atau PNG.",
+        },
+        { status: 400 }
+      );
+    }
 
     await mkdir(folderTujuan, { recursive: true });
-    const buffer = Buffer.from(await berkas.arrayBuffer());
     await writeFile(path.join(folderTujuan, namaBerkasAkhir), buffer);
 
     return NextResponse.json({
       sukses: true,
-      url: `/uploads/lampiran/${namaBerkasAkhir}`,
+      url: `/api/lampiran/${namaBerkasAkhir}`,
       namaBerkas: berkas.name,
     });
   } catch {
