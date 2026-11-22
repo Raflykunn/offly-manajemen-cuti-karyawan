@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { jalankanKueri } from "@/lib/db";
 import { wajibSesiPengguna } from "@/lib/autentikasi";
+import { formatTanggalIso } from "@/lib/kalkulasi-cuti";
 
 export async function ambilSemuaJenisCuti() {
   await wajibSesiPengguna(["admin"]);
@@ -176,12 +177,12 @@ export async function ambilDataKalenderDanKapasitas() {
   return {
     hariLibur: hasilLibur.rows.map((baris) => ({
       ...baris,
-      tanggal: new Date(baris.tanggal).toISOString().slice(0, 10),
+      tanggal: formatTanggalIso(baris.tanggal),
     })),
     periodeBlackout: hasilBlackout.rows.map((baris) => ({
       ...baris,
-      tanggal_mulai: new Date(baris.tanggal_mulai).toISOString().slice(0, 10),
-      tanggal_selesai: new Date(baris.tanggal_selesai).toISOString().slice(0, 10),
+      tanggal_mulai: formatTanggalIso(baris.tanggal_mulai),
+      tanggal_selesai: formatTanggalIso(baris.tanggal_selesai),
     })),
     daftarDivisi: hasilDivisi.rows,
   };

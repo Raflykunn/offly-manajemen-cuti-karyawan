@@ -7,6 +7,7 @@ import {
   buatHashKataSandi,
   wajibSesiPengguna,
 } from "@/lib/autentikasi";
+import { formatTanggalIso } from "@/lib/kalkulasi-cuti";
 
 export async function ambilProfilLengkap() {
   const sesi = await ambilSesiPengguna();
@@ -53,7 +54,7 @@ export async function ambilProfilLengkap() {
       kuota_cuti_awal: Number(profil.kuota_cuti_awal),
       sisa_kuota_cuti: Number(profil.sisa_kuota_cuti),
       tanggal_bergabung: profil.tanggal_bergabung
-        ? new Date(profil.tanggal_bergabung).toISOString().slice(0, 10)
+        ? formatTanggalIso(profil.tanggal_bergabung)
         : "",
     },
     notifikasi: hasilNotifikasi.rows.map((item) => ({
@@ -233,9 +234,7 @@ export async function ambilDaftarPengguna(filter = {}) {
       ...baris,
       kuota_cuti_awal: Number(baris.kuota_cuti_awal),
       sisa_kuota_cuti: Number(baris.sisa_kuota_cuti),
-      tanggal_bergabung: new Date(baris.tanggal_bergabung)
-        .toISOString()
-        .slice(0, 10),
+      tanggal_bergabung: formatTanggalIso(baris.tanggal_bergabung),
     })),
     daftarDivisi: hasilDivisi.rows,
   };
@@ -255,7 +254,7 @@ export async function tambahPenggunaBaru(formData) {
   const kuotaAwal = Number(formData.get("kuota_cuti_awal") || 12);
   const tanggalBergabung =
     String(formData.get("tanggal_bergabung") || "").trim() ||
-    new Date().toISOString().slice(0, 10);
+    formatTanggalIso(new Date());
 
   if (!username || !email || !kataSandi || !namaLengkap || !peran) {
     return {

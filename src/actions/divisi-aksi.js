@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { jalankanKueri, jalankanTransaksi } from "@/lib/db";
 import { wajibSesiPengguna } from "@/lib/autentikasi";
+import { formatTanggalIso } from "@/lib/kalkulasi-cuti";
 
 export async function ambilDaftarDivisi(filter = {}) {
   await wajibSesiPengguna(["admin"]);
@@ -79,9 +80,7 @@ export async function ambilDaftarDivisi(filter = {}) {
   return {
     daftarDivisi: hasilDivisi.rows.map((baris) => ({
       ...baris,
-      tanggal_dibentuk: new Date(baris.tanggal_dibentuk)
-        .toISOString()
-        .slice(0, 10),
+      tanggal_dibentuk: formatTanggalIso(baris.tanggal_dibentuk),
     })),
     kandidatKetuaTersedia: hasilKandidatKetua.rows,
     semuaKetua: hasilSemuaKetua.rows,
@@ -131,16 +130,12 @@ export async function ambilDetailDivisi(divisiId) {
   return {
     divisi: {
       ...hasilDivisi.rows[0],
-      tanggal_dibentuk: new Date(hasilDivisi.rows[0].tanggal_dibentuk)
-        .toISOString()
-        .slice(0, 10),
+      tanggal_dibentuk: formatTanggalIso(hasilDivisi.rows[0].tanggal_dibentuk),
     },
     anggota: hasilAnggota.rows.map((baris) => ({
       ...baris,
       sisa_kuota_cuti: Number(baris.sisa_kuota_cuti),
-      tanggal_bergabung: new Date(baris.tanggal_bergabung)
-        .toISOString()
-        .slice(0, 10),
+      tanggal_bergabung: formatTanggalIso(baris.tanggal_bergabung),
     })),
     kandidatAnggota: hasilKandidatAnggota.rows,
   };

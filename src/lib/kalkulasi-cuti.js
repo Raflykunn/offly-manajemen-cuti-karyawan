@@ -208,3 +208,25 @@ export function gayaStatusCuti(status) {
   };
   return peta[status] || "bg-muted text-muted-foreground";
 }
+
+export function hitungKapasitasCutiDivisi(
+  totalAnggota,
+  sedangCuti,
+  batasPersen = 30
+) {
+  const jumlahAnggota = Math.max(0, Number(totalAnggota || 0));
+  const jumlahCuti = Math.max(0, Number(sedangCuti || 0));
+  const batas = Math.max(0, Number(batasPersen ?? 30));
+  const maksOrang =
+    jumlahAnggota > 0 && batas > 0
+      ? Math.max(1, Math.floor((batas / 100) * jumlahAnggota))
+      : 0;
+  const persenBeban =
+    jumlahAnggota > 0 ? Math.round((jumlahCuti / jumlahAnggota) * 100) : 0;
+
+  return {
+    maksOrang,
+    persenBeban,
+    melebihiBatas: jumlahAnggota >= 2 && jumlahCuti > maksOrang,
+  };
+}

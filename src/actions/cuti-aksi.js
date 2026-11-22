@@ -7,8 +7,21 @@ import {
   apakahLayakCutiTahunan,
   formatTanggalIso,
   hitungHariKerjaCuti,
+  hitungKapasitasCutiDivisi,
   validasiBatasWaktuPengajuan,
 } from "@/lib/kalkulasi-cuti";
+
+function apakahLayakDiprosesHrd(data) {
+  const tanpaKetuaAktif =
+    !data.divisi_id || !data.ketua_divisi_id || data.ketua_aktif !== true;
+  if (data.peran_pemohon === "karyawan") {
+    return (
+      data.status === "Approved by Leader" ||
+      (data.status === "Pending" && tanpaKetuaAktif)
+    );
+  }
+  return data.peran_pemohon === "ketua_divisi" && data.status === "Pending";
+}
 
 function normalisasiBarisPengajuan(baris) {
   return {
@@ -161,9 +174,11 @@ export async function ajukanCutiBaru(formData) {
     const nomorBaru = await jalankanTransaksi(async (klien) => {
       const penggunaRes = await klien.query(
         `SELECT p.id, p.nama_lengkap, p.peran, p.divisi_id, p.sisa_kuota_cuti,
-                p.tanggal_bergabung, d.ketua_divisi_id, d.batas_kapasitas_persen
+                p.tanggal_bergabung, d.ketua_divisi_id, d.batas_kapasitas_persen,
+                k.status_aktif AS ketua_aktif
          FROM pengguna p
          LEFT JOIN divisi d ON d.id = p.divisi_id
+         LEFT JOIN pengguna k ON k.id = d.ketua_divisi_id
          WHERE p.id = $1 FOR UPDATE OF p`,
         [sesi.id]
       );
@@ -277,13 +292,14 @@ export async function ajukanCutiBaru(formData) {
         const totalAnggota = anggotaAktifRes.rows[0]?.total ?? 1;
         const sudahDisetujui = disetujuiBersamaanRes.rows[0]?.total ?? 0;
         const batasPersen = Number(pengguna.batas_kapasitas_persen ?? 30);
-        const persenProyeksi =
-          totalAnggota > 0
-            ? Math.round(((sudahDisetujui + 1) / totalAnggota) * 100)
-            : 0;
-        if (totalAnggota >= 2 && persenProyeksi > batasPersen) {
+        const kapasitas = hitungKapasitasCutiDivisi(
+          totalAnggota,
+          sudahDisetujui + 1,
+          batasPersen
+        );
+        if (kapasitas.melebihiBatas) {
           throw new Error(
-            `Kapasitas cuti divisi pada tanggal tersebut telah penuh (${persenProyeksi}% melebihi batas maksimal ${batasPersen}%).`
+            `Kapasitas cuti divisi pada tanggal tersebut telah penuh (${sudahDisetujui + 1}/${totalAnggota} anggota atau ${kapasitas.persenBeban}%, maksimal ${kapasitas.maksOrang} orang sesuai batas ${batasPersen}%).`
           );
         }
       }
@@ -357,7 +373,12 @@ export async function ajukanCutiBaru(formData) {
         );
       }
 
-      if (pengguna.peran === "karyawan" && pengguna.ketua_divisi_id) {
+      if (
+        pengguna.peran === "karyawan" &&
+        pengguna.divisi_id &&
+        pengguna.ketua_divisi_id &&
+        pengguna.ketua_aktif === true
+      ) {
         await klien.query(
           `INSERT INTO notifikasi (pengguna_id, judul, pesan, tautan)
            VALUES ($1, $2, $3, $4)`,
@@ -368,20 +389,23 @@ export async function ajukanCutiBaru(formData) {
             "/verifikasi-divisi",
           ]
         );
-      } else if (pengguna.peran === "ketua_divisi") {
+      } else {
         const daftarHrdRes = await klien.query(
           `SELECT id FROM pengguna WHERE peran = 'hrd' AND status_aktif = TRUE`
         );
+        const judulNotif =
+          pengguna.peran === "ketua_divisi"
+            ? "Pengajuan Cuti Ketua Divisi"
+            : "Pengajuan Cuti Karyawan (Langsung HRD)";
+        const pesanNotif =
+          pengguna.peran === "ketua_divisi"
+            ? `Ketua Divisi ${pengguna.nama_lengkap} mengajukan ${jenisCuti.nama_cuti} (${hasilHitung.totalHari} hari) langsung ke HRD.`
+            : `Karyawan ${pengguna.nama_lengkap} mengajukan ${jenisCuti.nama_cuti} (${hasilHitung.totalHari} hari) langsung ke HRD karena belum memiliki Ketua Divisi aktif.`;
         for (const hrd of daftarHrdRes.rows) {
           await klien.query(
             `INSERT INTO notifikasi (pengguna_id, judul, pesan, tautan)
              VALUES ($1, $2, $3, $4)`,
-            [
-              hrd.id,
-              "Pengajuan Cuti Ketua Divisi",
-              `Ketua Divisi ${pengguna.nama_lengkap} mengajukan ${jenisCuti.nama_cuti} (${hasilHitung.totalHari} hari) langsung ke HRD.`,
-              "/persetujuan-hrd",
-            ]
+            [hrd.id, judulNotif, pesanNotif, "/persetujuan-hrd"]
           );
         }
       }
@@ -518,9 +542,10 @@ export async function ambilDaftarVerifikasiKetuaDivisi() {
        LEFT JOIN pengguna rp ON rp.id = pc.rekan_pengganti_id
        WHERE p.divisi_id = $1
          AND p.peran = 'karyawan'
+         AND pc.pengguna_id <> $2
          AND pc.status = 'Pending'
        ORDER BY pc.dibuat_pada ASC`,
-      [divisi.id]
+      [divisi.id, sesi.id]
     ),
     jalankanKueri(
       `SELECT pc.*,
@@ -564,6 +589,11 @@ export async function verifikasiCutiKetuaDivisi(
 ) {
   const sesi = await wajibSesiPengguna(["ketua_divisi"]);
   const catatan = String(catatanKetua || "").trim();
+  const idPengajuan = Number(pengajuanId);
+
+  if (!Number.isInteger(idPengajuan) || idPengajuan <= 0) {
+    return { sukses: false, pesan: "ID pengajuan tidak valid." };
+  }
 
   if (!["setuju", "tolak"].includes(keputusan)) {
     return { sukses: false, pesan: "Keputusan verifikasi tidak valid." };
@@ -581,13 +611,14 @@ export async function verifikasiCutiKetuaDivisi(
       const hasil = await klien.query(
         `SELECT pc.id, pc.nomor_pengajuan, pc.pengguna_id, pc.total_hari_cuti,
                 pc.status, jc.potong_kuota_tahunan, jc.nama_cuti,
-                p.nama_lengkap AS nama_pemohon, d.ketua_divisi_id
+                p.nama_lengkap AS nama_pemohon, p.peran AS peran_pemohon,
+                d.ketua_divisi_id
          FROM pengajuan_cuti pc
          JOIN jenis_cuti jc ON jc.id = pc.jenis_cuti_id
          JOIN pengguna p ON p.id = pc.pengguna_id
          JOIN divisi d ON d.id = p.divisi_id
          WHERE pc.id = $1 FOR UPDATE OF pc`,
-        [Number(pengajuanId)]
+        [idPengajuan]
       );
 
       if (hasil.rows.length === 0) {
@@ -595,6 +626,11 @@ export async function verifikasiCutiKetuaDivisi(
       }
 
       const data = hasil.rows[0];
+      if (data.pengguna_id === sesi.id || data.peran_pemohon !== "karyawan") {
+        throw new Error(
+          "Pengajuan milik Ketua Divisi atau diri sendiri harus diproses langsung oleh HRD."
+        );
+      }
       if (data.ketua_divisi_id !== sesi.id) {
         throw new Error(
           "Anda hanya dapat memverifikasi pengajuan anggota divisi Anda sendiri."
@@ -729,9 +765,19 @@ export async function ambilDaftarPersetujuanHrd() {
      JOIN jenis_cuti jc ON jc.id = pc.jenis_cuti_id
      JOIN pengguna p ON p.id = pc.pengguna_id
      LEFT JOIN divisi d ON d.id = p.divisi_id
+     LEFT JOIN pengguna k ON k.id = d.ketua_divisi_id
      LEFT JOIN pengguna rp ON rp.id = pc.rekan_pengganti_id
      LEFT JOIN pengguna ka ON ka.id = pc.ketua_approver_id
-     WHERE (p.peran = 'karyawan' AND pc.status = 'Approved by Leader')
+     WHERE (
+       p.peran = 'karyawan'
+       AND (
+         pc.status = 'Approved by Leader'
+         OR (
+           pc.status = 'Pending'
+           AND (p.divisi_id IS NULL OR d.ketua_divisi_id IS NULL OR k.status_aktif IS NOT TRUE)
+         )
+       )
+     )
         OR (p.peran = 'ketua_divisi' AND pc.status = 'Pending')
      ORDER BY pc.tanggal_mulai ASC, pc.dibuat_pada ASC`
   );
@@ -740,11 +786,12 @@ export async function ambilDaftarPersetujuanHrd() {
     const totalAnggota = Number(baris.total_anggota_divisi || 1);
     const jumlahCuti = Number(baris.jumlah_cuti_bersamaan || 0);
     const tambahanDiri = baris.status === "Pending" ? 1 : 0;
-    const persenBeban =
-      baris.divisi_id && totalAnggota > 0
-        ? Math.round(((jumlahCuti + tambahanDiri) / totalAnggota) * 100)
-        : 0;
     const batasPersen = Number(baris.batas_kapasitas_persen ?? 30);
+    const kapasitas = hitungKapasitasCutiDivisi(
+      totalAnggota,
+      jumlahCuti + tambahanDiri,
+      batasPersen
+    );
 
     return {
       ...normalisasiBarisPengajuan(baris),
@@ -752,12 +799,9 @@ export async function ambilDaftarPersetujuanHrd() {
       kuota_cuti_awal: Number(baris.kuota_cuti_awal),
       total_anggota_divisi: totalAnggota,
       jumlah_cuti_bersamaan: jumlahCuti + tambahanDiri,
-      persen_beban_divisi: persenBeban,
+      persen_beban_divisi: baris.divisi_id ? kapasitas.persenBeban : 0,
       batas_kapasitas_persen: batasPersen,
-      melebihi_kapasitas:
-        Boolean(baris.divisi_id) &&
-        totalAnggota >= 2 &&
-        persenBeban > batasPersen,
+      melebihi_kapasitas: Boolean(baris.divisi_id) && kapasitas.melebihiBatas,
     };
   });
 }
@@ -781,10 +825,13 @@ export async function verifikasiFinalHrd(pengajuanId, keputusan, catatanHrd) {
     const info = await jalankanTransaksi(async (klien) => {
       const hasil = await klien.query(
         `SELECT pc.id, pc.nomor_pengajuan, pc.pengguna_id, pc.total_hari_cuti,
-                pc.status, jc.potong_kuota_tahunan, p.peran AS peran_pemohon
+                pc.status, jc.potong_kuota_tahunan, p.peran AS peran_pemohon,
+                p.divisi_id, d.ketua_divisi_id, k.status_aktif AS ketua_aktif
          FROM pengajuan_cuti pc
          JOIN jenis_cuti jc ON jc.id = pc.jenis_cuti_id
          JOIN pengguna p ON p.id = pc.pengguna_id
+         LEFT JOIN divisi d ON d.id = p.divisi_id
+         LEFT JOIN pengguna k ON k.id = d.ketua_divisi_id
          WHERE pc.id = $1 FOR UPDATE OF pc`,
         [Number(pengajuanId)]
       );
@@ -794,12 +841,7 @@ export async function verifikasiFinalHrd(pengajuanId, keputusan, catatanHrd) {
       }
 
       const data = hasil.rows[0];
-      const layakDiproses =
-        (data.peran_pemohon === "karyawan" &&
-          data.status === "Approved by Leader") ||
-        (data.peran_pemohon === "ketua_divisi" && data.status === "Pending");
-
-      if (!layakDiproses) {
+      if (!apakahLayakDiprosesHrd(data)) {
         throw new Error(
           "Status pengajuan ini tidak lagi menunggu persetujuan final HRD."
         );
@@ -900,20 +942,20 @@ export async function setujuiBanyakCutiHrd(daftarPengajuanId, catatanHrd) {
   try {
     const jumlahDisetujui = await jalankanTransaksi(async (klien) => {
       const hasil = await klien.query(
-        `SELECT pc.id, pc.nomor_pengajuan, pc.pengguna_id, pc.status, p.peran
+        `SELECT pc.id, pc.nomor_pengajuan, pc.pengguna_id, pc.status,
+                p.peran AS peran_pemohon, p.divisi_id,
+                d.ketua_divisi_id, k.status_aktif AS ketua_aktif
          FROM pengajuan_cuti pc
          JOIN pengguna p ON p.id = pc.pengguna_id
+         LEFT JOIN divisi d ON d.id = p.divisi_id
+         LEFT JOIN pengguna k ON k.id = d.ketua_divisi_id
          WHERE pc.id = ANY($1::int[]) FOR UPDATE OF pc`,
         [ids]
       );
 
       let total = 0;
       for (const data of hasil.rows) {
-        const layak =
-          (data.peran === "karyawan" &&
-            data.status === "Approved by Leader") ||
-          (data.peran === "ketua_divisi" && data.status === "Pending");
-        if (!layak) continue;
+        if (!apakahLayakDiprosesHrd(data)) continue;
 
         await klien.query(
           `UPDATE pengajuan_cuti

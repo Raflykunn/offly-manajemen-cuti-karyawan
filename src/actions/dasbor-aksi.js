@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { jalankanKueri } from "@/lib/db";
 import { wajibSesiPengguna } from "@/lib/autentikasi";
+import { formatTanggalIso } from "@/lib/kalkulasi-cuti";
 
 async function ambilKandidatKuotaHangus() {
   const hasil = await jalankanKueri(
@@ -21,7 +22,7 @@ async function ambilKandidatKuotaHangus() {
     ...baris,
     kuota_cuti_awal: Number(baris.kuota_cuti_awal),
     sisa_kuota_cuti: Number(baris.sisa_kuota_cuti),
-    tanggal_bergabung: new Date(baris.tanggal_bergabung).toISOString().slice(0, 10),
+    tanggal_bergabung: formatTanggalIso(baris.tanggal_bergabung),
   }));
 }
 
@@ -81,7 +82,7 @@ export async function ambilDataDasborAdmin() {
     },
     karyawanBelumLayak: hasilBelumLayak.rows.map((baris) => ({
       ...baris,
-      tanggal_bergabung: new Date(baris.tanggal_bergabung).toISOString().slice(0, 10),
+      tanggal_bergabung: formatTanggalIso(baris.tanggal_bergabung),
     })),
     kandidatKuotaHangus,
   };
@@ -146,7 +147,7 @@ export async function ambilDataDasborKaryawan(penggunaId) {
       kuota_cuti_awal: Number(infoPengguna.kuota_cuti_awal ?? 12),
       sisa_kuota_cuti: Number(infoPengguna.sisa_kuota_cuti ?? 0),
       tanggal_bergabung: infoPengguna.tanggal_bergabung
-        ? new Date(infoPengguna.tanggal_bergabung).toISOString().slice(0, 10)
+        ? formatTanggalIso(infoPengguna.tanggal_bergabung)
         : "",
     },
     ringkasan: hasilRingkasanCuti.rows[0] || {
@@ -157,13 +158,13 @@ export async function ambilDataDasborKaryawan(penggunaId) {
     pengajuanTerbaru: hasilPengajuanTerbaru.rows.map((baris) => ({
       ...baris,
       total_hari_cuti: Number(baris.total_hari_cuti),
-      tanggal_mulai: new Date(baris.tanggal_mulai).toISOString().slice(0, 10),
-      tanggal_selesai: new Date(baris.tanggal_selesai).toISOString().slice(0, 10),
+      tanggal_mulai: formatTanggalIso(baris.tanggal_mulai),
+      tanggal_selesai: formatTanggalIso(baris.tanggal_selesai),
     })),
     tugasHandover: hasilTugasHandover.rows.map((baris) => ({
       ...baris,
-      tanggal_mulai: new Date(baris.tanggal_mulai).toISOString().slice(0, 10),
-      tanggal_selesai: new Date(baris.tanggal_selesai).toISOString().slice(0, 10),
+      tanggal_mulai: formatTanggalIso(baris.tanggal_mulai),
+      tanggal_selesai: formatTanggalIso(baris.tanggal_selesai),
     })),
   };
 }
@@ -244,8 +245,8 @@ export async function ambilDataDasborKetuaDivisi(penggunaId) {
   for (const item of hasilCutiMingguIni.rows) {
     petaCutiMingguIni.set(item.pengguna_id, {
       nama_cuti: item.nama_cuti,
-      tanggal_mulai: new Date(item.tanggal_mulai).toISOString().slice(0, 10),
-      tanggal_selesai: new Date(item.tanggal_selesai).toISOString().slice(0, 10),
+      tanggal_mulai: formatTanggalIso(item.tanggal_mulai),
+      tanggal_selesai: formatTanggalIso(item.tanggal_selesai),
       status: item.status,
     });
   }
@@ -268,8 +269,8 @@ export async function ambilDataDasborKetuaDivisi(penggunaId) {
     pengajuanMenunggu: hasilAntrean.rows.map((baris) => ({
       ...baris,
       total_hari_cuti: Number(baris.total_hari_cuti),
-      tanggal_mulai: new Date(baris.tanggal_mulai).toISOString().slice(0, 10),
-      tanggal_selesai: new Date(baris.tanggal_selesai).toISOString().slice(0, 10),
+      tanggal_mulai: formatTanggalIso(baris.tanggal_mulai),
+      tanggal_selesai: formatTanggalIso(baris.tanggal_selesai),
     })),
   };
 }
@@ -335,8 +336,8 @@ export async function ambilDataDasborHrd() {
     karyawanCutiBulanIni: hasilSedangCutiBulanIni.rows.map((baris) => ({
       ...baris,
       total_hari_cuti: Number(baris.total_hari_cuti),
-      tanggal_mulai: new Date(baris.tanggal_mulai).toISOString().slice(0, 10),
-      tanggal_selesai: new Date(baris.tanggal_selesai).toISOString().slice(0, 10),
+      tanggal_mulai: formatTanggalIso(baris.tanggal_mulai),
+      tanggal_selesai: formatTanggalIso(baris.tanggal_selesai),
     })),
     daftarDivisi: hasilDaftarDivisi.rows,
     kandidatKuotaHangus,
