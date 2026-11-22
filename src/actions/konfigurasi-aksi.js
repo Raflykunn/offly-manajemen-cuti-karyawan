@@ -16,6 +16,20 @@ export async function ambilSemuaJenisCuti() {
   return hasil.rows;
 }
 
+function validasiAngkaJenisCuti(kuotaDefault, batasHariPengajuan) {
+  if (!Number.isInteger(kuotaDefault) || kuotaDefault < 0 || kuotaDefault > 365) {
+    return "Kuota default harus berupa bilangan bulat antara 0 hingga 365 hari.";
+  }
+  if (
+    !Number.isInteger(batasHariPengajuan) ||
+    batasHariPengajuan < -30 ||
+    batasHariPengajuan > 365
+  ) {
+    return "Batas hari pengajuan harus berupa bilangan bulat antara -30 hingga 365 hari.";
+  }
+  return null;
+}
+
 export async function tambahJenisCutiBaru(formData) {
   await wajibSesiPengguna(["admin"]);
 
@@ -35,6 +49,10 @@ export async function tambahJenisCutiBaru(formData) {
       sukses: false,
       pesan: "Kode cuti dan nama jenis cuti wajib diisi.",
     };
+  }
+  const kesalahanAngka = validasiAngkaJenisCuti(kuotaDefault, batasHariPengajuan);
+  if (kesalahanAngka) {
+    return { sukses: false, pesan: kesalahanAngka };
   }
 
   try {
@@ -89,6 +107,10 @@ export async function ubahJenisCuti(formData) {
 
   if (!id || !kodeCuti || !namaCuti) {
     return { sukses: false, pesan: "Data wajib tidak boleh kosong." };
+  }
+  const kesalahanAngka = validasiAngkaJenisCuti(kuotaDefault, batasHariPengajuan);
+  if (kesalahanAngka) {
+    return { sukses: false, pesan: kesalahanAngka };
   }
 
   try {

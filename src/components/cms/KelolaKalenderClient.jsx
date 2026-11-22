@@ -179,7 +179,7 @@ export default function KelolaKalenderClient({
       )}
 
       <Tabs defaultValue="libur" className="space-y-4">
-        <TabsList>
+        <TabsList className="flex-wrap h-auto max-w-full">
           <TabsTrigger value="libur">Hari Libur &amp; Cuti Bersama</TabsTrigger>
           <TabsTrigger value="blackout">Periode Blackout</TabsTrigger>
           <TabsTrigger value="kapasitas">Kapasitas Tim Divisi</TabsTrigger>
@@ -250,7 +250,7 @@ export default function KelolaKalenderClient({
                   Daftar Hari Libur &amp; Cuti Bersama ({hariLibur.length})
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -367,7 +367,7 @@ export default function KelolaKalenderClient({
                   Daftar Periode Blackout ({periodeBlackout.length})
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -421,7 +421,7 @@ export default function KelolaKalenderClient({
                               aturTargetHapus({
                                 jenis: "blackout",
                                 id: item.id,
-                                label: item.judul || "periode blackout ini",
+                                label: item.nama_periode || "periode blackout ini",
                               })
                             }
                           >
@@ -448,7 +448,7 @@ export default function KelolaKalenderClient({
                 Menentukan batas persentase maksimal anggota dalam satu divisi yang diperbolehkan cuti pada rentang tanggal yang bersamaan.
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>

@@ -165,6 +165,7 @@ export function formatTanggalIndo(nilaiTanggal, denganJam = false) {
     day: "2-digit",
     month: "short",
     year: "numeric",
+    timeZone: "Asia/Makassar",
   };
   if (denganJam) {
     opsi.hour = "2-digit";
