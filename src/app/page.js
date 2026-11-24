@@ -4,7 +4,6 @@ import {
   Building2,
   CalendarCheck2,
   CalendarDays,
-  Check,
   Clock3,
   FileCheck2,
   FileText,
@@ -19,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import TombolTema from "@/components/tata-letak/TombolTema";
 import NavigasiBeranda from "@/components/tata-letak/NavigasiBeranda";
+import IlustrasiHero from "@/components/beranda/IlustrasiHero";
 
 async function ambilDataPublikBeranda() {
   try {
@@ -197,88 +197,7 @@ export default async function HalamanUtama() {
             </div>
 
             <div className="lg:col-span-5">
-              <div className="rounded-xl border bg-card shadow-md dark:shadow-none ring-1 ring-border/50 overflow-hidden motion-safe:transition-transform motion-safe:duration-200 motion-safe:hover:-translate-y-0.5">
-                <div className="bg-primary px-5 py-4 text-primary-foreground flex items-center justify-between gap-3">
-                  <div>
-                    <p className="text-xs font-medium opacity-90">
-                      Pratinjau Tiket Cuti
-                    </p>
-                    <p className="text-base font-bold font-mono">
-                      OFFLY-2026-0001
-                    </p>
-                  </div>
-                  <Badge className="bg-background text-foreground hover:bg-background text-xs font-medium">
-                    Disetujui HRD
-                  </Badge>
-                </div>
-
-                <div className="p-5 space-y-4">
-                  <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div className="rounded-lg border bg-muted/30 p-3">
-                      <p className="text-xs text-muted-foreground">Jenis Cuti</p>
-                      <p className="font-semibold mt-0.5">
-                        Cuti Tahunan
-                      </p>
-                    </div>
-                    <div className="rounded-lg border bg-muted/30 p-3">
-                      <p className="text-xs text-muted-foreground">Presisi Durasi</p>
-                      <p className="font-semibold mt-0.5 text-primary">
-                        0.5 Hari Kerja
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2.5 border-y border-dashed py-4">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="flex items-center gap-2 font-medium">
-                        <span className="size-5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 flex items-center justify-center">
-                          <Check className="size-3" aria-hidden="true" />
-                        </span>
-                        1. Pengajuan Karyawan
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        Serah terima siap
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="flex items-center gap-2 font-medium">
-                        <span className="size-5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 flex items-center justify-center">
-                          <Check className="size-3" aria-hidden="true" />
-                        </span>
-                        2. Verifikasi Ketua Divisi
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        Disetujui
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="flex items-center gap-2 font-medium">
-                        <span className="size-5 rounded-full bg-primary/15 text-primary dark:bg-primary/25 dark:text-amber-300 flex items-center justify-center">
-                          <Check className="size-3" aria-hidden="true" />
-                        </span>
-                        3. Pengesahan Akhir HRD
-                      </span>
-                      <span className="text-xs text-primary font-semibold">
-                        Berkas PDF siap
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <div className="flex justify-between text-xs">
-                      <span className="text-muted-foreground">
-                        Simulasi Sisa Kuota
-                      </span>
-                      <span className="font-mono font-semibold tabular-nums">
-                        11.0 → 10.5 Hari
-                      </span>
-                    </div>
-                    <div className="h-2 rounded-full bg-muted overflow-hidden">
-                      <div className="h-full w-[87%] bg-primary rounded-full" />
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <IlustrasiHero />
             </div>
           </div>
         </section>

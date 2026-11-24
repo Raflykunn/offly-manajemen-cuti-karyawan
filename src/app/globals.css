@@ -229,6 +229,36 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  @keyframes mengambang {
+    0%,
+    100% {
+      transform: translateY(-6px) rotate(-1deg);
+    }
+    50% {
+      transform: translateY(6px) rotate(1deg);
+    }
+  }
+
+  @keyframes mengambang-lambat {
+    0%,
+    100% {
+      transform: translateY(5px) rotate(0.8deg);
+    }
+    50% {
+      transform: translateY(-5px) rotate(-0.8deg);
+    }
+  }
+
+  .animasi-mengambang {
+    animation: mengambang 5.5s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  .animasi-mengambang-lambat {
+    animation: mengambang-lambat 6.5s ease-in-out infinite;
+    will-change: transform;
+  }
+
   @supports ((animation-timeline: view()) and (animation-range: entry)) {
     @keyframes ungkapMasukGulir {
       from {
