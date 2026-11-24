@@ -1,24 +1,23 @@
 import Link from "next/link";
 import {
   ArrowRight,
-  Building2,
   CalendarCheck2,
-  CalendarDays,
   Clock3,
   FileCheck2,
   FileText,
   LogIn,
   ShieldAlert,
-  Users,
 } from "lucide-react";
 import { ambilSesiPengguna } from "@/lib/autentikasi";
 import { jalankanKueri } from "@/lib/db";
 import { formatTanggalIndo, labelPeranPengguna } from "@/lib/kalkulasi-cuti";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import TombolTema from "@/components/tata-letak/TombolTema";
 import NavigasiBeranda from "@/components/tata-letak/NavigasiBeranda";
 import IlustrasiHero from "@/components/beranda/IlustrasiHero";
+import AlurVerifikasiBeranda from "@/components/beranda/AlurVerifikasiBeranda";
+import DaftarHariLiburBeranda from "@/components/beranda/DaftarHariLiburBeranda";
 
 async function ambilDataPublikBeranda() {
   try {
@@ -34,7 +33,7 @@ async function ambilDataPublikBeranda() {
         `SELECT id, TO_CHAR(tanggal, 'YYYY-MM-DD') AS tanggal, nama_libur, jenis
          FROM hari_libur
          ORDER BY tanggal ASC
-         LIMIT 6`
+         LIMIT 12`
       ),
       jalankanKueri(
         `SELECT
@@ -79,6 +78,11 @@ export default async function HalamanUtama() {
   ]);
 
   const { daftarJenisCuti, daftarHariLibur, ringkasan } = dataPublik;
+  const jadwalLiburSiap = daftarHariLibur.map((libur) => ({
+    ...libur,
+    ...pecahTanggalKartu(libur.tanggal),
+    tanggalIndo: formatTanggalIndo(libur.tanggal),
+  }));
 
   return (
     <div className="min-h-dvh flex flex-col bg-background text-foreground selection:bg-primary/25">
@@ -126,14 +130,10 @@ export default async function HalamanUtama() {
 
       <main id="konten-utama" tabIndex={-1} className="flex-1 outline-none">
         <section className="border-b">
-          <div className="max-w-6xl mx-auto px-4 md:px-6 py-12 md:py-20 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+          <div className="max-w-6xl mx-auto px-4 md:px-6 py-20 md:py-28 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
             <div className="lg:col-span-7 space-y-6">
-              <h1 className="judul-seimbang text-[clamp(2.1rem,1.4rem+2.8vw,3.35rem)] font-bold tracking-tight leading-[1.15]">
-                Ajukan dan setujui cuti tim{" "}
-                <span className="text-primary underline decoration-primary/40 decoration-2 underline-offset-4">
-                  tanpa rekap manual
-                </span>
-                .
+              <h1 className="judul-seimbang text-[clamp(2.1rem,1.4rem+2.8vw,3.35rem)] font-bold tracking-tight leading-[1.15] text-foreground">
+                Ajukan dan setujui cuti tim tanpa rekap manual.
               </h1>
 
               <p className="paragraf-rapi text-base md:text-lg text-muted-foreground leading-relaxed max-w-xl">
@@ -203,7 +203,7 @@ export default async function HalamanUtama() {
         </section>
 
         <section id="alur" tabIndex={-1} className="border-b bg-muted/20 scroll-mt-20 outline-none">
-          <div className="max-w-6xl mx-auto px-4 md:px-6 py-14 space-y-8 ungkap-gulir">
+          <div className="max-w-6xl mx-auto px-4 md:px-6 py-20 md:py-28 space-y-8 ungkap-gulir">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div className="space-y-1">
                 <p className="text-xs font-semibold uppercase tracking-wide text-primary">
@@ -218,67 +218,14 @@ export default async function HalamanUtama() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
-              <div className="@container rounded-xl border bg-card p-6 flex flex-col gap-5 h-full">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-semibold">Alur Karyawan</h3>
-                  <span className="text-xs text-muted-foreground">3 Tahap</span>
-                </div>
-                <div className="grid grid-cols-1 @sm:grid-cols-3 gap-2.5 text-sm">
-                  <div className="rounded-lg border bg-muted/30 p-3 space-y-1">
-                    <p className="text-xs font-mono text-primary font-bold">Tahap 1</p>
-                    <p className="font-semibold">Karyawan</p>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      Mengajukan cuti dan menunjuk rekan serah terima tugas.
-                    </p>
-                  </div>
-                  <div className="rounded-lg border bg-muted/30 p-3 space-y-1">
-                    <p className="text-xs font-mono text-primary font-bold">Tahap 2</p>
-                    <p className="font-semibold">Ketua Divisi</p>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      Memeriksa kesiapan tugas dan beban tim di divisi.
-                    </p>
-                  </div>
-                  <div className="rounded-lg border bg-accent/50 dark:bg-accent/40 border-primary/30 p-3 space-y-1">
-                    <p className="text-xs font-mono text-primary font-bold">Tahap 3</p>
-                    <p className="font-semibold">HRD</p>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      Pengesahan akhir dan penerbitan surat cuti PDF.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="@container rounded-xl border bg-card p-6 flex flex-col gap-5 h-full">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-semibold">Alur Ketua Divisi</h3>
-                  <span className="text-xs text-muted-foreground">2 Tahap</span>
-                </div>
-                <div className="grid grid-cols-1 @sm:grid-cols-2 gap-3 text-sm">
-                  <div className="rounded-lg border bg-muted/30 p-3.5 space-y-1">
-                    <p className="text-xs font-mono text-primary font-bold">Tahap 1</p>
-                    <p className="font-semibold">Ketua Divisi</p>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      Mengajukan cuti pribadi langsung menuju antrean HRD.
-                    </p>
-                  </div>
-                  <div className="rounded-lg border bg-accent/50 dark:bg-accent/40 border-primary/30 p-3.5 space-y-1">
-                    <p className="text-xs font-mono text-primary font-bold">Tahap 2</p>
-                    <p className="font-semibold">HRD</p>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      Memvalidasi kapasitas divisi dan menerbitkan surat izin cuti.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <AlurVerifikasiBeranda />
           </div>
         </section>
 
         <section
           id="keunggulan"
           tabIndex={-1}
-          className="max-w-6xl mx-auto px-4 md:px-6 py-14 space-y-8 ungkap-gulir scroll-mt-20 outline-none"
+          className="max-w-6xl mx-auto px-4 md:px-6 py-20 md:py-28 space-y-8 ungkap-gulir scroll-mt-20 outline-none"
         >
           <div className="space-y-1">
             <p className="text-xs font-semibold uppercase tracking-wide text-primary">
@@ -289,8 +236,8 @@ export default async function HalamanUtama() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-            <div className="md:col-span-7 rounded-xl border bg-card p-6 flex flex-col justify-between gap-5 hover:border-primary/40 transition-colors">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+            <div className="md:col-span-7 rounded-xl border bg-card p-6 flex flex-col justify-between gap-6 hover:border-primary/40 transition-colors">
               <div className="space-y-2">
                 <div className="size-9 rounded-lg bg-accent dark:bg-accent/60 text-accent-foreground flex items-center justify-center">
                   <Clock3 className="size-4 text-primary" aria-hidden="true" />
@@ -302,15 +249,42 @@ export default async function HalamanUtama() {
                   Sebelum mengirim permohonan, karyawan dapat melihat proyeksi sisa kuota, akhir pekan serta hari libur nasional yang dilewati, dan rekan satu divisi yang cuti di tanggal yang sama.
                 </p>
               </div>
-              <div className="rounded-lg border bg-muted/30 p-3 flex flex-wrap items-center justify-between gap-2 text-xs">
-                <span className="font-medium">Aturan pengajuan otomatis</span>
-                <span className="text-muted-foreground">
-                  Dukungan 0.5 hari · Validasi tanggal bentrok · Aturan H-3 dan H+3 sakit
-                </span>
+
+              <div className="rounded-lg border bg-muted/30 p-3.5 space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                  <span className="font-medium text-foreground">
+                    Simulasi hari kerja vs akhir pekan
+                  </span>
+                  <span className="font-mono font-semibold text-primary tabular-nums">
+                    11.0 → 8.5 Hari
+                  </span>
+                </div>
+                <div className="grid grid-cols-5 gap-1.5 text-center text-[11px] font-mono tabular-nums">
+                  <div className="rounded-md bg-primary/15 text-primary py-1.5 px-1 font-semibold">
+                    <div>Kam 12</div>
+                    <div className="text-[10px]">1.0 Hr</div>
+                  </div>
+                  <div className="rounded-md bg-primary/15 text-primary py-1.5 px-1 font-semibold">
+                    <div>Jum 13</div>
+                    <div className="text-[10px]">1.0 Hr</div>
+                  </div>
+                  <div className="rounded-md bg-muted text-muted-foreground py-1.5 px-1">
+                    <div>Sab 14</div>
+                    <div className="text-[10px]">Libur</div>
+                  </div>
+                  <div className="rounded-md bg-muted text-muted-foreground py-1.5 px-1">
+                    <div>Min 15</div>
+                    <div className="text-[10px]">Libur</div>
+                  </div>
+                  <div className="rounded-md bg-accent text-accent-foreground py-1.5 px-1 font-semibold">
+                    <div>Sen 16</div>
+                    <div className="text-[10px]">0.5 Hr</div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="md:col-span-5 rounded-xl border bg-card p-6 flex flex-col justify-between gap-5 hover:border-primary/40 transition-colors">
+            <div className="md:col-span-5 rounded-xl border bg-card p-6 flex flex-col justify-between gap-6 hover:border-primary/40 transition-colors">
               <div className="space-y-2">
                 <div className="size-9 rounded-lg bg-accent dark:bg-accent/60 text-accent-foreground flex items-center justify-center">
                   <ShieldAlert className="size-4 text-primary" aria-hidden="true" />
@@ -322,15 +296,26 @@ export default async function HalamanUtama() {
                   Mencegah kekosongan operasional divisi dengan batas persentase cuti bersamaan dan penguncian tanggal sibuk perusahaan.
                 </p>
               </div>
-              <div className="rounded-lg border bg-muted/30 p-3 flex items-center justify-between text-xs">
-                <span className="font-medium">Batas Aman Divisi</span>
-                <span className="font-mono font-bold text-primary tabular-nums">
-                  30% – 40%
-                </span>
+
+              <div className="rounded-lg border bg-muted/30 p-3.5 space-y-2.5">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-medium text-foreground">
+                    Terpakai 30% dari batas 40%
+                  </span>
+                  <span className="font-mono font-bold text-primary tabular-nums">
+                    Aman
+                  </span>
+                </div>
+                <div className="h-2 rounded-full bg-muted overflow-hidden">
+                  <div className="h-full w-3/4 rounded-full bg-primary" />
+                </div>
+                <p className="text-[11px] text-muted-foreground">
+                  Periode sibuk otomatis memblokir pengajuan baru.
+                </p>
               </div>
             </div>
 
-            <div className="md:col-span-5 rounded-xl border bg-card p-6 flex flex-col justify-between gap-5 hover:border-primary/40 transition-colors">
+            <div className="md:col-span-6 rounded-xl border bg-card p-6 flex flex-col justify-between gap-5 hover:border-primary/40 transition-colors">
               <div className="space-y-2">
                 <div className="size-9 rounded-lg bg-accent dark:bg-accent/60 text-accent-foreground flex items-center justify-center">
                   <FileText className="size-4 text-primary" aria-hidden="true" />
@@ -340,15 +325,20 @@ export default async function HalamanUtama() {
                   Pengajuan yang telah disetujui HRD otomatis menghasilkan surat izin cuti berstempel digital yang siap diunduh oleh Karyawan maupun Ketua Divisi.
                 </p>
               </div>
-              <div className="rounded-lg border bg-muted/30 p-3 flex items-center justify-between text-xs">
-                <span className="font-medium">Validasi Berkas</span>
-                <span className="font-mono font-bold text-primary">
-                  Stempel Digital Resmi
-                </span>
+              <div className="space-y-2.5">
+                <Separator />
+                <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                  <span className="text-muted-foreground">
+                    Akses terproteksi sesi pemilik, atasan, dan HRD
+                  </span>
+                  <span className="font-mono font-semibold text-primary">
+                    Stempel Digital PDF
+                  </span>
+                </div>
               </div>
             </div>
 
-            <div className="md:col-span-7 rounded-xl border bg-card p-6 flex flex-col justify-between gap-4 hover:border-primary/40 transition-colors">
+            <div className="md:col-span-6 rounded-xl border bg-card p-6 flex flex-col justify-between gap-5 hover:border-primary/40 transition-colors">
               <div className="space-y-2">
                 <div className="size-9 rounded-lg bg-accent dark:bg-accent/60 text-accent-foreground flex items-center justify-center">
                   <FileCheck2 className="size-4 text-primary" aria-hidden="true" />
@@ -360,14 +350,12 @@ export default async function HalamanUtama() {
                   HRD dapat menyetujui beberapa pengajuan sekaligus dalam satu transaksi serta mengirim pengingat kepada karyawan yang belum mengambil hak cuti tahunan.
                 </p>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                <div className="rounded-lg border bg-muted/30 p-2.5 flex items-center gap-2">
-                  <Building2 className="size-4 text-primary shrink-0" aria-hidden="true" />
-                  <span>Manajemen Divisi dan Anggota</span>
-                </div>
-                <div className="rounded-lg border bg-muted/30 p-2.5 flex items-center gap-2">
-                  <Users className="size-4 text-primary shrink-0" aria-hidden="true" />
-                  <span>Deteksi Masa Kerja di Bawah 1 Tahun</span>
+              <div className="space-y-2.5">
+                <Separator />
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                  <span>Manajemen divisi dan anggota</span>
+                  <span aria-hidden="true">·</span>
+                  <span>Deteksi masa kerja di bawah 1 tahun</span>
                 </div>
               </div>
             </div>
@@ -375,8 +363,8 @@ export default async function HalamanUtama() {
         </section>
 
         <section id="kebijakan" tabIndex={-1} className="border-t bg-muted/20 scroll-mt-20 outline-none">
-          <div className="max-w-6xl mx-auto px-4 md:px-6 py-14 grid grid-cols-1 lg:grid-cols-12 gap-8 ungkap-gulir">
-            <div className="@container lg:col-span-7 space-y-5">
+          <div className="max-w-6xl mx-auto px-4 md:px-6 py-20 md:py-28 grid grid-cols-1 lg:grid-cols-12 gap-10 ungkap-gulir">
+            <div className="lg:col-span-7 space-y-5">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-primary">
                   Kebijakan Perusahaan
@@ -394,27 +382,24 @@ export default async function HalamanUtama() {
                   Data jenis cuti belum tersedia.
                 </div>
               ) : (
-                <div className="grid grid-cols-1 @sm:grid-cols-2 gap-3">
+                <div className="rounded-xl border bg-card divide-y divide-border overflow-hidden">
                   {daftarJenisCuti.map((item) => (
                     <div
                       key={item.id}
-                      className="rounded-xl border bg-card p-4 flex flex-col justify-between gap-2.5 hover:border-primary/40 transition-colors"
+                      className="px-4 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 hover:bg-muted/50 transition-colors"
                     >
-                      <div className="space-y-1.5">
-                        <div className="flex items-start justify-between gap-2">
-                          <h3 className="text-sm font-bold">{item.nama_cuti}</h3>
-                          <Badge variant="secondary" className="font-mono text-xs shrink-0 tabular-nums">
-                            {item.kuota_default} Hari
-                          </Badge>
-                        </div>
-                        <p className="text-xs text-muted-foreground leading-relaxed">
-                          {item.deskripsi || "Mengikuti ketentuan perusahaan."}
-                        </p>
+                      <div className="min-w-0 sm:w-44 shrink-0">
+                        <h3 className="text-sm font-semibold text-foreground">
+                          {item.nama_cuti}
+                        </h3>
                       </div>
-                      <p className="text-[11px] font-medium text-muted-foreground pt-1 border-t">
+                      <p className="text-xs text-muted-foreground flex-1 leading-relaxed">
                         {item.wajib_lampiran ? "Wajib lampiran" : "Tanpa lampiran"} ·{" "}
                         {item.potong_kuota_tahunan ? "Potong kuota tahunan" : "Non-kuota"}
                       </p>
+                      <span className="font-mono text-xs font-semibold text-primary tabular-nums sm:text-right shrink-0">
+                        {item.kuota_default} Hari
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -434,53 +419,27 @@ export default async function HalamanUtama() {
                 </p>
               </div>
 
-              <div className="rounded-xl border bg-card p-4 space-y-2.5">
-                {daftarHariLibur.length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-8">
-                    Belum ada jadwal hari libur terdaftar.
-                  </p>
-                ) : (
-                  daftarHariLibur.map((libur) => {
-                    const { hari, bulan } = pecahTanggalKartu(libur.tanggal);
-                    return (
-                      <div
-                        key={libur.id}
-                        className="flex items-center justify-between gap-3 rounded-lg border bg-muted/20 p-2.5"
-                      >
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className="size-11 rounded-lg bg-accent dark:bg-accent/50 border border-primary/20 flex flex-col items-center justify-center shrink-0 leading-none tabular-nums">
-                            <span className="text-sm font-bold font-mono text-foreground">
-                              {hari}
-                            </span>
-                            <span className="text-[10px] font-mono text-accent-foreground dark:text-amber-300 mt-0.5">
-                              {bulan}
-                            </span>
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-sm font-medium leading-snug">
-                              {libur.nama_libur}
-                            </p>
-                            <p className="text-xs text-muted-foreground flex items-center gap-1">
-                              <CalendarDays className="size-3" aria-hidden="true" />
-                              {formatTanggalIndo(libur.tanggal)}
-                            </p>
-                          </div>
-                        </div>
-                        <Badge variant="outline" className="text-[11px] shrink-0">
-                          {libur.jenis}
-                        </Badge>
-                      </div>
-                    );
-                  })
-                )}
-              </div>
+              <DaftarHariLiburBeranda daftarHariLibur={jadwalLiburSiap} />
             </div>
           </div>
         </section>
 
-        <section className="max-w-6xl mx-auto px-4 md:px-6 py-12 ungkap-gulir">
-          <div className="rounded-2xl border bg-primary text-primary-foreground p-8 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-            <div className="space-y-2 max-w-xl">
+        <section className="max-w-6xl mx-auto px-4 md:px-6 py-20 md:py-28 ungkap-gulir">
+          <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-primary text-primary-foreground p-8 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 opacity-20"
+              style={{
+                backgroundImage:
+                  "linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)",
+                backgroundSize: "32px 32px",
+                maskImage:
+                  "radial-gradient(circle at 80% 30%, black 15%, transparent 75%)",
+                WebkitMaskImage:
+                  "radial-gradient(circle at 80% 30%, black 15%, transparent 75%)",
+              }}
+            />
+            <div className="relative space-y-2 max-w-xl">
               <h2 className="judul-seimbang text-2xl md:text-3xl font-bold tracking-tight">
                 Mulai kelola cuti tim kerja Anda dengan lebih teratur
               </h2>
@@ -494,7 +453,7 @@ export default async function HalamanUtama() {
                 render={<Link href="/dasbor" />}
                 variant="secondary"
                 size="lg"
-                className="shrink-0"
+                className="relative shrink-0"
               >
                 Buka Dasbor Sekarang
                 <ArrowRight className="size-4 ml-1.5" />
@@ -505,7 +464,7 @@ export default async function HalamanUtama() {
                 render={<Link href="/masuk" />}
                 variant="secondary"
                 size="lg"
-                className="shrink-0"
+                className="relative shrink-0"
               >
                 <LogIn className="size-4 mr-1.5" />
                 Masuk ke Offly

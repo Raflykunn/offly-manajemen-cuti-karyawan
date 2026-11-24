@@ -30,7 +30,8 @@ export default function IlustrasiHero() {
       className="relative mx-auto w-full max-w-[460px] py-8 sm:py-10 px-3 sm:px-5 font-sans select-none group"
     >
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden rounded-3xl">
-        <div className="absolute inset-0 bg-gradient-to-br from-accent/70 via-background to-muted/40 dark:from-accent/25 dark:via-background dark:to-muted/30" />
+        <div className="absolute inset-0 bg-gradient-to-br from-accent/80 via-background to-muted/50 dark:from-accent/30 dark:via-background dark:to-muted/30" />
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-72 rounded-full bg-accent/80 blur-3xl dark:bg-accent/25" />
         <div className="absolute -top-10 -right-10 size-48 rounded-full bg-primary/15 blur-3xl dark:bg-primary/20" />
         <div className="absolute -bottom-8 -left-8 size-44 rounded-full bg-chart-1/20 blur-3xl dark:bg-chart-1/15" />
         <div
@@ -155,7 +156,7 @@ export default function IlustrasiHero() {
         </div>
 
         <div
-          className="animasi-mengambang absolute -top-2 left-0 sm:left-1 z-20 -rotate-3 rounded-xl border border-border bg-card/95 backdrop-blur-sm p-2.5 shadow-lg dark:shadow-none w-36 sm:w-40"
+          className="animasi-mengambang absolute -top-2 left-0 sm:left-1 z-20 -rotate-3 rounded-xl border border-border ring-1 ring-border/80 bg-card/95 backdrop-blur-sm p-2.5 shadow-md dark:shadow-none w-36 sm:w-40"
           style={{ animationDuration: "4.5s", animationDelay: "0s" }}
         >
           <div className="flex items-center gap-2">
@@ -183,7 +184,7 @@ export default function IlustrasiHero() {
         </div>
 
         <div
-          className="animasi-mengambang-lambat absolute -top-1 right-1 sm:right-2 z-20 flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-3 py-1.5 shadow-lg dark:shadow-none"
+          className="animasi-mengambang-lambat absolute -top-1 right-1 sm:right-2 z-20 flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-3 py-1.5 shadow-md ring-1 ring-border/80 dark:shadow-none"
           style={{ animationDuration: "5.5s", animationDelay: "0.7s" }}
         >
           <span className="size-5 rounded-full bg-primary-foreground/20 flex items-center justify-center">
@@ -196,7 +197,7 @@ export default function IlustrasiHero() {
         </div>
 
         <div
-          className="animasi-mengambang-lambat absolute -bottom-2 left-0 sm:left-2 z-20 flex items-center gap-2.5 rounded-xl border border-border bg-card/90 backdrop-blur-md px-3 py-2 shadow-md dark:shadow-none"
+          className="animasi-mengambang-lambat absolute -bottom-2 left-0 sm:left-2 z-20 flex items-center gap-2.5 rounded-xl border border-border ring-1 ring-border/80 bg-card/90 backdrop-blur-md px-3 py-2 shadow-md dark:shadow-none"
           style={{ animationDuration: "6.5s", animationDelay: "1.1s" }}
         >
           <div className="flex -space-x-2">
@@ -221,7 +222,7 @@ export default function IlustrasiHero() {
         </div>
 
         <div
-          className="animasi-mengambang absolute -bottom-3 right-0 sm:right-1 z-20 w-40 sm:w-44 rounded-xl border border-border bg-card/85 backdrop-blur-md p-3 shadow-md dark:shadow-none"
+          className="animasi-mengambang absolute -bottom-3 right-0 sm:right-1 z-20 w-40 sm:w-44 rounded-xl border border-border ring-1 ring-border/80 bg-card/85 backdrop-blur-md p-3 shadow-md dark:shadow-none"
           style={{ animationDuration: "5.5s", animationDelay: "1.6s" }}
         >
           <div className="flex items-center justify-between text-[10px]">
