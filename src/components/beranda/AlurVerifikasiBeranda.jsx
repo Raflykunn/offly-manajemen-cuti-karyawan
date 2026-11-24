@@ -74,7 +74,7 @@ function GarisTahap({ daftarTahap, kolomMd }) {
 export default function AlurVerifikasiBeranda() {
   return (
     <Tabs defaultValue="karyawan" className="space-y-6">
-      <TabsList className="flex-wrap h-auto max-w-full">
+      <TabsList>
         <TabsTrigger value="karyawan">Alur Karyawan (3 Tahap)</TabsTrigger>
         <TabsTrigger value="ketua">Alur Ketua Divisi (2 Tahap)</TabsTrigger>
       </TabsList>

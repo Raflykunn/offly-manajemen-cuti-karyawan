@@ -8,12 +8,71 @@ function Table({
   className,
   ...props
 }) {
+  const refTabel = React.useRef(null)
+
+  React.useEffect(() => {
+    const tabel = refTabel.current
+    if (!tabel) return
+
+    const perbaruiLabel = () => {
+      const daftarLabel = Array.from(
+        tabel.querySelectorAll("thead tr th")
+      ).map((th) => th.textContent.replace(/\s+/g, " ").trim())
+
+      const daftarBaris = tabel.querySelectorAll("tbody > tr")
+      daftarBaris.forEach((tr) => {
+        const selKosong = tr.querySelector("td[colspan]")
+        if (selKosong) {
+          tr.setAttribute("data-kosong", "true")
+          return
+        }
+        tr.removeAttribute("data-kosong")
+
+        const daftarSel = tr.querySelectorAll(":scope > td")
+        daftarSel.forEach((td, indeks) => {
+          const label = daftarLabel[indeks] || ""
+          td.setAttribute("data-label", label)
+
+          if (indeks === 0) {
+            td.setAttribute("data-utama", "true")
+          } else {
+            td.removeAttribute("data-utama")
+          }
+
+          if (label === "Aksi" || label === "Simpan") {
+            td.setAttribute("data-aksi", "true")
+            if (td.textContent.trim() === "" && td.children.length === 0) {
+              td.setAttribute("data-kosong", "true")
+            } else {
+              td.removeAttribute("data-kosong")
+            }
+          } else {
+            td.removeAttribute("data-aksi")
+            td.removeAttribute("data-kosong")
+          }
+        })
+      })
+    }
+
+    perbaruiLabel()
+
+    const pengamat = new MutationObserver(perbaruiLabel)
+    pengamat.observe(tabel, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    })
+
+    return () => pengamat.disconnect()
+  }, [])
+
   return (
     <div
       data-slot="table-container"
-      className="relative w-full overflow-x-auto rounded-lg border border-border bg-card"
+      className="relative w-full md:overflow-x-auto md:rounded-lg md:border md:border-border md:bg-card"
     >
       <table
+        ref={refTabel}
         data-slot="table"
         className={cn("w-full caption-bottom text-sm", className)}
         {...props}

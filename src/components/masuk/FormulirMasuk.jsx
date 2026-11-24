@@ -68,7 +68,7 @@ export default function FormulirMasuk() {
       </div>
 
       <main className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-        <div className="lg:col-span-6 rounded-xl border bg-card p-6 md:p-8 flex flex-col justify-between shadow-xs">
+        <div className="hidden lg:col-span-6 rounded-xl border bg-card p-6 md:p-8 lg:flex flex-col justify-between shadow-xs">
           <div className="space-y-6">
             <Link href="/" className="inline-flex items-center gap-3 rounded-lg">
               <div className="size-10 rounded-lg bg-primary text-primary-foreground flex items-center justify-center shadow-xs">
@@ -148,9 +148,10 @@ export default function FormulirMasuk() {
                     type="text"
                     autoComplete="username"
                     placeholder="nama@offly.id atau username"
+                    autoFocus
                     value={identitas}
                     onChange={(e) => aturIdentitas(e.target.value)}
-                    className="pl-9 h-9"
+                    className="pl-9 h-10 md:h-9"
                     required
                   />
                 </div>
@@ -168,13 +169,13 @@ export default function FormulirMasuk() {
                     placeholder="Masukkan kata sandi"
                     value={kataSandi}
                     onChange={(e) => aturKataSandi(e.target.value)}
-                    className="pl-9 pr-9 h-9"
+                    className="pl-9 pr-11 md:pr-9 h-10 md:h-9"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => aturTampilkanSandi(!tampilkanSandi)}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    className="absolute right-0 top-1/2 -translate-y-1/2 size-11 md:size-9 flex items-center justify-center text-muted-foreground hover:text-foreground"
                     aria-label={tampilkanSandi ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"}
                   >
                     {tampilkanSandi ? (

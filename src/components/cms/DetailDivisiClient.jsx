@@ -105,6 +105,7 @@ export default function DetailDivisiClient({
             render={<Link href="/manajemen-divisi" />}
             variant="outline"
             size="icon"
+            aria-label="Kembali ke Manajemen Divisi"
           >
             <ArrowLeft className="size-4" />
           </Button>
@@ -173,13 +174,13 @@ export default function DetailDivisiClient({
               Tambah Anggota ke Divisi
             </CardTitle>
           </CardHeader>
-          <CardContent className="flex gap-2">
+          <CardContent className="flex flex-col sm:flex-row gap-2">
             <Select
               value={kandidatDipilih}
               onValueChange={aturKandidatDipilih}
               disabled={kandidatAnggota.length === 0}
             >
-              <SelectTrigger className="flex-1">
+              <SelectTrigger className="w-full min-w-0 flex-1">
                 <SelectValue>
                   {(v) =>
                     petaKandidat.get(v) ||

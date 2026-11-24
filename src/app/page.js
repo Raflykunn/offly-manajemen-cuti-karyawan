@@ -444,19 +444,19 @@ export default async function HalamanUtama() {
           <span className="font-medium text-foreground">
             Offly | Sistem Manajemen Cuti Karyawan
           </span>
-          <div className="flex flex-wrap items-center gap-4">
-            <a href="#alur" className="hover:text-foreground">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <a href="#alur" className="inline-flex items-center min-h-11 md:min-h-0 hover:text-foreground">
               Alur Cuti
             </a>
-            <a href="#keunggulan" className="hover:text-foreground">
+            <a href="#keunggulan" className="inline-flex items-center min-h-11 md:min-h-0 hover:text-foreground">
               Fitur
             </a>
-            <a href="#kebijakan" className="hover:text-foreground">
+            <a href="#kebijakan" className="inline-flex items-center min-h-11 md:min-h-0 hover:text-foreground">
               Kebijakan &amp; Libur
             </a>
             <Link
               href={sesi ? "/dasbor" : "/masuk"}
-              className="text-primary hover:underline font-medium"
+              className="inline-flex items-center min-h-11 md:min-h-0 text-primary hover:underline font-medium"
             >
               {sesi ? "Dasbor" : "Masuk"}
             </Link>

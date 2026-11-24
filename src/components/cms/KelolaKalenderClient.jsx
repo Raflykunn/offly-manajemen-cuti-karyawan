@@ -179,7 +179,7 @@ export default function KelolaKalenderClient({
       )}
 
       <Tabs defaultValue="libur" className="space-y-4">
-        <TabsList className="flex-wrap h-auto max-w-full">
+        <TabsList>
           <TabsTrigger value="libur">Hari Libur &amp; Cuti Bersama</TabsTrigger>
           <TabsTrigger value="blackout">Periode Blackout</TabsTrigger>
           <TabsTrigger value="kapasitas">Kapasitas Tim Divisi</TabsTrigger>
@@ -274,14 +274,16 @@ export default function KelolaKalenderClient({
                           <Button
                             size="icon-sm"
                             variant="outline"
+                            aria-label={`Edit ${item.nama_libur}`}
                             disabled={sedangProses}
                             onClick={() => aturLiburDiedit({ ...item })}
                           >
-                            <Pencil className="size-3.5" />
+                            <Pencil className="size-3.5" aria-hidden="true" />
                           </Button>
                           <Button
                             size="icon-sm"
                             variant="destructive"
+                            aria-label={`Hapus ${item.nama_libur}`}
                             disabled={sedangProses}
                             onClick={() =>
                               aturTargetHapus({
@@ -416,6 +418,7 @@ export default function KelolaKalenderClient({
                           <Button
                             size="icon-sm"
                             variant="destructive"
+                            aria-label={`Hapus ${item.nama_periode || "periode blackout"}`}
                             disabled={sedangProses}
                             onClick={() =>
                               aturTargetHapus({

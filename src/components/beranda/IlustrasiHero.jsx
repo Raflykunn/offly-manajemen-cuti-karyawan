@@ -27,7 +27,7 @@ export default function IlustrasiHero() {
   return (
     <div
       aria-hidden="true"
-      className="relative mx-auto w-full max-w-[460px] pt-12 pb-12 sm:py-12 px-2 sm:px-5 font-sans select-none group"
+      className="relative mx-auto w-full max-w-[460px] pt-14 pb-12 sm:py-12 px-2 sm:px-5 font-sans select-none group"
     >
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden rounded-3xl">
         <div className="absolute inset-0 bg-gradient-to-br from-accent/80 via-background to-muted/50 dark:from-accent/30 dark:via-background dark:to-muted/30" />
@@ -155,7 +155,7 @@ export default function IlustrasiHero() {
           </svg>
         </div>
 
-        <div className="absolute -top-8 left-0 sm:-left-4 z-20 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-safe:group-hover:-translate-x-2.5 motion-safe:group-hover:-translate-y-2 motion-safe:group-hover:-rotate-2 motion-safe:group-hover:scale-[1.03]">
+        <div className="absolute -top-11 sm:-top-8 left-0 sm:-left-4 z-20 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-safe:group-hover:-translate-x-2.5 motion-safe:group-hover:-translate-y-2 motion-safe:group-hover:-rotate-2 motion-safe:group-hover:scale-[1.03]">
           <div
             className="animasi-mengambang -rotate-3 rounded-xl border border-border ring-1 ring-border/80 bg-card/95 backdrop-blur-sm p-2.5 shadow-md dark:shadow-none w-36 sm:w-40"
             style={{ animationDuration: "4.5s", animationDelay: "0s" }}
