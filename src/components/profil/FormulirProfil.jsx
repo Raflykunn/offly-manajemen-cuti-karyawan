@@ -42,6 +42,7 @@ export default function FormulirProfil({ pengguna }) {
   const [pratinjauFoto, aturPratinjauFoto] = useState(
     pengguna?.foto_profil || ""
   );
+  const [galatFoto, aturGalatFoto] = useState("");
 
   const kuotaAwal = Number(pengguna?.kuota_cuti_awal ?? 12);
   const sisaKuota = Number(pengguna?.sisa_kuota_cuti ?? 0);
@@ -54,8 +55,11 @@ export default function FormulirProfil({ pengguna }) {
     const berkas = event.target.files?.[0];
     if (!berkas) return;
     if (berkas.size > 1024 * 1024) {
+      aturGalatFoto("Ukuran gambar maksimal 1 MB.");
+      event.target.value = "";
       return;
     }
+    aturGalatFoto("");
     const pembaca = new FileReader();
     pembaca.onload = () => {
       if (typeof pembaca.result === "string") {
@@ -64,6 +68,8 @@ export default function FormulirProfil({ pengguna }) {
     };
     pembaca.readAsDataURL(berkas);
   }
+
+  const fotoDariUnggahanLokal = pratinjauFoto.startsWith("data:");
 
   return (
     <div className="space-y-6">
@@ -102,19 +108,19 @@ export default function FormulirProfil({ pengguna }) {
             <CardContent className="space-y-3 text-sm pt-2">
               <Separator />
               <div className="flex items-center gap-2.5 text-muted-foreground">
-                <Mail className="size-4 shrink-0 text-primary" />
+                <Mail className="size-4 shrink-0 text-primary" aria-hidden="true" />
                 <span className="truncate text-foreground">{pengguna.email}</span>
               </div>
               <div className="flex items-center gap-2.5 text-muted-foreground">
-                <Phone className="size-4 shrink-0 text-primary" />
+                <Phone className="size-4 shrink-0 text-primary" aria-hidden="true" />
                 <span className="text-foreground">{pengguna.telepon || "-"}</span>
               </div>
               <div className="flex items-start gap-2.5 text-muted-foreground">
-                <MapPin className="size-4 shrink-0 text-primary mt-0.5" />
+                <MapPin className="size-4 shrink-0 text-primary mt-0.5" aria-hidden="true" />
                 <span className="text-foreground">{pengguna.alamat || "-"}</span>
               </div>
               <div className="flex items-center gap-2.5 text-muted-foreground">
-                <Shield className="size-4 shrink-0 text-primary" />
+                <Shield className="size-4 shrink-0 text-primary" aria-hidden="true" />
                 <span className="text-foreground">
                   Bergabung: {formatTanggalIndo(pengguna.tanggal_bergabung)}
                 </span>
@@ -126,7 +132,7 @@ export default function FormulirProfil({ pengguna }) {
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base flex items-center gap-2">
-                  <CalendarCheck className="size-4 text-primary" />
+                  <CalendarCheck className="size-4 text-primary" aria-hidden="true" />
                   Informasi Kuota Tahunan
                 </CardTitle>
                 <Badge variant={layakTahunan ? "default" : "secondary"}>
@@ -138,14 +144,14 @@ export default function FormulirProfil({ pengguna }) {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-3 gap-2 text-center">
+              <div className="grid grid-cols-3 gap-2 text-center tabular-nums">
                 <div className="rounded-lg border bg-background p-2.5">
                   <p className="text-[11px] text-muted-foreground">Kuota Awal</p>
                   <p className="text-lg font-bold">{formatAngkaKuota(kuotaAwal)}</p>
                 </div>
                 <div className="rounded-lg border bg-background p-2.5">
                   <p className="text-[11px] text-muted-foreground">Terpakai</p>
-                  <p className="text-lg font-bold text-amber-700">
+                  <p className="text-lg font-bold text-amber-700 dark:text-amber-400">
                     {formatAngkaKuota(kuotaTerpakai)}
                   </p>
                 </div>
@@ -160,7 +166,9 @@ export default function FormulirProfil({ pengguna }) {
               <div className="space-y-1.5">
                 <div className="flex justify-between text-xs text-muted-foreground">
                   <span>Ketersediaan Kuota</span>
-                  <span className="font-medium text-foreground">{persentaseSisa}%</span>
+                  <span className="font-medium text-foreground tabular-nums">
+                    {persentaseSisa}%
+                  </span>
                 </div>
                 <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
                   <div
@@ -176,7 +184,7 @@ export default function FormulirProfil({ pengguna }) {
         <Card className="lg:col-span-8">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
-              <User className="size-4 text-primary" />
+              <User className="size-4 text-primary" aria-hidden="true" />
               Perbarui Data Pribadi
             </CardTitle>
             <CardDescription>
@@ -186,10 +194,12 @@ export default function FormulirProfil({ pengguna }) {
           <CardContent>
             {statusAksi && (
               <Alert
+                role="status"
+                aria-live="polite"
                 variant={statusAksi.sukses ? "default" : "destructive"}
                 className={`mb-5 ${
                   statusAksi.sukses
-                    ? "border-emerald-300 bg-emerald-50 text-emerald-900"
+                    ? "border-emerald-300 bg-emerald-50 text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-200"
                     : ""
                 }`}
               >
@@ -204,6 +214,7 @@ export default function FormulirProfil({ pengguna }) {
                   <Input
                     id="nama_lengkap"
                     name="nama_lengkap"
+                    autoComplete="name"
                     defaultValue={pengguna.nama_lengkap}
                     required
                   />
@@ -213,6 +224,8 @@ export default function FormulirProfil({ pengguna }) {
                   <Input
                     id="telepon"
                     name="telepon"
+                    type="tel"
+                    autoComplete="tel"
                     defaultValue={pengguna.telepon || ""}
                     placeholder="0812xxxxxxxx"
                   />
@@ -221,12 +234,12 @@ export default function FormulirProfil({ pengguna }) {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Email (Dikelola Admin)</Label>
-                  <Input value={pengguna.email} disabled />
+                  <Label htmlFor="email_pengguna">Email (Dikelola Admin)</Label>
+                  <Input id="email_pengguna" value={pengguna.email} disabled />
                 </div>
                 <div className="space-y-2">
-                  <Label>Username (Dikelola Admin)</Label>
-                  <Input value={pengguna.username} disabled />
+                  <Label htmlFor="username_pengguna">Username (Dikelola Admin)</Label>
+                  <Input id="username_pengguna" value={pengguna.username} disabled />
                 </div>
               </div>
 
@@ -236,6 +249,7 @@ export default function FormulirProfil({ pengguna }) {
                   id="alamat"
                   name="alamat"
                   rows={3}
+                  autoComplete="street-address"
                   defaultValue={pengguna.alamat || ""}
                   placeholder="Masukkan alamat tempat tinggal"
                 />
@@ -244,12 +258,20 @@ export default function FormulirProfil({ pengguna }) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="foto_profil_url">URL Foto Profil (Opsional)</Label>
+                  <input type="hidden" name="foto_profil" value={pratinjauFoto} />
                   <Input
                     id="foto_profil_url"
-                    name="foto_profil"
-                    value={pratinjauFoto}
-                    onChange={(e) => aturPratinjauFoto(e.target.value)}
-                    placeholder="https://... atau pilih file gambar"
+                    type="url"
+                    value={fotoDariUnggahanLokal ? "" : pratinjauFoto}
+                    onChange={(e) => {
+                      aturGalatFoto("");
+                      aturPratinjauFoto(e.target.value);
+                    }}
+                    placeholder={
+                      fotoDariUnggahanLokal
+                        ? "Gambar lokal dipilih (siap disimpan)"
+                        : "https://... atau pilih file gambar"
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -258,8 +280,15 @@ export default function FormulirProfil({ pengguna }) {
                     id="unggah_foto_lokal"
                     type="file"
                     accept="image/png,image/jpeg,image/webp"
+                    aria-invalid={galatFoto ? "true" : undefined}
+                    aria-describedby={galatFoto ? "galat-foto-lokal" : undefined}
                     onChange={tanganiPilihBerkasFoto}
                   />
+                  {galatFoto && (
+                    <p id="galat-foto-lokal" role="alert" className="text-xs text-destructive">
+                      {galatFoto}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -270,20 +299,26 @@ export default function FormulirProfil({ pengguna }) {
                   htmlFor="kata_sandi_baru"
                   className="flex items-center gap-1.5"
                 >
-                  <KeyRound className="size-3.5 text-primary" />
+                  <KeyRound className="size-3.5 text-primary" aria-hidden="true" />
                   Kata Sandi Baru (Kosongkan jika tidak ingin mengganti)
                 </Label>
                 <Input
                   id="kata_sandi_baru"
                   name="kata_sandi_baru"
                   type="password"
+                  autoComplete="new-password"
+                  minLength={6}
+                  aria-describedby="bantuan-sandi-baru"
                   placeholder="Minimal 6 karakter"
                 />
+                <p id="bantuan-sandi-baru" className="text-xs text-muted-foreground">
+                  Gunakan minimal 6 karakter bila ingin mengganti kata sandi.
+                </p>
               </div>
 
               <div className="pt-2 flex justify-end">
                 <Button type="submit" disabled={sedangMenyimpan}>
-                  <Save className="size-4 mr-1.5" />
+                  <Save className="size-4 mr-1.5" aria-hidden="true" />
                   {sedangMenyimpan ? "Menyimpan..." : "Simpan Perubahan Profil"}
                 </Button>
               </div>
