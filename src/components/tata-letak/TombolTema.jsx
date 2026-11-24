@@ -47,10 +47,15 @@ export default function TombolTema() {
       variant="outline"
       size="icon"
       onClick={gantiTema}
+      className="size-11 sm:size-9"
       aria-label={modeGelap ? "Aktifkan mode terang" : "Aktifkan mode gelap"}
       title={modeGelap ? "Mode Terang" : "Mode Gelap"}
     >
-      {modeGelap ? <Sun className="size-4" /> : <Moon className="size-4" />}
+      {modeGelap ? (
+        <Sun className="size-4" aria-hidden="true" />
+      ) : (
+        <Moon className="size-4" aria-hidden="true" />
+      )}
     </Button>
   );
 }

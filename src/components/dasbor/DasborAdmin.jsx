@@ -64,10 +64,10 @@ export default function DasborAdmin({ data }) {
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Karyawan Aktif / Nonaktif
             </CardTitle>
-            <UserCheck className="size-4 text-primary" />
+            <UserCheck className="size-4 text-primary" aria-hidden="true" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold tabular-nums">
               {statistik.karyawanAktif}{" "}
               <span className="text-sm font-normal text-muted-foreground">
                 / {statistik.karyawanNonaktif} Nonaktif
@@ -84,29 +84,43 @@ export default function DasborAdmin({ data }) {
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Pengajuan Bulan Ini
             </CardTitle>
-            <CalendarPlus className="size-4 text-primary" />
+            <CalendarPlus className="size-4 text-primary" aria-hidden="true" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{statistik.pengajuanBulanIni}</div>
+            <div className="text-2xl font-bold tabular-nums">
+              {statistik.pengajuanBulanIni}
+            </div>
             <p className="text-xs text-muted-foreground mt-1">
               Total permohonan masuk bulan berjalan
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card
+          className={
+            statistik.pendingApproval > 0
+              ? "border-primary/40 bg-accent/25"
+              : undefined
+          }
+        >
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="text-sm font-medium text-foreground">
               Pending Approval
             </CardTitle>
-            <Clock3 className="size-4 text-primary" />
+            <Clock3 className="size-4 text-primary" aria-hidden="true" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-primary">
+            <div className="text-2xl font-bold tabular-nums text-primary">
               {statistik.pendingApproval}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              Menunggu verifikasi atasan atau HRD
+              Menunggu verifikasi atasan atau HRD{" "}
+              <Link
+                href="/riwayat-cuti"
+                className="font-medium text-primary hover:underline"
+              >
+                (Lihat antrean)
+              </Link>
             </p>
           </CardContent>
         </Card>
@@ -116,10 +130,12 @@ export default function DasborAdmin({ data }) {
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Total Divisi
             </CardTitle>
-            <Building2 className="size-4 text-primary" />
+            <Building2 className="size-4 text-primary" aria-hidden="true" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{statistik.totalDivisi}</div>
+            <div className="text-2xl font-bold tabular-nums">
+              {statistik.totalDivisi}
+            </div>
             <p className="text-xs text-muted-foreground mt-1">
               Unit divisi terdaftar aktif
             </p>
@@ -132,7 +148,7 @@ export default function DasborAdmin({ data }) {
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <CardTitle className="text-base flex items-center gap-2">
-                <CalendarClock className="size-4 text-primary" />
+                <CalendarClock className="size-4 text-primary" aria-hidden="true" />
                 Karyawan Masa Kerja &lt; 1 Tahun
               </CardTitle>
               <CardDescription>
@@ -151,14 +167,17 @@ export default function DasborAdmin({ data }) {
             </p>
           ) : (
             <Table>
+              <caption className="sr-only">
+                Daftar karyawan dengan masa kerja kurang dari 1 tahun
+              </caption>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Nama Karyawan</TableHead>
-                  <TableHead>Divisi</TableHead>
-                  <TableHead>Peran</TableHead>
-                  <TableHead>Tanggal Bergabung</TableHead>
-                  <TableHead>Masa Kerja</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead scope="col">Nama Karyawan</TableHead>
+                  <TableHead scope="col">Divisi</TableHead>
+                  <TableHead scope="col">Peran</TableHead>
+                  <TableHead scope="col">Tanggal Bergabung</TableHead>
+                  <TableHead scope="col">Masa Kerja</TableHead>
+                  <TableHead scope="col">Status</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -173,17 +192,23 @@ export default function DasborAdmin({ data }) {
                     <TableCell>{item.nama_divisi || "-"}</TableCell>
                     <TableCell>{labelPeranPengguna(item.peran)}</TableCell>
                     <TableCell>{formatTanggalIndo(item.tanggal_bergabung)}</TableCell>
-                    <TableCell>
+                    <TableCell className="tabular-nums">
                       {item.bulan_kerja} Bulan
                     </TableCell>
                     <TableCell>
                       {item.status_aktif ? (
-                        <Badge variant="outline" className="bg-amber-50 text-amber-800 border-amber-200">
+                        <Badge
+                          variant="outline"
+                          className="bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/60 dark:text-amber-200 dark:border-amber-800/70"
+                        >
                           Belum Eligible
                         </Badge>
                       ) : (
-                        <Badge variant="outline" className="bg-zinc-100 text-zinc-700">
-                          <UserX className="size-3 mr-1" />
+                        <Badge
+                          variant="outline"
+                          className="bg-zinc-100 text-zinc-700 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:border-zinc-700"
+                        >
+                          <UserX className="size-3 mr-1" aria-hidden="true" />
                           Nonaktif
                         </Badge>
                       )}

@@ -50,12 +50,12 @@ export default function LoncengNotifikasi({
           <Button
             variant="outline"
             size="icon"
-            className="relative"
+            className="relative size-11 sm:size-9"
             aria-label="Notifikasi"
           />
         }
       >
-        <Bell className="size-4" />
+        <Bell className="size-4" aria-hidden="true" />
         {jumlahBelumDibaca > 0 && (
           <span className="absolute -top-1.5 -right-1.5 min-w-4 h-4 px-1 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
             {jumlahBelumDibaca > 9 ? "9+" : jumlahBelumDibaca}
@@ -74,7 +74,7 @@ export default function LoncengNotifikasi({
               disabled={sedangProses}
               className="text-[11px] text-primary hover:underline flex items-center gap-1"
             >
-              <CheckCheck className="size-3" />
+              <CheckCheck className="size-3" aria-hidden="true" />
               Tandai Dibaca
             </button>
           )}

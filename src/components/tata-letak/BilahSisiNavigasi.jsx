@@ -18,6 +18,7 @@ import {
   Users,
 } from "lucide-react";
 import { keluarAkun } from "@/actions/autentikasi-aksi";
+import { labelPeranPengguna } from "@/lib/kalkulasi-cuti";
 import { gabungKelas } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -68,7 +69,11 @@ function dapatkanDaftarMenu(peran) {
   ];
 }
 
-export default function BilahSisiNavigasi({ pengguna, saatPilihMenu }) {
+export default function BilahSisiNavigasi({
+  pengguna,
+  saatPilihMenu,
+  tampilkanLogo = true,
+}) {
   const lokasi = usePathname();
   const daftarMenu = dapatkanDaftarMenu(pengguna?.peran);
   const [konfirmasiKeluar, aturKonfirmasiKeluar] = useState(false);
@@ -82,19 +87,26 @@ export default function BilahSisiNavigasi({ pengguna, saatPilihMenu }) {
 
   return (
     <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
-      <div className="flex items-center gap-3 px-4 py-5 border-b border-sidebar-border">
-        <div className="size-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center shadow-xs">
-          <CalendarCheck2 className="size-5" aria-hidden="true" />
+      {tampilkanLogo && (
+        <div className="flex items-center gap-3 px-4 py-4 border-b border-sidebar-border">
+          <div className="size-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center shadow-xs shrink-0">
+            <CalendarCheck2 className="size-5" aria-hidden="true" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-base font-bold tracking-tight truncate">Offly</p>
+            {pengguna?.nama_lengkap && (
+              <p className="text-[11px] text-muted-foreground truncate">
+                {pengguna.nama_lengkap} • {labelPeranPengguna(pengguna?.peran)}
+              </p>
+            )}
+          </div>
         </div>
-        <div className="min-w-0">
-          <p className="text-base font-bold tracking-tight truncate">Offly</p>
-          <p className="text-[11px] text-muted-foreground truncate">
-            Manajemen Cuti Karyawan
-          </p>
-        </div>
-      </div>
+      )}
 
-      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+      <nav
+        aria-label="Navigasi utama"
+        className="flex-1 overflow-y-auto px-3 py-4 space-y-1"
+      >
         {daftarMenu.map((item) => {
           const Ikon = item.ikon;
           const aktif =
@@ -106,14 +118,15 @@ export default function BilahSisiNavigasi({ pengguna, saatPilihMenu }) {
               key={item.href}
               href={item.href}
               onClick={saatPilihMenu}
+              aria-current={aktif ? "page" : undefined}
               className={gabungKelas(
-                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                 aktif
                   ? "bg-primary text-primary-foreground shadow-2xs"
                   : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
               )}
             >
-              <Ikon className="size-4 shrink-0" />
+              <Ikon className="size-4 shrink-0" aria-hidden="true" />
               <span className="truncate">{item.label}</span>
             </Link>
           );
