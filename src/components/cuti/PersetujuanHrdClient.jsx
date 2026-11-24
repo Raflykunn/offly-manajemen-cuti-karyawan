@@ -182,6 +182,7 @@ export default function PersetujuanHrdClient({ daftarMenunggu }) {
                       <div className="pt-1">
                         <Checkbox
                           checked={terpilih}
+                          className="border-muted-foreground/50"
                           onCheckedChange={(nilai) =>
                             toggleSatu(item.id, Boolean(nilai))
                           }
@@ -231,13 +232,16 @@ export default function PersetujuanHrdClient({ daftarMenunggu }) {
 
                 <CardContent className="space-y-3 text-sm">
                   {item.melebihi_kapasitas && (
-                    <Alert
-                      variant="destructive"
-                      className="bg-amber-50 border-amber-300 text-amber-900"
-                    >
-                      <AlertTriangle className="size-4 text-amber-700" />
-                      <AlertDescription className="text-xs">
-                        Peringatan Limit Kapasitas Tim: {item.jumlah_cuti_bersamaan} dari{" "}
+                    <Alert className="bg-yellow-100 border-yellow-400 text-foreground dark:bg-yellow-950/70 dark:border-yellow-700 dark:text-yellow-100">
+                      <AlertTriangle
+                        className="size-4 text-yellow-700 dark:text-yellow-400"
+                        aria-hidden="true"
+                      />
+                      <AlertDescription className="text-xs text-foreground dark:text-yellow-100">
+                        <strong className="font-semibold">
+                          Peringatan Limit Kapasitas Tim:
+                        </strong>{" "}
+                        {item.jumlah_cuti_bersamaan} dari{" "}
                         {item.total_anggota_divisi} anggota Divisi {item.nama_divisi} (
                         {item.persen_beban_divisi}%) tercatat cuti pada rentang tanggal yang sama, melampaui batas maksimal {item.batas_kapasitas_persen}%.
                       </AlertDescription>
