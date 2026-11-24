@@ -82,7 +82,9 @@ export default function KelolaPenggunaClient({
   const [modalResetKuota, aturModalResetKuota] = useState(false);
 
   const [peranForm, aturPeranForm] = useState("karyawan");
-  const [divisiForm, aturDivisiForm] = useState("kosong");
+  const [divisiForm, aturDivisiForm] = useState(
+    daftarDivisi[0] ? String(daftarDivisi[0].id) : ""
+  );
   const [statusForm, aturStatusForm] = useState("true");
 
   const petaDivisi = useMemo(() => {
@@ -555,36 +557,35 @@ export default function KelolaPenggunaClient({
                     <SelectItem value="karyawan">Karyawan</SelectItem>
                     <SelectItem value="ketua_divisi">Ketua Divisi</SelectItem>
                     <SelectItem value="hrd">HRD</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-1.5">
-                <Label>Divisi (Opsional)</Label>
-                <Select
-                  name="divisi_id"
-                  value={divisiForm}
-                  onValueChange={aturDivisiForm}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue>
-                      {(v) =>
-                        v === "kosong"
-                          ? "Belum Ada Divisi"
-                          : petaDivisi.get(v) || "Pilih Divisi"
-                      }
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="kosong">Belum Ada Divisi</SelectItem>
-                    {daftarDivisi.map((d) => (
-                      <SelectItem key={d.id} value={String(d.id)}>
-                        {d.nama_divisi}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              {peranForm === "karyawan" ? (
+                <div className="space-y-1.5">
+                  <Label>Divisi</Label>
+                  <Select
+                    name="divisi_id"
+                    value={divisiForm}
+                    onValueChange={aturDivisiForm}
+                    required
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue>
+                        {(v) => petaDivisi.get(v) || "Pilih Divisi"}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {daftarDivisi.map((d) => (
+                        <SelectItem key={d.id} value={String(d.id)}>
+                          {d.nama_divisi}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              ) : (
+                <input type="hidden" name="divisi_id" value="kosong" />
+              )}
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">

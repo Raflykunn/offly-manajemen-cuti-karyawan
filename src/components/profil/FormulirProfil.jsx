@@ -128,57 +128,60 @@ export default function FormulirProfil({ pengguna }) {
             </CardContent>
           </Card>
 
-          <Card className="border-primary/25 bg-accent/20">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <CalendarCheck className="size-4 text-primary" aria-hidden="true" />
-                  Informasi Kuota Tahunan
-                </CardTitle>
-                <Badge variant={layakTahunan ? "default" : "secondary"}>
-                  {layakTahunan ? "Eligible" : "Masa Kerja < 1 Thn"}
-                </Badge>
-              </div>
-              <CardDescription>
-                Diperbarui otomatis setiap pengajuan, pembatalan, atau penolakan.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-3 gap-2 text-center tabular-nums">
-                <div className="rounded-lg border bg-background p-2.5">
-                  <p className="text-[11px] text-muted-foreground">Kuota Awal</p>
-                  <p className="text-lg font-bold">{formatAngkaKuota(kuotaAwal)}</p>
+          {(pengguna.peran === "karyawan" ||
+            pengguna.peran === "ketua_divisi") && (
+            <Card className="border-primary/25 bg-accent/20">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <CalendarCheck className="size-4 text-primary" aria-hidden="true" />
+                    Informasi Kuota Tahunan
+                  </CardTitle>
+                  <Badge variant={layakTahunan ? "default" : "secondary"}>
+                    {layakTahunan ? "Eligible" : "Masa Kerja < 1 Thn"}
+                  </Badge>
                 </div>
-                <div className="rounded-lg border bg-background p-2.5">
-                  <p className="text-[11px] text-muted-foreground">Terpakai</p>
-                  <p className="text-lg font-bold text-amber-700 dark:text-amber-400">
-                    {formatAngkaKuota(kuotaTerpakai)}
-                  </p>
+                <CardDescription>
+                  Diperbarui otomatis setiap pengajuan, pembatalan, atau penolakan.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-3 gap-2 text-center tabular-nums">
+                  <div className="rounded-lg border bg-background p-2.5">
+                    <p className="text-[11px] text-muted-foreground">Kuota Awal</p>
+                    <p className="text-lg font-bold">{formatAngkaKuota(kuotaAwal)}</p>
+                  </div>
+                  <div className="rounded-lg border bg-background p-2.5">
+                    <p className="text-[11px] text-muted-foreground">Terpakai</p>
+                    <p className="text-lg font-bold text-amber-700 dark:text-amber-400">
+                      {formatAngkaKuota(kuotaTerpakai)}
+                    </p>
+                  </div>
+                  <div className="rounded-lg border bg-background p-2.5 border-primary/40">
+                    <p className="text-[11px] text-muted-foreground">Sisa Kuota</p>
+                    <p className="text-lg font-bold text-primary">
+                      {formatAngkaKuota(sisaKuota)}
+                    </p>
+                  </div>
                 </div>
-                <div className="rounded-lg border bg-background p-2.5 border-primary/40">
-                  <p className="text-[11px] text-muted-foreground">Sisa Kuota</p>
-                  <p className="text-lg font-bold text-primary">
-                    {formatAngkaKuota(sisaKuota)}
-                  </p>
-                </div>
-              </div>
 
-              <div className="space-y-1.5">
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>Ketersediaan Kuota</span>
-                  <span className="font-medium text-foreground tabular-nums">
-                    {persentaseSisa}%
-                  </span>
+                <div className="space-y-1.5">
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>Ketersediaan Kuota</span>
+                    <span className="font-medium text-foreground tabular-nums">
+                      {persentaseSisa}%
+                    </span>
+                  </div>
+                  <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+                    <div
+                      className="h-full bg-primary transition-all duration-300"
+                      style={{ width: `${persentaseSisa}%` }}
+                    />
+                  </div>
                 </div>
-                <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-                  <div
-                    className="h-full bg-primary transition-all duration-300"
-                    style={{ width: `${persentaseSisa}%` }}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         <Card className="lg:col-span-8">
