@@ -32,6 +32,11 @@ export default function NavbarBeranda({ sudahMasuk = false }) {
     if (elemenDaftar.length === 0) return;
 
     const tanganiGulir = () => {
+      if (window.scrollY < 200) {
+        pasangBagianAktif("");
+        return;
+      }
+
       const posisiGaris = window.innerHeight * 0.35;
       let terpilih = "";
 
@@ -45,8 +50,6 @@ export default function NavbarBeranda({ sudahMasuk = false }) {
 
       if (terpilih) {
         pasangBagianAktif(terpilih);
-      } else if (window.scrollY < 200) {
-        pasangBagianAktif("");
       }
     };
 
