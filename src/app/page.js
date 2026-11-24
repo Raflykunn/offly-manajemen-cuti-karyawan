@@ -1,7 +1,6 @@
 import Link from "next/link";
 import {
   ArrowRight,
-  CalendarCheck2,
   Clock3,
   FileCheck2,
   FileText,
@@ -10,11 +9,10 @@ import {
 } from "lucide-react";
 import { ambilSesiPengguna } from "@/lib/autentikasi";
 import { jalankanKueri } from "@/lib/db";
-import { formatTanggalIndo, labelPeranPengguna } from "@/lib/kalkulasi-cuti";
+import { formatTanggalIndo } from "@/lib/kalkulasi-cuti";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import TombolTema from "@/components/tata-letak/TombolTema";
-import NavigasiBeranda from "@/components/tata-letak/NavigasiBeranda";
+import NavbarBeranda from "@/components/beranda/NavbarBeranda";
 import IlustrasiHero from "@/components/beranda/IlustrasiHero";
 import AlurVerifikasiBeranda from "@/components/beranda/AlurVerifikasiBeranda";
 import DaftarHariLiburBeranda from "@/components/beranda/DaftarHariLiburBeranda";
@@ -93,40 +91,7 @@ export default async function HalamanUtama() {
         Lewati ke konten utama
       </a>
 
-      <header className="sticky top-0 z-30 border-b bg-background/90 backdrop-blur-sm supports-[backdrop-filter]:bg-background/85">
-        <div className="max-w-6xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-2.5 rounded-lg">
-            <div className="size-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center">
-              <CalendarCheck2 className="size-5" />
-            </div>
-            <div className="leading-none">
-              <span className="text-lg font-bold tracking-tight block">
-                Offly
-              </span>
-              <span className="text-[11px] text-muted-foreground">
-                Manajemen Cuti Karyawan
-              </span>
-            </div>
-          </Link>
-
-          <NavigasiBeranda />
-
-          <div className="flex items-center gap-2">
-            {sesi ? (
-              <Button nativeButton={false} render={<Link href="/dasbor" />} size="sm">
-                Buka Dasbor ({labelPeranPengguna(sesi.peran)})
-                <ArrowRight className="size-4 ml-1.5" />
-              </Button>
-            ) : (
-              <Button nativeButton={false} render={<Link href="/masuk" />} size="sm">
-                <LogIn className="size-4 mr-1.5" />
-                Masuk
-              </Button>
-            )}
-            <TombolTema />
-          </div>
-        </div>
-      </header>
+      <NavbarBeranda sudahMasuk={Boolean(sesi)} />
 
       <main id="konten-utama" tabIndex={-1} className="flex-1 outline-none">
         <section className="border-b">
