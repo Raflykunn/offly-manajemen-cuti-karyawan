@@ -243,7 +243,7 @@ export default function KelolaJenisCutiClient({ daftarJenisCuti }) {
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={tanganiTambah} className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="tambah_kode">Kode Cuti</Label>
                 <Input
@@ -267,7 +267,7 @@ export default function KelolaJenisCutiClient({ daftarJenisCuti }) {
               <Label htmlFor="tambah_desk_cuti">Deskripsi</Label>
               <Textarea id="tambah_desk_cuti" name="deskripsi" rows={2} />
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="tambah_kuota_def">Kuota Maks (Hari)</Label>
                 <Input
@@ -351,7 +351,7 @@ export default function KelolaJenisCutiClient({ daftarJenisCuti }) {
           {jenisDiedit && (
             <form onSubmit={tanganiUbah} className="space-y-3">
               <input type="hidden" name="id" value={jenisDiedit.id} />
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label htmlFor="edit_kode">Kode Cuti</Label>
                   <Input
@@ -380,7 +380,7 @@ export default function KelolaJenisCutiClient({ daftarJenisCuti }) {
                   defaultValue={jenisDiedit.deskripsi || ""}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label htmlFor="edit_kuota_def">Kuota Maks (Hari)</Label>
                   <Input
