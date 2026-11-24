@@ -95,7 +95,7 @@ export default async function HalamanUtama() {
 
       <main id="konten-utama" tabIndex={-1} className="flex-1 outline-none">
         <section className="border-b">
-          <div className="max-w-6xl mx-auto px-4 md:px-6 py-20 md:py-28 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+          <div className="max-w-6xl mx-auto px-4 md:px-6 py-10 md:py-16 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
             <div className="lg:col-span-7 space-y-6">
               <h1 className="judul-seimbang text-[clamp(2.1rem,1.4rem+2.8vw,3.35rem)] font-bold tracking-tight leading-[1.15] text-foreground">
                 Ajukan dan setujui cuti tim tanpa rekap manual.
@@ -135,26 +135,26 @@ export default async function HalamanUtama() {
                 </Button>
               </div>
 
-              <div className="grid grid-cols-3 gap-4 pt-5 border-t max-w-lg tabular-nums">
-                <div>
-                  <p className="text-2xl font-bold font-mono">12</p>
-                  <p className="text-sm text-muted-foreground">
+              <div className="grid grid-cols-3 gap-2.5 sm:gap-3 pt-2 max-w-lg tabular-nums text-center">
+                <div className="rounded-xl border bg-card px-3 py-3 sm:px-4 shadow-2xs">
+                  <p className="text-xl sm:text-2xl font-bold font-mono">12</p>
+                  <p className="text-xs text-muted-foreground leading-snug mt-0.5">
                     Hari Kerja / Tahun
                   </p>
                 </div>
-                <div>
-                  <p className="text-2xl font-bold font-mono text-primary">
+                <div className="rounded-xl border border-primary/25 bg-accent/40 dark:bg-accent/20 px-3 py-3 sm:px-4 shadow-2xs">
+                  <p className="text-xl sm:text-2xl font-bold font-mono text-primary">
                     {ringkasan.total_divisi}
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs text-muted-foreground leading-snug mt-0.5">
                     Divisi Terdaftar
                   </p>
                 </div>
-                <div>
-                  <p className="text-2xl font-bold font-mono">
+                <div className="rounded-xl border bg-card px-3 py-3 sm:px-4 shadow-2xs">
+                  <p className="text-xl sm:text-2xl font-bold font-mono">
                     {daftarJenisCuti.length}
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs text-muted-foreground leading-snug mt-0.5">
                     Jenis Cuti Aktif
                   </p>
                 </div>
@@ -168,7 +168,7 @@ export default async function HalamanUtama() {
         </section>
 
         <section id="alur" tabIndex={-1} className="border-b bg-muted/20 scroll-mt-20 outline-none">
-          <div className="max-w-6xl mx-auto px-4 md:px-6 py-20 md:py-28 space-y-8 ungkap-gulir">
+          <div className="max-w-6xl mx-auto px-4 md:px-6 py-12 md:py-14 space-y-8 ungkap-gulir">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <h2 className="judul-seimbang text-2xl md:text-3xl font-bold tracking-tight">
                 Verifikasi berjenjang sesuai peran di divisi
@@ -185,7 +185,7 @@ export default async function HalamanUtama() {
         <section
           id="keunggulan"
           tabIndex={-1}
-          className="max-w-6xl mx-auto px-4 md:px-6 py-20 md:py-28 space-y-8 ungkap-gulir scroll-mt-20 outline-none"
+          className="max-w-6xl mx-auto px-4 md:px-6 py-12 md:py-14 space-y-8 ungkap-gulir scroll-mt-20 outline-none"
         >
           <div>
             <h2 className="judul-seimbang text-2xl md:text-3xl font-bold tracking-tight">
@@ -320,7 +320,7 @@ export default async function HalamanUtama() {
         </section>
 
         <section id="kebijakan" tabIndex={-1} className="border-t bg-muted/20 scroll-mt-20 outline-none">
-          <div className="max-w-6xl mx-auto px-4 md:px-6 py-20 md:py-28 grid grid-cols-1 lg:grid-cols-12 gap-10 ungkap-gulir">
+          <div className="max-w-6xl mx-auto px-4 md:px-6 pt-12 pb-8 md:pt-14 md:pb-8 grid grid-cols-1 lg:grid-cols-12 gap-10 ungkap-gulir">
             <div className="lg:col-span-7 space-y-5">
               <div>
                 <h2 className="judul-seimbang text-2xl font-bold tracking-tight">
@@ -375,7 +375,7 @@ export default async function HalamanUtama() {
           </div>
         </section>
 
-        <section className="max-w-6xl mx-auto px-4 md:px-6 py-20 md:py-28 ungkap-gulir">
+        <section className="max-w-6xl mx-auto px-4 md:px-6 pt-4 pb-10 md:pt-6 md:pb-12 ungkap-gulir">
           <div className="rounded-2xl border border-primary/20 bg-primary text-primary-foreground p-8 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div className="space-y-2 max-w-xl">
               <h2 className="judul-seimbang text-2xl md:text-3xl font-bold tracking-tight">
