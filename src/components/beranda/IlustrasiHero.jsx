@@ -48,13 +48,13 @@ export default function IlustrasiHero() {
         />
       </div>
 
-      <div className="relative flex items-center justify-center transition-transform duration-500 motion-safe:group-hover:scale-[1.02]">
-        <div className="relative w-[268px] sm:w-[296px] pt-3">
+      <div className="relative flex items-center justify-center">
+        <div className="relative w-[268px] sm:w-[296px] pt-3 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-safe:group-hover:scale-[1.015]">
           <div
             className="absolute inset-x-3 top-6 bottom-0 translate-x-2.5 translate-y-2.5 rounded-2xl bg-primary/15 dark:bg-primary/20 border border-primary/20"
           />
 
-          <div className="relative rounded-2xl border border-border bg-card text-card-foreground shadow-xl dark:shadow-none overflow-hidden">
+          <div className="relative rounded-2xl border border-border bg-card text-card-foreground shadow-lg dark:shadow-none transition-shadow duration-500 group-hover:shadow-xl overflow-hidden">
             <div className="absolute top-1.5 inset-x-6 flex justify-between pointer-events-none z-10">
               {[0, 1, 2, 3, 4].map((indeks) => (
                 <span
@@ -155,115 +155,123 @@ export default function IlustrasiHero() {
           </svg>
         </div>
 
-        <div
-          className="animasi-mengambang absolute -top-7 left-0 sm:-left-2 z-20 -rotate-3 rounded-xl border border-border ring-1 ring-border/80 bg-card/95 backdrop-blur-sm p-2.5 shadow-md dark:shadow-none w-36 sm:w-40"
-          style={{ animationDuration: "4.5s", animationDelay: "0s" }}
-        >
-          <div className="flex items-center gap-2">
-            <div className="size-7 rounded-lg bg-primary/15 text-primary flex items-center justify-center shrink-0">
-              <FileCheck2 className="size-4" />
+        <div className="absolute -top-8 left-0 sm:-left-4 z-20 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-safe:group-hover:-translate-x-2.5 motion-safe:group-hover:-translate-y-2 motion-safe:group-hover:-rotate-2 motion-safe:group-hover:scale-[1.03]">
+          <div
+            className="animasi-mengambang -rotate-3 rounded-xl border border-border ring-1 ring-border/80 bg-card/95 backdrop-blur-sm p-2.5 shadow-md dark:shadow-none w-36 sm:w-40"
+            style={{ animationDuration: "4.5s", animationDelay: "0s" }}
+          >
+            <div className="flex items-center gap-2">
+              <div className="size-7 rounded-lg bg-primary/15 text-primary flex items-center justify-center shrink-0">
+                <FileCheck2 className="size-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[11px] font-bold text-card-foreground truncate">
+                  Surat Cuti PDF
+                </p>
+                <p className="text-[10px] font-mono text-muted-foreground tabular-nums">
+                  #0012-HRD
+                </p>
+              </div>
             </div>
-            <div className="min-w-0">
-              <p className="text-[11px] font-bold text-card-foreground truncate">
-                Surat Cuti PDF
+            <div className="mt-2 flex items-center justify-between gap-1.5">
+              <div className="space-y-1 flex-1">
+                <div className="h-1.5 w-full rounded-full bg-muted" />
+                <div className="h-1.5 w-3/4 rounded-full bg-muted" />
+              </div>
+              <span className="rounded border border-primary/40 bg-primary/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary">
+                Sah
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="absolute -top-2 right-0 sm:-right-2 z-20 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-safe:group-hover:translate-x-2.5 motion-safe:group-hover:-translate-y-2 motion-safe:group-hover:rotate-2 motion-safe:group-hover:scale-[1.03]">
+          <div
+            className="animasi-mengambang-lambat flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-3 py-1.5 shadow-md ring-1 ring-border/80 dark:shadow-none"
+            style={{ animationDuration: "5.5s", animationDelay: "0.7s" }}
+          >
+            <span className="size-5 rounded-full bg-primary-foreground/20 flex items-center justify-center">
+              <Check className="size-3.5" strokeWidth={2.5} />
+            </span>
+            <div className="leading-tight pr-0.5">
+              <p className="text-[9px] uppercase tracking-wider opacity-85">HRD</p>
+              <p className="text-[11px] font-bold">Disetujui</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="absolute -bottom-8 left-0 sm:-left-3 z-20 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-safe:group-hover:-translate-x-2.5 motion-safe:group-hover:translate-y-2 motion-safe:group-hover:-rotate-1 motion-safe:group-hover:scale-[1.03]">
+          <div
+            className="animasi-mengambang-lambat flex items-center gap-2 rounded-xl border border-border ring-1 ring-border/80 bg-card/90 backdrop-blur-md px-2.5 py-1.5 sm:px-3 sm:py-2 shadow-md dark:shadow-none"
+            style={{ animationDuration: "6.5s", animationDelay: "1.1s" }}
+          >
+            <div className="flex -space-x-2">
+              {DAFTAR_ANGGOTA_TIM.map((anggota) => (
+                <span
+                  key={anggota.inisial}
+                  className={`relative size-7 rounded-full ring-2 ring-background flex items-center justify-center text-[10px] font-bold ${anggota.warna}`}
+                >
+                  {anggota.inisial}
+                </span>
+              ))}
+            </div>
+            <div className="leading-tight">
+              <p className="text-[11px] font-semibold text-card-foreground flex items-center gap-1">
+                <Users className="size-3 text-primary" />
+                Tim Aktif
               </p>
               <p className="text-[10px] font-mono text-muted-foreground tabular-nums">
-                #0012-HRD
+                3/4 Siaga
               </p>
             </div>
           </div>
-          <div className="mt-2 flex items-center justify-between gap-1.5">
-            <div className="space-y-1 flex-1">
-              <div className="h-1.5 w-full rounded-full bg-muted" />
-              <div className="h-1.5 w-3/4 rounded-full bg-muted" />
-            </div>
-            <span className="rounded border border-primary/40 bg-primary/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary">
-              Sah
-            </span>
-          </div>
         </div>
 
-        <div
-          className="animasi-mengambang-lambat absolute -top-1 right-1 sm:right-2 z-20 flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-3 py-1.5 shadow-md ring-1 ring-border/80 dark:shadow-none"
-          style={{ animationDuration: "5.5s", animationDelay: "0.7s" }}
-        >
-          <span className="size-5 rounded-full bg-primary-foreground/20 flex items-center justify-center">
-            <Check className="size-3.5" strokeWidth={2.5} />
-          </span>
-          <div className="leading-tight pr-0.5">
-            <p className="text-[9px] uppercase tracking-wider opacity-85">HRD</p>
-            <p className="text-[11px] font-bold">Disetujui</p>
-          </div>
-        </div>
-
-        <div
-          className="animasi-mengambang-lambat absolute -bottom-7 left-0 sm:left-1 z-20 flex items-center gap-2 rounded-xl border border-border ring-1 ring-border/80 bg-card/90 backdrop-blur-md px-2.5 py-1.5 sm:px-3 sm:py-2 shadow-md dark:shadow-none"
-          style={{ animationDuration: "6.5s", animationDelay: "1.1s" }}
-        >
-          <div className="flex -space-x-2">
-            {DAFTAR_ANGGOTA_TIM.map((anggota) => (
-              <span
-                key={anggota.inisial}
-                className={`relative size-7 rounded-full ring-2 ring-background flex items-center justify-center text-[10px] font-bold ${anggota.warna}`}
-              >
-                {anggota.inisial}
+        <div className="absolute -bottom-8 right-0 sm:-right-3 z-20 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-safe:group-hover:translate-x-2.5 motion-safe:group-hover:translate-y-2 motion-safe:group-hover:rotate-1 motion-safe:group-hover:scale-[1.03]">
+          <div
+            className="animasi-mengambang w-36 sm:w-44 rounded-xl border border-border ring-1 ring-border/80 bg-card/85 backdrop-blur-md p-2.5 sm:p-3 shadow-md dark:shadow-none"
+            style={{ animationDuration: "5.5s", animationDelay: "1.6s" }}
+          >
+            <div className="flex items-center justify-between text-[10px]">
+              <span className="font-semibold text-card-foreground">
+                Status Kuota
               </span>
-            ))}
-          </div>
-          <div className="leading-tight">
-            <p className="text-[11px] font-semibold text-card-foreground flex items-center gap-1">
-              <Users className="size-3 text-primary" />
-              Tim Aktif
-            </p>
-            <p className="text-[10px] font-mono text-muted-foreground tabular-nums">
-              3/4 Siaga
-            </p>
-          </div>
-        </div>
-
-        <div
-          className="animasi-mengambang absolute -bottom-7 right-0 sm:right-1 z-20 w-36 sm:w-44 rounded-xl border border-border ring-1 ring-border/80 bg-card/85 backdrop-blur-md p-2.5 sm:p-3 shadow-md dark:shadow-none"
-          style={{ animationDuration: "5.5s", animationDelay: "1.6s" }}
-        >
-          <div className="flex items-center justify-between text-[10px]">
-            <span className="font-semibold text-card-foreground">
-              Status Kuota
-            </span>
-            <span className="font-mono font-bold text-primary tabular-nums">
-              10.5 Hr
-            </span>
-          </div>
-          <svg viewBox="0 0 120 32" className="mt-1.5 h-7 w-full overflow-visible">
-            <defs>
-              <linearGradient id="gradKuotaHero" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="var(--chart-1)" stopOpacity="0.35" />
-                <stop offset="100%" stopColor="var(--chart-1)" stopOpacity="0.02" />
-              </linearGradient>
-            </defs>
-            <path
-              d="M2 24 C20 22, 32 10, 52 14 C72 18, 86 6, 118 8 L118 30 L2 30 Z"
-              fill="url(#gradKuotaHero)"
-            />
-            <path
-              d="M2 24 C20 22, 32 10, 52 14 C72 18, 86 6, 118 8"
-              fill="none"
-              stroke="var(--chart-1)"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-            />
-            <circle cx="118" cy="8" r="3" fill="var(--chart-1)" />
-          </svg>
-          <div className="mt-1 flex items-center justify-between border-t border-border/60 pt-1.5">
-            <span className="text-[9px] text-muted-foreground">Tanda Tangan</span>
-            <svg viewBox="0 0 60 16" className="h-3.5 w-12">
+              <span className="font-mono font-bold text-primary tabular-nums">
+                10.5 Hr
+              </span>
+            </div>
+            <svg viewBox="0 0 120 32" className="mt-1.5 h-7 w-full overflow-visible">
+              <defs>
+                <linearGradient id="gradKuotaHero" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="var(--chart-1)" stopOpacity="0.35" />
+                  <stop offset="100%" stopColor="var(--chart-1)" stopOpacity="0.02" />
+                </linearGradient>
+              </defs>
               <path
-                d="M3 12 Q10 3, 18 10 T34 8 T56 7"
+                d="M2 24 C20 22, 32 10, 52 14 C72 18, 86 6, 118 8 L118 30 L2 30 Z"
+                fill="url(#gradKuotaHero)"
+              />
+              <path
+                d="M2 24 C20 22, 32 10, 52 14 C72 18, 86 6, 118 8"
                 fill="none"
-                stroke="var(--primary)"
-                strokeWidth="1.6"
+                stroke="var(--chart-1)"
+                strokeWidth="2.2"
                 strokeLinecap="round"
               />
+              <circle cx="118" cy="8" r="3" fill="var(--chart-1)" />
             </svg>
+            <div className="mt-1 flex items-center justify-between border-t border-border/60 pt-1.5">
+              <span className="text-[9px] text-muted-foreground">Tanda Tangan</span>
+              <svg viewBox="0 0 60 16" className="h-3.5 w-12">
+                <path
+                  d="M3 12 Q10 3, 18 10 T34 8 T56 7"
+                  fill="none"
+                  stroke="var(--primary)"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </div>
           </div>
         </div>
       </div>
