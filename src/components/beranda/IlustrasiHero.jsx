@@ -66,20 +66,20 @@ export default function IlustrasiHero() {
 
             <div className="bg-primary text-primary-foreground px-5 pt-5 pb-3.5 flex items-center justify-between">
               <div>
-                <p className="text-[10px] font-medium uppercase tracking-wider opacity-85">
+                <p className="text-sm font-medium tracking-wide">
                   Kalender Cuti Tim
                 </p>
-                <p className="text-sm font-bold font-mono tabular-nums mt-0.5">
+                <p className="text-base font-bold tabular-nums mt-0.5">
                   Nov 2026
                 </p>
               </div>
-              <span className="rounded-md bg-primary-foreground/15 px-2 py-1 text-[11px] font-mono font-semibold tabular-nums">
+              <span className="rounded-md bg-primary-foreground/20 px-2.5 py-1 text-sm font-semibold tabular-nums">
                 12 Hari
               </span>
             </div>
 
             <div className="p-4 space-y-2.5">
-              <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-medium text-muted-foreground">
+              <div className="grid grid-cols-7 gap-1 text-center text-sm font-medium text-muted-foreground">
                 <span>S</span>
                 <span>S</span>
                 <span>R</span>
@@ -93,10 +93,10 @@ export default function IlustrasiHero() {
                 {DAFTAR_TANGGAL_KALENDER.map((tgl) => (
                   <div
                     key={tgl.angka}
-                    className={`relative h-8 rounded-lg flex items-center justify-center text-xs font-mono tabular-nums ${
+                    className={`relative h-8 rounded-lg flex items-center justify-center text-sm tabular-nums ${
                       tgl.sorot
-                        ? "bg-primary/15 text-primary font-bold ring-1 ring-primary/30"
-                        : "bg-muted/40 text-card-foreground/80"
+                        ? "bg-primary/15 text-primary font-bold ring-1 ring-primary/40"
+                        : "bg-muted/60 text-card-foreground"
                     }`}
                   >
                     {tgl.angka}
@@ -109,9 +109,9 @@ export default function IlustrasiHero() {
                 ))}
               </div>
 
-              <div className="flex items-center justify-between pt-2 border-t border-dashed border-border text-[11px]">
+              <div className="flex items-center justify-between pt-2 border-t border-dashed border-border text-sm">
                 <span className="text-muted-foreground">Jadwal Disetujui</span>
-                <span className="font-mono font-semibold text-primary tabular-nums">
+                <span className="font-semibold text-primary tabular-nums">
                   12-13, 18 Nov
                 </span>
               </div>
@@ -155,7 +155,7 @@ export default function IlustrasiHero() {
           </svg>
         </div>
 
-        <div className="absolute -top-11 sm:-top-8 left-0 sm:-left-4 z-20 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-safe:group-hover:-translate-x-2.5 motion-safe:group-hover:-translate-y-2 motion-safe:group-hover:-rotate-2 motion-safe:group-hover:scale-[1.03]">
+        <div className="absolute -top-11 sm:-top-8 left-0 sm:-left-4 z-20 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-safe:group-hover:-translate-x-8 motion-safe:group-hover:-translate-y-6 motion-safe:group-hover:-rotate-6 motion-safe:group-hover:scale-[1.03]">
           <div
             className="animasi-mengambang -rotate-3 rounded-xl border border-border ring-1 ring-border/80 bg-card/95 backdrop-blur-sm p-2.5 shadow-md dark:shadow-none w-36 sm:w-40"
             style={{ animationDuration: "4.5s", animationDelay: "0s" }}
@@ -165,10 +165,10 @@ export default function IlustrasiHero() {
                 <FileCheck2 className="size-4" />
               </div>
               <div className="min-w-0">
-                <p className="text-[11px] font-bold text-card-foreground truncate">
+                <p className="text-sm font-bold text-card-foreground">
                   Surat Cuti PDF
                 </p>
-                <p className="text-[10px] font-mono text-muted-foreground tabular-nums">
+                <p className="text-sm text-muted-foreground tabular-nums">
                   #0012-HRD
                 </p>
               </div>
@@ -178,7 +178,7 @@ export default function IlustrasiHero() {
                 <div className="h-1.5 w-full rounded-full bg-muted" />
                 <div className="h-1.5 w-3/4 rounded-full bg-muted" />
               </div>
-              <span className="rounded border border-primary/40 bg-primary/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary">
+              <span className="rounded border border-primary/50 bg-accent px-1.5 py-0.5 text-sm font-bold text-accent-foreground">
                 Sah
               </span>
             </div>
@@ -187,56 +187,55 @@ export default function IlustrasiHero() {
 
         <div className="absolute -top-2 right-0 sm:-right-2 z-20 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-safe:group-hover:translate-x-2.5 motion-safe:group-hover:-translate-y-2 motion-safe:group-hover:rotate-2 motion-safe:group-hover:scale-[1.03]">
           <div
-            className="animasi-mengambang-lambat flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-3 py-1.5 shadow-md ring-1 ring-border/80 dark:shadow-none"
+            className="animasi-mengambang-lambat flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-3.5 py-1.5 shadow-md ring-1 ring-border/80"
             style={{ animationDuration: "5.5s", animationDelay: "0.7s" }}
           >
             <span className="size-5 rounded-full bg-primary-foreground/20 flex items-center justify-center">
               <Check className="size-3.5" strokeWidth={2.5} />
             </span>
             <div className="leading-tight pr-0.5">
-              <p className="text-[9px] uppercase tracking-wider opacity-85">HRD</p>
-              <p className="text-[11px] font-bold">Disetujui</p>
+              <p className="text-sm font-medium">HRD · Disetujui</p>
             </div>
           </div>
         </div>
 
         <div className="absolute -bottom-8 left-0 sm:-left-3 z-20 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-safe:group-hover:-translate-x-2.5 motion-safe:group-hover:translate-y-2 motion-safe:group-hover:-rotate-1 motion-safe:group-hover:scale-[1.03]">
           <div
-            className="animasi-mengambang-lambat flex items-center gap-2 rounded-xl border border-border ring-1 ring-border/80 bg-card/90 backdrop-blur-md px-2.5 py-1.5 sm:px-3 sm:py-2 shadow-md dark:shadow-none"
+            className="animasi-mengambang-lambat flex items-center gap-2 rounded-xl border border-border ring-1 ring-border/80 bg-card/95 backdrop-blur-md px-2.5 py-1.5 sm:px-3 sm:py-2 shadow-md"
             style={{ animationDuration: "6.5s", animationDelay: "1.1s" }}
           >
-            <div className="flex -space-x-2">
+            <div className="flex -space-x-0.5">
               {DAFTAR_ANGGOTA_TIM.map((anggota) => (
                 <span
                   key={anggota.inisial}
-                  className={`relative size-7 rounded-full ring-2 ring-background flex items-center justify-center text-[10px] font-bold ${anggota.warna}`}
+                  className={`relative size-7 rounded-full ring-2 ring-background flex items-center justify-center text-sm font-bold ${anggota.warna}`}
                 >
                   {anggota.inisial}
                 </span>
               ))}
             </div>
             <div className="leading-tight">
-              <p className="text-[11px] font-semibold text-card-foreground flex items-center gap-1">
-                <Users className="size-3 text-primary" />
+              <p className="text-sm font-semibold text-card-foreground flex items-center gap-1">
+                <Users className="size-3.5 text-primary" />
                 Tim Aktif
               </p>
-              <p className="text-[10px] font-mono text-muted-foreground tabular-nums">
+              <p className="text-sm text-muted-foreground tabular-nums">
                 3/4 Siaga
               </p>
             </div>
           </div>
         </div>
 
-        <div className="absolute -bottom-8 right-0 sm:-right-3 z-20 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-safe:group-hover:translate-x-2.5 motion-safe:group-hover:translate-y-2 motion-safe:group-hover:rotate-1 motion-safe:group-hover:scale-[1.03]">
+        <div className="absolute -bottom-8 right-0 sm:-right-3 z-20 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-safe:group-hover:translate-x-8 motion-safe:group-hover:translate-y-6 motion-safe:group-hover:rotate-1 motion-safe:group-hover:scale-[1.03]">
           <div
-            className="animasi-mengambang w-36 sm:w-44 rounded-xl border border-border ring-1 ring-border/80 bg-card/85 backdrop-blur-md p-2.5 sm:p-3 shadow-md dark:shadow-none"
+            className="animasi-mengambang w-44 sm:w-52 rounded-xl border border-border ring-1 ring-border/80 bg-card/95 backdrop-blur-md p-2.5 sm:p-3 shadow-md"
             style={{ animationDuration: "5.5s", animationDelay: "1.6s" }}
           >
-            <div className="flex items-center justify-between text-[10px]">
+            <div className="flex items-center justify-between text-sm">
               <span className="font-semibold text-card-foreground">
                 Status Kuota
               </span>
-              <span className="font-mono font-bold text-primary tabular-nums">
+              <span className="font-bold text-primary tabular-nums">
                 10.5 Hr
               </span>
             </div>

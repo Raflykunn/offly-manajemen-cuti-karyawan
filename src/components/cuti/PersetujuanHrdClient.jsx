@@ -205,16 +205,16 @@ export default function PersetujuanHrdClient({ daftarMenunggu }) {
                           <CardTitle className="text-base">
                             {item.nama_pemohon}
                           </CardTitle>
-                          <Badge variant="secondary" className="text-[11px]">
+                          <Badge variant="secondary" className="text-sm">
                             {labelPeranPengguna(item.peran_pemohon)}
                           </Badge>
                           {item.nama_divisi && (
-                            <Badge variant="outline" className="text-[11px]">
+                            <Badge variant="outline" className="text-sm">
                               Divisi {item.nama_divisi}
                             </Badge>
                           )}
                         </div>
-                        <CardDescription className="font-mono text-xs mt-0.5">
+                        <CardDescription className="text-sm mt-0.5">
                           {item.nomor_pengajuan} • Diajukan{" "}
                           {formatTanggalIndo(item.tanggal_pengajuan)}
                         </CardDescription>

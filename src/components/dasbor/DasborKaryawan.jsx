@@ -160,14 +160,14 @@ export default function DasborKaryawan({ data }) {
                   {pengajuanTerbaru.map((item) => (
                     <TableRow key={item.id}>
                       <TableCell>
-                        <div className="font-mono text-xs font-semibold">
+                        <div className="text-sm font-semibold">
                           {item.nomor_pengajuan}
                         </div>
-                        <div className="text-xs text-muted-foreground">
+                        <div className="text-sm text-muted-foreground">
                           {item.nama_cuti}
                         </div>
                       </TableCell>
-                      <TableCell className="text-xs">
+                      <TableCell className="text-sm">
                         {formatTanggalIndo(item.tanggal_mulai)} s.d.{" "}
                         {formatTanggalIndo(item.tanggal_selesai)}
                       </TableCell>

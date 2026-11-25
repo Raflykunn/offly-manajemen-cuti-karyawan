@@ -16,7 +16,7 @@ import TombolTema from "@/components/tata-letak/TombolTema";
 const DAFTAR_TAUTAN = [
   { href: "#alur", label: "Alur Cuti" },
   { href: "#keunggulan", label: "Fitur" },
-  { href: "#kebijakan", label: "Kebijakan & Libur" },
+  { href: "#kebijakan", label: "Jenis Cuti" },
 ];
 
 export default function NavbarBeranda({ sudahMasuk = false }) {
@@ -66,7 +66,7 @@ export default function NavbarBeranda({ sudahMasuk = false }) {
 
   return (
     <header className="sticky top-4 z-40 px-4">
-      <div className="max-w-6xl mx-auto h-14 px-4 md:px-5 rounded-full bg-background/80 backdrop-blur-md border border-border/80 shadow-sm flex items-center justify-between gap-3 transition-all">
+      <div className="max-w-6xl mx-auto h-14 px-4 md:px-5 rounded-full bg-white/95 dark:bg-[oklch(0.185_0.007_55)]/95 backdrop-blur-md border border-border/55 shadow-md flex items-center justify-between gap-3 transition-all">
         <Link
           href="/"
           className="flex items-center gap-2.5 rounded-full pr-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"

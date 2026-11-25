@@ -34,7 +34,7 @@ export default function PanelSimulasiWhatIf({
             Simulasi Kuota &amp; Kalender (What-If)
           </CardTitle>
           {sedangMemuat && (
-            <Badge variant="outline" className="text-[11px]">
+            <Badge variant="outline" className="text-sm">
               Menghitung...
             </Badge>
           )}
@@ -46,12 +46,12 @@ export default function PanelSimulasiWhatIf({
       <CardContent className="space-y-4 text-sm">
         {!simulasi ? (
           <div className="space-y-4">
-            <div className="rounded-lg border bg-background p-4 text-center space-y-2">
+            <div className="rounded-lg border bg-card p-4 text-center space-y-2">
               <CalendarDays className="size-6 text-primary mx-auto" />
-              <p className="text-xs text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 Pilih jenis cuti, tanggal mulai, dan tanggal selesai untuk melihat simulasi kuota &amp; kalender tim secara real-time.
               </p>
-              <p className="text-sm font-semibold">
+              <p className="text-base font-semibold">
                 Sisa Kuota Saat Ini:{" "}
                 <span className="text-primary">
                   {formatAngkaKuota(sisaKuotaAwal)} Hari
@@ -59,7 +59,7 @@ export default function PanelSimulasiWhatIf({
               </p>
             </div>
 
-            <div className="rounded-lg border bg-background/80 p-4 space-y-2.5 text-xs">
+            <div className="rounded-lg border bg-card p-4 space-y-2.5 text-sm">
               <p className="font-semibold text-foreground">Ketentuan Ringkas Pengajuan</p>
               <ul className="space-y-1.5 text-muted-foreground list-disc pl-4 leading-relaxed">
                 <li>Akhir pekan dan hari libur nasional otomatis dilewati dari hitungan kuota.</li>
@@ -72,27 +72,27 @@ export default function PanelSimulasiWhatIf({
         ) : (
           <>
             <div className="grid grid-cols-3 gap-2 text-center">
-              <div className="rounded-lg border bg-background p-2.5">
-                <p className="text-[11px] text-muted-foreground">Hari Kerja</p>
+              <div className="rounded-lg border bg-card p-2.5">
+                <p className="text-sm text-muted-foreground">Hari Kerja</p>
                 <p className="text-lg font-bold text-primary">
                   {formatAngkaKuota(simulasi.totalHari)}
                 </p>
               </div>
-              <div className="rounded-lg border bg-background p-2.5">
-                <p className="text-[11px] text-muted-foreground">Sisa Awal</p>
+              <div className="rounded-lg border bg-card p-2.5">
+                <p className="text-sm text-muted-foreground">Sisa Awal</p>
                 <p className="text-lg font-bold">
                   {formatAngkaKuota(simulasi.sisaKuotaSekarang)}
                 </p>
               </div>
-              <div className="rounded-lg border bg-background p-2.5 border-primary/40">
-                <p className="text-[11px] text-muted-foreground">Proyeksi Sisa</p>
-                <p className="text-lg font-bold text-emerald-700">
+              <div className="rounded-lg border-2 border-primary bg-accent p-2.5">
+                <p className="text-sm font-medium text-accent-foreground">Proyeksi Sisa</p>
+                <p className="text-lg font-bold text-primary">
                   {formatAngkaKuota(simulasi.proyeksiSisaKuota)}
                 </p>
               </div>
             </div>
 
-            <div className="rounded-lg border bg-background p-3 space-y-1.5 text-xs">
+            <div className="rounded-lg border bg-card p-3 space-y-1.5 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Akhir Pekan Terlewati</span>
                 <span className="font-medium">
@@ -119,7 +119,7 @@ export default function PanelSimulasiWhatIf({
                     Hari libur di dalam rentang:
                   </p>
                   {simulasi.hariLiburTerlewati.map((h) => (
-                    <p key={h.tanggal} className="text-[11px] text-amber-700">
+                    <p key={h.tanggal} className="text-sm text-amber-800 dark:text-amber-300 font-medium">
                       • {formatTanggalIndo(h.tanggal)}: {h.nama}
                     </p>
                   ))}
@@ -128,7 +128,7 @@ export default function PanelSimulasiWhatIf({
             </div>
 
             {simulasi.infoKapasitas && (
-              <div className="rounded-lg border bg-background p-3 space-y-2 text-xs">
+              <div className="rounded-lg border bg-card p-3 space-y-2 text-sm">
                 <div className="flex items-center justify-between">
                   <span className="font-semibold flex items-center gap-1.5">
                     <Users className="size-3.5 text-primary" />
@@ -155,7 +155,7 @@ export default function PanelSimulasiWhatIf({
                     {simulasi.infoKapasitas.rekanCutiBersamaan.map((r) => (
                       <div
                         key={r.id}
-                        className="flex items-center justify-between text-[11px]"
+                        className="flex items-center justify-between text-sm"
                       >
                         <span className="font-medium">{r.nama_lengkap}</span>
                         <span className="text-muted-foreground">
@@ -172,16 +172,16 @@ export default function PanelSimulasiWhatIf({
             <Separator />
 
             {simulasi.dapatDiajukan ? (
-              <Alert className="border-emerald-300 bg-emerald-50 text-emerald-900">
-                <CheckCircle2 className="size-4 text-emerald-700" />
-                <AlertDescription className="text-xs">
+              <Alert className="border-emerald-600/40 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-950 dark:text-emerald-100">
+                <CheckCircle2 className="size-4 text-emerald-700 dark:text-emerald-300" />
+                <AlertDescription className="text-sm">
                   Pengajuan memenuhi seluruh aturan kuota, rentang waktu, dan kalender perusahaan.
                 </AlertDescription>
               </Alert>
             ) : (
               <Alert variant="destructive">
                 <XCircle className="size-4" />
-                <AlertDescription className="text-xs space-y-1">
+                <AlertDescription className="text-sm space-y-1">
                   {simulasi.daftarPesanValidasi.map((pesan, indeks) => (
                     <p key={indeks} className="flex items-start gap-1">
                       <AlertTriangle className="size-3 shrink-0 mt-0.5" />

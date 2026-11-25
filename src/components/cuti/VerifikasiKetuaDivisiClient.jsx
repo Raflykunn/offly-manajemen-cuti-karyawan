@@ -134,7 +134,7 @@ export default function VerifikasiKetuaDivisiClient({
                         <CardTitle className="text-base truncate">
                           {item.nama_pemohon}
                         </CardTitle>
-                        <CardDescription className="text-xs font-mono">
+                        <CardDescription className="text-sm">
                           {item.nomor_pengajuan} • Diajukan{" "}
                           {formatTanggalIndo(item.tanggal_pengajuan)}
                         </CardDescription>
@@ -240,10 +240,10 @@ export default function VerifikasiKetuaDivisiClient({
               >
                 <div>
                   <span className="font-semibold">{r.nama_pemohon}</span>{" "}
-                  <span className="text-xs font-mono text-muted-foreground">
+                  <span className="text-sm text-muted-foreground">
                     ({r.nomor_pengajuan})
                   </span>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-sm text-muted-foreground">
                     {r.nama_cuti} • {formatTanggalIndo(r.tanggal_mulai)} –{" "}
                     {formatTanggalIndo(r.tanggal_selesai)} (
                     {formatAngkaKuota(r.total_hari_cuti)} hari)

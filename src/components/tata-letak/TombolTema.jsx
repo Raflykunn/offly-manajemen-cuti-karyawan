@@ -3,6 +3,12 @@
 import { useSyncExternalStore } from "react";
 import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 function langgananTema(panggilUlang) {
   window.addEventListener("storage", panggilUlang);
@@ -41,21 +47,31 @@ export default function TombolTema() {
     window.dispatchEvent(new Event("offly-tema-berubah"));
   }
 
+  const labelTema = modeGelap ? "Aktifkan mode terang" : "Aktifkan mode gelap";
+
   return (
-    <Button
-      type="button"
-      variant="outline"
-      size="icon"
-      onClick={gantiTema}
-      className="size-11 sm:size-9"
-      aria-label={modeGelap ? "Aktifkan mode terang" : "Aktifkan mode gelap"}
-      title={modeGelap ? "Mode Terang" : "Mode Gelap"}
-    >
-      {modeGelap ? (
-        <Sun className="size-4" aria-hidden="true" />
-      ) : (
-        <Moon className="size-4" aria-hidden="true" />
-      )}
-    </Button>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger
+          render={
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={gantiTema}
+              className="size-11 sm:size-9"
+              aria-label={labelTema}
+            >
+              {modeGelap ? (
+                <Sun className="size-4" aria-hidden="true" />
+              ) : (
+                <Moon className="size-4" aria-hidden="true" />
+              )}
+            </Button>
+          }
+        />
+        <TooltipContent>{labelTema}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }

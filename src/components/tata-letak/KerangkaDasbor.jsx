@@ -80,7 +80,7 @@ export default function KerangkaDasbor({
         Lewati ke konten utama
       </a>
 
-      <header className="sticky top-0 z-30 h-14 border-b bg-background/95 backdrop-blur-xs px-4 md:px-6 flex items-center justify-between gap-3">
+      <header className="sticky top-0 z-30 h-14 border-b border-border/55 bg-white/95 dark:bg-[oklch(0.185_0.007_55)]/95 backdrop-blur-xs shadow-sm px-4 md:px-6 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
           <Sheet
             open={menuSelulerTerbuka}

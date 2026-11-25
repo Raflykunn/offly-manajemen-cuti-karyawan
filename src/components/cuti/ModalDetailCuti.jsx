@@ -39,7 +39,7 @@ export default function ModalDetailCuti({ pengajuan, saatTutup }) {
       <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex flex-wrap items-center justify-between gap-2 pr-6">
-            <DialogTitle className="font-mono text-base">
+            <DialogTitle className="text-base font-semibold">
               {pengajuan.nomor_pengajuan}
             </DialogTitle>
             <LencanaStatusCuti status={pengajuan.status} />
@@ -54,21 +54,21 @@ export default function ModalDetailCuti({ pengajuan, saatTutup }) {
         </DialogHeader>
 
         <div className="space-y-4 text-sm">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 rounded-lg border bg-muted/25 p-3.5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 rounded-lg border bg-muted/40 p-3.5">
             <div>
-              <p className="text-xs text-muted-foreground">Jenis Cuti</p>
-              <p className="font-semibold">{pengajuan.nama_cuti}</p>
+              <p className="text-sm text-muted-foreground">Jenis Cuti</p>
+              <p className="font-semibold text-base">{pengajuan.nama_cuti}</p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Periode Cuti</p>
-              <p className="font-semibold">
+              <p className="text-sm text-muted-foreground">Periode Cuti</p>
+              <p className="font-semibold text-base">
                 {formatTanggalIndo(pengajuan.tanggal_mulai)} s.d.{" "}
                 {formatTanggalIndo(pengajuan.tanggal_selesai)}
               </p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Total Durasi</p>
-              <p className="font-semibold text-primary">
+              <p className="text-sm text-muted-foreground">Total Durasi</p>
+              <p className="font-semibold text-base text-primary">
                 {formatAngkaKuota(pengajuan.total_hari_cuti)} Hari Kerja{" "}
                 {pengajuan.opsi_setengah_hari ? "(Setengah Hari)" : ""}
               </p>
@@ -76,13 +76,13 @@ export default function ModalDetailCuti({ pengajuan, saatTutup }) {
           </div>
 
           <div className="space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <p className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
               Alasan &amp; Serah Terima (Handover)
             </p>
             <div className="rounded-lg border p-3 space-y-2">
               <p>{pengajuan.alasan_cuti}</p>
               <Separator />
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
                 <div className="flex items-center gap-1.5">
                   <UserCheck className="size-3.5 text-primary" />
                   <span className="text-muted-foreground">Rekan Pengganti:</span>

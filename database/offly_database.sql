@@ -156,8 +156,7 @@ INSERT INTO jenis_cuti (
     (2, 'SAKIT', 'Cuti Sakit', 'Cuti karena gangguan kesehatan dengan lampiran wajib surat keterangan dokter.', 14, -3, TRUE, FALSE, TRUE),
     (3, 'MENIKAH', 'Cuti Menikah', 'Cuti khusus pernikahan karyawan dengan melampirkan surat keterangan atau undangan resmi.', 3, 7, TRUE, FALSE, TRUE),
     (4, 'MELAHIRKAN', 'Cuti Melahirkan', 'Cuti persalinan bagi karyawati dengan lampiran surat keterangan dokter atau bidan.', 90, 14, TRUE, FALSE, TRUE),
-    (5, 'DUKA', 'Cuti Duka Keluarga', 'Cuti kedukaan anggota keluarga inti yang dapat diajukan mendadak.', 2, -3, FALSE, FALSE, TRUE),
-    (6, 'TANPA_GAJI', 'Cuti Tanpa Gaji', 'Cuti di luar tanggungan perusahaan setelah melalui persetujuan khusus manajemen.', 30, 3, FALSE, FALSE, TRUE);
+    (5, 'DUKA', 'Cuti Duka Keluarga', 'Cuti kedukaan anggota keluarga inti yang dapat diajukan mendadak.', 2, -3, FALSE, FALSE, TRUE);
 
 INSERT INTO hari_libur (id, tanggal, nama_libur, jenis) VALUES
     (1, '2026-01-01', 'Tahun Baru 2026 Masehi', 'Libur Nasional'),

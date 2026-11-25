@@ -337,19 +337,19 @@ export default function RiwayatCutiClient({
                     <TableRow key={item.id}>
                       <TableCell>
                         <div className="flex flex-wrap items-center gap-1.5">
-                          <span className="font-mono text-xs font-semibold">
+                          <span className="text-sm font-semibold">
                             {item.nomor_pengajuan}
                           </span>
                           {adalahHandover && (
-                            <Badge variant="outline" className="text-[10px]">
+                            <Badge variant="outline" className="text-sm">
                               Rekan Handover
                             </Badge>
                           )}
                         </div>
-                        <div className="font-medium text-sm">
+                        <div className="font-medium text-base">
                           {item.nama_pemohon}
                         </div>
-                        <div className="text-xs text-muted-foreground">
+                        <div className="text-sm text-muted-foreground">
                           {labelPeranPengguna(item.peran_pemohon)}
                           {item.nama_divisi ? ` • ${item.nama_divisi}` : ""}
                         </div>
@@ -429,7 +429,7 @@ export default function RiwayatCutiClient({
             <DialogTitle>Batalkan Pengajuan Cuti</DialogTitle>
             <DialogDescription>
               Pengajuan{" "}
-              <span className="font-mono font-semibold text-foreground">
+              <span className="font-semibold text-foreground">
                 {pengajuanDibatalkan?.nomor_pengajuan}
               </span>{" "}
               akan dibatalkan dan kuota cuti tahunan Anda akan dikembalikan otomatis.
