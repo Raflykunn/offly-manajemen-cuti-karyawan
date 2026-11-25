@@ -2,7 +2,7 @@
   <img width="96" height="96" alt="Logo Offly" src="public/logo-512.png" />
 </p>
 
-<h1 align="center">Offly — Sistem Manajemen Cuti Karyawan</h1>
+<h1 align="center">Offly: Sistem Manajemen Cuti Karyawan</h1>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Next.js-16.4-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js">
@@ -46,9 +46,9 @@ Satu pintu pengajuan, saldo, dan persetujuan cuti tim tanpa rekap manual.
 
 ## 🎯 Tentang Proyek
 
-**Offly** adalah platform manajemen cuti karyawan berbasis web yang mendigitalisasi proses pengajuan, verifikasi berjenjang, dan persetujuan akhir HRD. Seluruh aturan bisnis—mulai dari perhitungan hari kerja efektif, pengecekan periode larangan cuti, kapasitas divisi, pengembalian kuota otomatis, hingga penerbitan Surat Cuti PDF—dijalankan langsung di server dan transaksi PostgreSQL.
+**Offly** adalah aplikasi web manajemen cuti karyawan untuk menangani pengajuan, verifikasi berjenjang, dan persetujuan akhir HRD. Seluruh aturan bisnis, mulai dari perhitungan hari kerja efektif, pengecekan periode larangan cuti, kapasitas divisi, pengembalian kuota otomatis, sampai penerbitan Surat Cuti PDF, dijalankan langsung di server dan transaksi PostgreSQL.
 
-Sistem ini melayani empat peran utama (**Karyawan**, **Ketua Divisi**, **HRD**, dan **Admin**) dengan otorisasi yang selalu diverifikasi di sisi server.
+Sistem ini melayani empat peran utama (Karyawan, Ketua Divisi, HRD, dan Admin) dengan hak akses yang selalu diperiksa di sisi server.
 
 ### 🎯 Tujuan
 - 📅 Menghilangkan rekap cuti manual dengan perhitungan hari kerja dan kuota otomatis
@@ -57,11 +57,11 @@ Sistem ini melayani empat peran utama (**Karyawan**, **Ketua Divisi**, **HRD**, 
 - 📄 Menerbitkan surat izin cuti resmi berformat PDF secara otomatis setelah disetujui HRD
 
 ### ⭐ Nilai Inti
-- ✅ **Satu Design System** — Warna OKLCH, tipografi, radius, dan bayangan dikelola terpusat di [globals.css](src/app/globals.css) ([DESIGN_WARNA.md](DESIGN_WARNA.md))
-- ✅ **Otorisasi di Server** — Setiap Server Action dan Route Handler memverifikasi sesi JWT HTTP-Only serta peran pengguna di PostgreSQL
-- ✅ **Transaksi Aman** — Pengajuan, pembatalan, dan persetujuan memakai transaksi `BEGIN/COMMIT` dengan penguncian baris `FOR UPDATE`
-- ✅ **Lampiran Privat** — Berkas lampiran divalidasi sebagai PDF (`%PDF-`, maks. 5 MB), disimpan di `storage/lampiran/`, dan diakses lewat `/api/lampiran/[nama]` setelah cek autentikasi
-- ✅ **Notifikasi Terarah** — Setiap notifikasi pengajuan cuti langsung membuka detail surat terkait (`?detail=<id>`)
+- ✅ **Satu Sistem Desain:** Warna OKLCH, tipografi, radius, dan bayangan dikelola terpusat di [globals.css](src/app/globals.css)
+- ✅ **Otorisasi di Server:** Setiap Server Action dan Route Handler memverifikasi sesi JWT HTTP-Only serta peran pengguna di PostgreSQL
+- ✅ **Transaksi Aman:** Pengajuan, pembatalan, dan persetujuan memakai transaksi `BEGIN/COMMIT` dengan penguncian baris `FOR UPDATE`
+- ✅ **Lampiran Privat:** Berkas lampiran divalidasi sebagai PDF (`%PDF-`, maks. 5 MB), disimpan di `storage/lampiran/`, dan diakses lewat `/api/lampiran/[nama]` setelah cek autentikasi
+- ✅ **Notifikasi Terarah:** Setiap notifikasi pengajuan cuti langsung membuka detail surat terkait (`?detail=<id>`)
 
 ---
 
@@ -105,28 +105,28 @@ Sistem ini melayani empat peran utama (**Karyawan**, **Ketua Divisi**, **HRD**, 
 ## ✨ Fitur
 
 ### 👤 Karyawan
-- 📝 **Pengajuan Cuti & Simulasi Kuota** — Hitung hari kerja otomatis (mengecualikan akhir pekan, libur nasional, dan cuti bersama), mendukung cuti setengah hari (`0.5`), dan jenis **Cuti Lainnya** kustom
-- 🔔 **Wajib Ketua Divisi Aktif** — Jika belum ditempatkan di divisi berketua aktif, tersedia tombol 1-klik untuk mengirim notifikasi penempatan ke Admin
-- 🔁 **Ajukan Ulang & Batalkan** — Pengajuan `Pending` dapat dibatalkan dengan pengembalian kuota otomatis; pengajuan ditolak bisa langsung diajukan ulang dengan data terisi otomatis
-- 📄 **Surat Cuti PDF** — Unduh surat resmi setelah status **Disetujui HRD**
+- 📝 **Pengajuan Cuti & Simulasi Kuota:** Hitung hari kerja otomatis (mengecualikan akhir pekan, libur nasional, dan cuti bersama), mendukung cuti setengah hari (`0.5`), dan jenis **Cuti Lainnya** kustom
+- 🔔 **Wajib Ketua Divisi Aktif:** Jika belum ditempatkan di divisi berketua aktif, tersedia tombol 1-klik untuk mengirim notifikasi penempatan ke Admin
+- 🔁 **Ajukan Ulang & Batalkan:** Pengajuan `Pending` dapat dibatalkan dengan pengembalian kuota otomatis; pengajuan ditolak bisa langsung diajukan ulang dengan data terisi otomatis
+- 📄 **Surat Cuti PDF:** Unduh surat resmi setelah status **Disetujui HRD**
 
 ### 🧑‍💼 Ketua Divisi
-- ✅ **Verifikasi Cuti** — Tinjau antrean pengajuan anggota divisi lengkap dengan alasan, rekan pengganti, catatan tugas, dan lampiran PDF, lalu **Setujui** atau **Tolak** (catatan wajib)
-- 📆 **Pengajuan Pribadi** — Pengajuan cuti Ketua Divisi langsung diteruskan ke antrean HRD
+- ✅ **Verifikasi Cuti:** Tinjau antrean pengajuan anggota divisi lengkap dengan alasan, rekan pengganti, catatan tugas, dan lampiran PDF, lalu **Setujui** atau **Tolak** (catatan wajib)
+- 📆 **Pengajuan Pribadi:** Pengajuan cuti Ketua Divisi langsung diteruskan ke antrean HRD
 
 ### 🏢 HRD
-- 🏛️ **Persetujuan Akhir (Satuan & Massal)** — Proses pengajuan yang lolos verifikasi ketua maupun pengajuan langsung Ketua Divisi dengan peringatan otomatis bila melampaui batas kapasitas divisi
-- 🗓️ **Kalender, Larangan Cuti & Kapasitas** — Kelola hari libur nasional, cuti bersama, periode larangan cuti, dan persentase batas kapasitas per divisi
-- ⏰ **Pengingat Kuota Hangus** — Pantau karyawan yang jarang mengambil cuti menjelang akhir tahun dan kirim notifikasi pengingat
+- 🏛️ **Persetujuan Akhir (Satuan & Massal):** Proses pengajuan yang lolos verifikasi ketua maupun pengajuan langsung Ketua Divisi dengan peringatan otomatis jika melampaui batas kapasitas divisi
+- 🗓️ **Kalender, Larangan Cuti & Kapasitas:** Kelola hari libur nasional, cuti bersama, periode larangan cuti, dan persentase batas kapasitas per divisi
+- ⏰ **Pengingat Kuota Hangus:** Pantau karyawan yang jarang mengambil cuti menjelang akhir tahun dan kirim notifikasi pengingat
 
 ### 🛠️ Admin
-- 👥 **Manajemen Pengguna & Divisi** — CRUD pengguna, atur ulang kuota tahunan, kelola divisi beserta anggota dan Ketua Divisi
-- 📑 **Manajemen Jenis Cuti** — Konfigurasi dinamis kuota default, batas hari pengajuan, syarat lampiran PDF, dan aturan pemotongan kuota tahunan
+- 👥 **Manajemen Pengguna & Divisi:** CRUD pengguna, atur ulang kuota tahunan, kelola divisi beserta anggota dan Ketua Divisi
+- 📑 **Manajemen Jenis Cuti:** Konfigurasi dinamis kuota default, batas hari pengajuan, syarat lampiran PDF, dan aturan pemotongan kuota tahunan
 
 ### 🎨 Profil & Umum
-- 🖼️ **Ganti Avatar Sekali Klik** — Klik avatar pada halaman profil untuk memilih gambar (`JPG`, `PNG`, `WEBP`, maks. 1 MB) yang langsung tersimpan
-- 🔒 **Keamanan Kata Sandi** — Mengganti kata sandi mewajibkan verifikasi kata sandi lama dan konfirmasi kata sandi baru
-- 🌓 **Mode Terang & Gelap** — Pengalih tema dengan penyimpanan preferensi lokal
+- 🖼️ **Ganti Avatar Sekali Klik:** Klik avatar pada halaman profil untuk memilih gambar (`JPG`, `PNG`, `WEBP`, maks. 1 MB) yang langsung tersimpan
+- 🔒 **Keamanan Kata Sandi:** Mengganti kata sandi mewajibkan verifikasi kata sandi lama dan konfirmasi kata sandi baru
+- 🌓 **Mode Terang & Gelap:** Pengalih tema dengan penyimpanan preferensi lokal
 
 ---
 
@@ -134,7 +134,7 @@ Sistem ini melayani empat peran utama (**Karyawan**, **Ketua Divisi**, **HRD**, 
 
 | Lapisan | Teknologi |
 | :--- | :--- |
-| **Framework & UI** | Next.js `16.4.6` (App Router), React `19.3`, Tailwind CSS `v4`, `@base-ui/react`, `lucide-react` |
+| **Kerangka & Antarmuka** | Next.js `16.4.6` (App Router), React `19.3`, Tailwind CSS `v4`, `@base-ui/react`, `lucide-react` |
 | **Backend** | Next.js Server Actions (`src/actions/*.js`) & Route Handlers (`src/app/api/*/route.js`) |
 | **Database** | PostgreSQL dengan kueri Raw SQL (`pg`) |
 | **Autentikasi & PDF** | `jose` (JWT cookie `httpOnly`), `bcryptjs`, `pdf-lib` |
@@ -145,7 +145,7 @@ Sistem ini melayani empat peran utama (**Karyawan**, **Ketua Divisi**, **HRD**, 
 
 - **Node.js** v20+ dan **npm**
 - **PostgreSQL** v14+
-- **pgAdmin 4** (atau `psql`) untuk menjalankan skrip SQL awal
+- **pgAdmin 4** ([unduh di pgadmin.org/download](https://www.pgadmin.org/download/)) atau `psql` untuk menjalankan skrip SQL awal
 
 ---
 
@@ -158,8 +158,12 @@ Sistem ini melayani empat peran utama (**Karyawan**, **Ketua Divisi**, **HRD**, 
    ```
 
 2. **Siapkan database PostgreSQL**
-   - Buat database baru bernama `offly_db` di **pgAdmin 4**.
-   - Buka **Query Tool** pada `offly_db`, lalu jalankan seluruh isi berkas [database/offly_database.sql](database/offly_database.sql).
+   - **Via pgAdmin 4:** buat database baru bernama `offly_db`, klik kanan `offly_db` lalu pilih **Query Tool**, kemudian jalankan skrip [database/offly_database.sql](database/offly_database.sql).
+   - **Atau via terminal (`psql`):**
+     ```bash
+     psql -U postgres -c "CREATE DATABASE offly_db;"
+     psql -U postgres -d offly_db -f database/offly_database.sql
+     ```
 
 3. **Pasang dependensi**
    ```bash
@@ -171,7 +175,7 @@ Sistem ini melayani empat peran utama (**Karyawan**, **Ketua Divisi**, **HRD**, 
    npm run dev
    ```
 
-5. Buka `http://localhost:3000` di peramban.
+5. Buka `http://localhost:3000` di browser.
 
 ---
 

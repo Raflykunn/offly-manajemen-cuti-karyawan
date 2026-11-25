@@ -394,3 +394,33 @@ export async function kirimPengingatKuotaHangus(targetPenggunaId) {
     pesan: `Notifikasi pengingat kuota hangus berhasil dikirim ke ${target.nama_lengkap}.`,
   };
 }
+
+export async function kirimSemuaPengingatKuotaHangus(daftarTargetId) {
+  await wajibSesiPengguna(["admin", "hrd"]);
+
+  const ids = [...new Set((daftarTargetId || []).map(Number).filter(Boolean))];
+  if (ids.length === 0) {
+    return { sukses: false, pesan: "Tidak ada karyawan tujuan untuk dikirim pengingat." };
+  }
+
+  const hasilInsert = await jalankanKueri(
+    `INSERT INTO notifikasi (pengguna_id, judul, pesan, tautan)
+     SELECT id,
+            'Pengingat Sisa Kuota Cuti Tahunan',
+            'Halo ' || nama_lengkap || ', Anda masih memiliki sisa kuota cuti tahunan sebanyak ' ||
+              TRIM(TRAILING '.' FROM TRIM(TRAILING '0' FROM sisa_kuota_cuti::text)) ||
+              ' hari. Manfaatkan sebelum periode akhir tahun berakhir.',
+            '/pengajuan-cuti'
+     FROM pengguna
+     WHERE id = ANY($1::int[]) AND status_aktif = TRUE
+     RETURNING pengguna_id`,
+    [ids]
+  );
+
+  revalidatePath("/dasbor");
+  return {
+    sukses: true,
+    terkirimIds: hasilInsert.rows.map((r) => r.pengguna_id),
+    pesan: `Notifikasi pengingat berhasil dikirim ke ${hasilInsert.rowCount} karyawan.`,
+  };
+}

@@ -2,7 +2,10 @@
 
 import { useState, useTransition } from "react";
 import { AlertTriangle, BellRing, Check } from "lucide-react";
-import { kirimPengingatKuotaHangus } from "@/actions/dasbor-aksi";
+import {
+  kirimPengingatKuotaHangus,
+  kirimSemuaPengingatKuotaHangus,
+} from "@/actions/dasbor-aksi";
 import { formatAngkaKuota, labelPeranPengguna } from "@/lib/kalkulasi-cuti";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -27,11 +30,28 @@ export default function WidgetKuotaHangus({ kandidat = [] }) {
   const [pesanStatus, aturPesanStatus] = useState("");
   const [sedangKirim, mulaiTransisi] = useTransition();
 
+  const belumDikirimIds = kandidat
+    .filter((item) => !terkirimIds.includes(item.id))
+    .map((item) => item.id);
+
   function tanganiKirimPengingat(idPengguna) {
     mulaiTransisi(async () => {
       const hasil = await kirimPengingatKuotaHangus(idPengguna);
       if (hasil?.sukses) {
-        aturTerkirimIds((lama) => [...lama, idPengguna]);
+        aturTerkirimIds((lama) => [...new Set([...lama, idPengguna])]);
+        aturPesanStatus(hasil.pesan);
+      }
+    });
+  }
+
+  function tanganiKirimSemua() {
+    if (belumDikirimIds.length === 0) return;
+    mulaiTransisi(async () => {
+      const hasil = await kirimSemuaPengingatKuotaHangus(belumDikirimIds);
+      if (hasil?.sukses) {
+        aturTerkirimIds((lama) => [
+          ...new Set([...lama, ...(hasil.terkirimIds || belumDikirimIds)]),
+        ]);
         aturPesanStatus(hasil.pesan);
       }
     });
@@ -50,9 +70,24 @@ export default function WidgetKuotaHangus({ kandidat = [] }) {
               Daftar karyawan yang memenuhi syarat tetapi jarang mengambil cuti menjelang akhir tahun.
             </CardDescription>
           </div>
-          <Badge variant="outline" className="bg-amber-50 text-amber-800 border-amber-200">
-            {kandidat.length} Karyawan
-          </Badge>
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant="outline" className="bg-amber-50 text-amber-800 border-amber-200">
+              {kandidat.length} Karyawan
+            </Badge>
+            {kandidat.length > 0 && (
+              <Button
+                type="button"
+                size="sm"
+                disabled={sedangKirim || belumDikirimIds.length === 0}
+                onClick={tanganiKirimSemua}
+              >
+                <BellRing className="size-3.5 mr-1.5" />
+                {belumDikirimIds.length === 0
+                  ? "Semua Terkirim"
+                  : `Kirim Semua (${belumDikirimIds.length})`}
+              </Button>
+            )}
+          </div>
         </div>
         {pesanStatus && (
           <p className="text-xs text-emerald-700 font-medium pt-1">
