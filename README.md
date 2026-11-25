@@ -226,9 +226,9 @@ storage/
 ```text
 offly-manajemen-cuti-karyawan/
 ├── database/
-│   └── offly_database.sql
+│   └── offly_database.sql              # Skema 7 tabel dan data awal PostgreSQL
 ├── docs/
-│   └── screenshots/
+│   └── screenshots/                    # Screenshot halaman untuk dokumentasi
 │       ├── beranda.png
 │       ├── dasbor_karyawan.png
 │       ├── masuk.png
@@ -236,7 +236,7 @@ offly-manajemen-cuti-karyawan/
 │       ├── persetujuan_hrd.png
 │       ├── riwayat_cuti.png
 │       └── verifikasi_cuti.png
-├── public/
+├── public/                             # Aset publik, logo, dan ikon aplikasi
 │   ├── favicon-16.png
 │   ├── favicon-32.png
 │   ├── icon-192.png
@@ -244,66 +244,68 @@ offly-manajemen-cuti-karyawan/
 │   ├── logo-512.png
 │   └── logo.svg
 ├── src/
-│   ├── actions/
-│   │   ├── autentikasi-aksi.js
-│   │   ├── cuti-aksi.js
-│   │   ├── dasbor-aksi.js
-│   │   ├── divisi-aksi.js
-│   │   ├── konfigurasi-aksi.js
-│   │   └── pengguna-aksi.js
-│   ├── app/
-│   │   ├── (dasbor)/
-│   │   │   ├── dasbor/
-│   │   │   ├── manajemen-divisi/[id]/
-│   │   │   ├── manajemen-jenis-cuti/
-│   │   │   ├── manajemen-pengguna/
-│   │   │   ├── pengajuan-cuti/
-│   │   │   ├── pengaturan-kalender/
-│   │   │   ├── persetujuan-hrd/
-│   │   │   ├── profil/
-│   │   │   ├── riwayat-cuti/
-│   │   │   ├── verifikasi-divisi/
-│   │   │   ├── layout.js
-│   │   │   └── loading.js
-│   │   ├── api/
+│   ├── actions/                        # Server Actions (mutasi & transaksi database)
+│   │   ├── autentikasi-aksi.js         # Masuk, keluar, dan validasi akun
+│   │   ├── cuti-aksi.js                # Ajukan, batalkan, verifikasi, dan riwayat cuti
+│   │   ├── dasbor-aksi.js              # Statistik dasbor & pengingat kuota hangus
+│   │   ├── divisi-aksi.js              # CRUD divisi dan anggota divisi
+│   │   ├── konfigurasi-aksi.js         # Jenis cuti, hari libur, dan periode larangan cuti
+│   │   └── pengguna-aksi.js            # Manajemen pengguna, profil, dan notifikasi
+│   ├── app/                            # Halaman Next.js App Router & API Routes
+│   │   ├── (dasbor)/                   # Grup rute terproteksi setelah login
+│   │   │   ├── dasbor/                 # Dasbor dinamis sesuai peran
+│   │   │   ├── manajemen-divisi/[id]/  # Daftar & detail anggota divisi
+│   │   │   ├── manajemen-jenis-cuti/   # Konfigurasi jenis cuti
+│   │   │   ├── manajemen-pengguna/     # Kelola akun & reset kuota tahunan
+│   │   │   ├── pengajuan-cuti/         # Formulir pengajuan cuti & simulasi
+│   │   │   ├── pengaturan-kalender/    # Hari libur, larangan cuti, & kapasitas
+│   │   │   ├── persetujuan-hrd/        # Persetujuan akhir HRD (satuan & massal)
+│   │   │   ├── profil/                 # Data pribadi, avatar, & ubah sandi
+│   │   │   ├── riwayat-cuti/           # Riwayat, detail surat, & ajukan ulang
+│   │   │   ├── verifikasi-divisi/      # Antrean verifikasi Ketua Divisi
+│   │   │   ├── layout.js               # Kerangka sidebar & header dasbor
+│   │   │   └── loading.js              # Skeleton loading rute dasbor
+│   │   ├── api/                        # Route Handlers REST
 │   │   │   ├── cuti/
-│   │   │   │   ├── [id]/surat/route.js
-│   │   │   │   └── simulasi/route.js
-│   │   │   ├── lampiran/[nama]/route.js
-│   │   │   └── unggah/route.js
-│   │   ├── masuk/
-│   │   ├── apple-icon.png
-│   │   ├── favicon.ico
-│   │   ├── globals.css
-│   │   ├── layout.js
-│   │   ├── loading.js
-│   │   ├── not-found.js
-│   │   └── page.js
-│   ├── components/
-│   │   ├── beranda/
-│   │   ├── cms/
-│   │   ├── cuti/
-│   │   ├── dasbor/
-│   │   ├── masuk/
-│   │   ├── profil/
-│   │   ├── tata-letak/
-│   │   └── ui/
-│   ├── lib/
-│   │   ├── autentikasi.js
-│   │   ├── db.js
-│   │   ├── kalkulasi-cuti.js
-│   │   ├── token.js
-│   │   └── utils.js
-│   └── proxy.js
+│   │   │   │   ├── [id]/surat/route.js # Cetak Surat Izin Cuti PDF (pdf-lib)
+│   │   │   │   └── simulasi/route.js   # Simulasi hari kerja, kuota, & validasi
+│   │   │   ├── lampiran/[nama]/route.js# Unduh lampiran PDF terproteksi
+│   │   │   └── unggah/route.js         # Unggah lampiran PDF (maks. 5 MB)
+│   │   ├── masuk/                      # Halaman login tunggal
+│   │   ├── apple-icon.png              # Ikon perangkat Apple
+│   │   ├── error.js                    # Halaman error 500 per rute
+│   │   ├── favicon.ico                 # Favicon tab browser
+│   │   ├── global-error.js             # Halaman error 500 tingkat root
+│   │   ├── globals.css                 # Token warna OKLCH & tema Tailwind v4
+│   │   ├── layout.js                   # Root layout & font Roboto / JetBrains Mono
+│   │   ├── loading.js                  # Loading global
+│   │   ├── not-found.js                # Halaman 404
+│   │   └── page.js                     # Halaman beranda publik
+│   ├── components/                     # Komponen UI per fitur
+│   │   ├── beranda/                    # Navbar, ilustrasi hero, & alur verifikasi
+│   │   ├── cms/                        # Komponen manajemen pengguna, divisi, & kalender
+│   │   ├── cuti/                       # Form pengajuan, simulasi, verifikasi, & riwayat
+│   │   ├── dasbor/                     # Dasbor 4 peran & widget kuota hangus
+│   │   ├── masuk/                      # Formulir login
+│   │   ├── profil/                     # Formulir profil, avatar, & sandi
+│   │   ├── tata-letak/                 # Sidebar, notifikasi, tema, error, & 404
+│   │   └── ui/                         # Komponen dasar UI (@base-ui/react)
+│   ├── lib/                            # Utilitas inti server & klien
+│   │   ├── autentikasi.js              # Hash sandi (bcryptjs) & cek sesi
+│   │   ├── db.js                       # Pool koneksi & transaksi PostgreSQL
+│   │   ├── kalkulasi-cuti.js           # Hitung hari kerja, label status, & aturan
+│   │   ├── token.js                    # Buat & verifikasi JWT (jose)
+│   │   └── utils.js                    # Helper penggabung kelas CSS
+│   └── proxy.js                        # Proteksi rute & redirect ke /masuk
 ├── storage/
-│   └── lampiran/
+│   └── lampiran/                       # Penyimpanan privat PDF (di luar public/)
 │       └── contoh-surat-dokter.pdf
-├── components.json
-├── eslint.config.mjs
-├── jsconfig.json
-├── next.config.mjs
-├── package.json
-└── README.md
+├── components.json                     # Konfigurasi komponen shadcn
+├── eslint.config.mjs                   # Aturan ESLint Next.js
+├── jsconfig.json                       # Alias path (@/*)
+├── next.config.mjs                     # Konfigurasi Next.js
+├── package.json                        # Dependensi & skrip npm
+└── README.md                           # Dokumentasi utama proyek
 ```
 
 </details>
