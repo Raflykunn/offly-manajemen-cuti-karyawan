@@ -10,7 +10,6 @@ import {
   Lock,
   LogIn,
   Mail,
-  Users,
 } from "lucide-react";
 import { masukAkun } from "@/actions/autentikasi-aksi";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -39,8 +38,8 @@ export default function FormulirMasuk() {
   return (
     <div className="min-h-dvh w-full bg-background flex items-center justify-center p-4 md:p-8">
       <main className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-        <div className="hidden lg:col-span-6 rounded-xl border border-primary/80 bg-primary text-primary-foreground p-8 md:p-10 lg:flex flex-col justify-between shadow-md">
-          <div className="space-y-8">
+        <div className="hidden lg:col-span-6 rounded-xl border border-primary/80 bg-primary text-primary-foreground p-8 md:p-10 lg:flex flex-col justify-end shadow-md">
+          <div className="space-y-6">
             <Link href="/" className="inline-flex items-center gap-3 rounded-lg">
               <div className="size-11 rounded-lg bg-primary-foreground/15 border border-primary-foreground/25 text-primary-foreground flex items-center justify-center shadow-xs">
                 <CalendarCheck2 className="size-5" aria-hidden="true" />
@@ -54,15 +53,10 @@ export default function FormulirMasuk() {
             </Link>
 
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight leading-snug">
-              Satu pintu pengajuan, saldo, dan persetujuan cuti tim.
+              Satu pintu pengajuan,
+              <br />
+              saldo, dan persetujuan cuti tim.
             </h2>
-          </div>
-
-          <div className="pt-6 mt-8 border-t border-primary-foreground/25 flex items-center justify-between text-sm text-primary-foreground/90">
-            <span className="flex items-center gap-1.5 font-medium">
-              <Users className="size-4" aria-hidden="true" />4 Peran Pengguna
-            </span>
-            <span>Portal Internal Perusahaan</span>
           </div>
         </div>
 
