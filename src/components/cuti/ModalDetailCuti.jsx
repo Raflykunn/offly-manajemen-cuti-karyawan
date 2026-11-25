@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   CheckCircle2,
   Clock,
@@ -7,6 +8,7 @@ import {
   FileText,
   MapPin,
   Phone,
+  RotateCcw,
   UserCheck,
   XCircle,
 } from "lucide-react";
@@ -28,7 +30,11 @@ import {
 import { Separator } from "@/components/ui/separator";
 import LencanaStatusCuti from "./LencanaStatusCuti";
 
-export default function ModalDetailCuti({ pengajuan, saatTutup }) {
+export default function ModalDetailCuti({
+  pengajuan,
+  saatTutup,
+  bisaAjukanUlang = false,
+}) {
   if (!pengajuan) return null;
 
   const langsungKeHrd = pengajuan.peran_pemohon === "ketua_divisi";
@@ -228,6 +234,16 @@ export default function ModalDetailCuti({ pengajuan, saatTutup }) {
         </div>
 
         <DialogFooter>
+          {bisaAjukanUlang && (
+            <Button
+              variant="default"
+              nativeButton={false}
+              render={<Link href={`/pengajuan-cuti?ulangi=${pengajuan.id}`} />}
+            >
+              <RotateCcw className="size-4 mr-1.5" />
+              Ajukan Ulang
+            </Button>
+          )}
           {disetujuiHrd && (
             <Button
               variant="default"

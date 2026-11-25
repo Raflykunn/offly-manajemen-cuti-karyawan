@@ -118,7 +118,12 @@ export async function ambilDataDasborKaryawan(penggunaId) {
     ),
     jalankanKueri(
       `SELECT pc.id, pc.nomor_pengajuan, pc.tanggal_mulai, pc.tanggal_selesai,
-              pc.total_hari_cuti, pc.status, jc.nama_cuti
+              pc.total_hari_cuti, pc.status,
+              CASE
+                WHEN NULLIF(TRIM(pc.nama_cuti_kustom), '') IS NOT NULL
+                  THEN jc.nama_cuti || ' — ' || TRIM(pc.nama_cuti_kustom)
+                ELSE jc.nama_cuti
+              END AS nama_cuti
        FROM pengajuan_cuti pc
        JOIN jenis_cuti jc ON jc.id = pc.jenis_cuti_id
        WHERE pc.pengguna_id = $1
@@ -214,7 +219,12 @@ export async function ambilDataDasborKetuaDivisi(penggunaId) {
     ),
     jalankanKueri(
       `SELECT DISTINCT pc.pengguna_id, pc.tanggal_mulai, pc.tanggal_selesai,
-              pc.status, jc.nama_cuti
+              pc.status,
+              CASE
+                WHEN NULLIF(TRIM(pc.nama_cuti_kustom), '') IS NOT NULL
+                  THEN jc.nama_cuti || ' — ' || TRIM(pc.nama_cuti_kustom)
+                ELSE jc.nama_cuti
+              END AS nama_cuti
        FROM pengajuan_cuti pc
        JOIN pengguna p ON p.id = pc.pengguna_id
        JOIN jenis_cuti jc ON jc.id = pc.jenis_cuti_id
@@ -230,7 +240,12 @@ export async function ambilDataDasborKetuaDivisi(penggunaId) {
     ),
     jalankanKueri(
       `SELECT pc.id, pc.nomor_pengajuan, pc.tanggal_mulai, pc.tanggal_selesai,
-              pc.total_hari_cuti, pc.status, p.nama_lengkap, jc.nama_cuti
+              pc.total_hari_cuti, pc.status, p.nama_lengkap,
+              CASE
+                WHEN NULLIF(TRIM(pc.nama_cuti_kustom), '') IS NOT NULL
+                  THEN jc.nama_cuti || ' — ' || TRIM(pc.nama_cuti_kustom)
+                ELSE jc.nama_cuti
+              END AS nama_cuti
        FROM pengajuan_cuti pc
        JOIN pengguna p ON p.id = pc.pengguna_id
        JOIN jenis_cuti jc ON jc.id = pc.jenis_cuti_id
@@ -299,7 +314,12 @@ export async function ambilDataDasborHrd() {
     ),
     jalankanKueri(
       `SELECT pc.id, pc.nomor_pengajuan, pc.tanggal_mulai, pc.tanggal_selesai,
-              pc.total_hari_cuti, p.nama_lengkap, p.peran, d.nama_divisi, jc.nama_cuti
+              pc.total_hari_cuti, p.nama_lengkap, p.peran, d.nama_divisi,
+              CASE
+                WHEN NULLIF(TRIM(pc.nama_cuti_kustom), '') IS NOT NULL
+                  THEN jc.nama_cuti || ' — ' || TRIM(pc.nama_cuti_kustom)
+                ELSE jc.nama_cuti
+              END AS nama_cuti
        FROM pengajuan_cuti pc
        JOIN pengguna p ON p.id = pc.pengguna_id
        LEFT JOIN divisi d ON d.id = p.divisi_id

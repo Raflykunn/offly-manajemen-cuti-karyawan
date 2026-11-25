@@ -90,7 +90,12 @@ export async function ambilDataHalamanPengajuan() {
     ),
     jalankanKueri(
       `SELECT pc.*,
-              jc.nama_cuti, jc.kode_cuti, jc.potong_kuota_tahunan,
+              CASE
+                WHEN NULLIF(TRIM(pc.nama_cuti_kustom), '') IS NOT NULL
+                  THEN jc.nama_cuti || ' — ' || TRIM(pc.nama_cuti_kustom)
+                ELSE jc.nama_cuti
+              END AS nama_cuti,
+              jc.kode_cuti, jc.potong_kuota_tahunan,
               p.nama_lengkap AS nama_pemohon, p.peran AS peran_pemohon,
               d.nama_divisi,
               rp.nama_lengkap AS nama_rekan_pengganti,
@@ -136,6 +141,9 @@ export async function ajukanCutiBaru(formData) {
   const sesi = await wajibSesiPengguna(["karyawan", "ketua_divisi"]);
 
   const jenisCutiId = Number(formData.get("jenis_cuti_id"));
+  const ulangiMentah = String(formData.get("ulangi_dari_id") || "").trim();
+  const ulangiDariId = ulangiMentah ? Number(ulangiMentah) : null;
+  const namaCutiKustom = String(formData.get("nama_cuti_kustom") || "").trim();
   const opsiSetengahHari = formData.get("opsi_setengah_hari") === "on";
   const tanggalMulai = String(formData.get("tanggal_mulai") || "").trim();
   const tanggalSelesai = String(formData.get("tanggal_selesai") || "").trim();
@@ -163,6 +171,35 @@ export async function ajukanCutiBaru(formData) {
       pesan:
         "Jenis cuti, tanggal mulai/selesai, alasan, alamat selama cuti, dan nomor darurat wajib diisi.",
     };
+  }
+
+  if (!/^\d{12,13}$/.test(nomorDarurat)) {
+    return {
+      sukses: false,
+      pesan: "Nomor darurat harus berupa 12–13 digit angka.",
+    };
+  }
+
+  if (ulangiMentah) {
+    if (!Number.isInteger(ulangiDariId) || ulangiDariId <= 0) {
+      return {
+        sukses: false,
+        pesan: "Referensi pengajuan ulang tidak valid.",
+      };
+    }
+    const cekUlangiRes = await jalankanKueri(
+      `SELECT id FROM pengajuan_cuti
+       WHERE id = $1 AND pengguna_id = $2
+         AND status IN ('Rejected by Leader', 'Rejected by HRD')
+       LIMIT 1`,
+      [ulangiDariId, sesi.id]
+    );
+    if (cekUlangiRes.rows.length === 0) {
+      return {
+        sukses: false,
+        pesan: "Referensi pengajuan ulang tidak ditemukan atau tidak berstatus ditolak.",
+      };
+    }
   }
 
   if (tanggalSelesai < tanggalMulai) {
@@ -398,20 +435,31 @@ export async function ajukanCutiBaru(formData) {
       }
 
       const nomorSementara = `TMP-${crypto.randomUUID()}`;
+      const namaKustomTersimpan =
+        jenisCuti.kode_cuti === "LAINNYA" ? namaCutiKustom : null;
+      if (jenisCuti.kode_cuti === "LAINNYA") {
+        if (namaCutiKustom.length < 3 || namaCutiKustom.length > 120) {
+          throw new Error(
+            "Nama atau keperluan Cuti Lainnya wajib diisi (3–120 karakter)."
+          );
+        }
+      }
+
       const insertRes = await klien.query(
         `INSERT INTO pengajuan_cuti (
-           nomor_pengajuan, pengguna_id, jenis_cuti_id, opsi_setengah_hari,
-           tanggal_pengajuan, tanggal_mulai, tanggal_selesai, total_hari_cuti,
-           alasan_cuti, rekan_pengganti_id, catatan_tugas, lampiran_url,
-           alamat_selama_cuti, nomor_darurat, status
+           nomor_pengajuan, pengguna_id, jenis_cuti_id, nama_cuti_kustom,
+           opsi_setengah_hari, tanggal_pengajuan, tanggal_mulai, tanggal_selesai,
+           total_hari_cuti, alasan_cuti, rekan_pengganti_id, catatan_tugas,
+           lampiran_url, alamat_selama_cuti, nomor_darurat, status
          ) VALUES (
-           $1, $2, $3, $4, CURRENT_DATE, $5, $6, $7, $8, $9, $10, $11, $12, $13, 'Pending'
+           $1, $2, $3, $4, $5, CURRENT_DATE, $6, $7, $8, $9, $10, $11, $12, $13, $14, 'Pending'
          )
          RETURNING id`,
         [
           nomorSementara,
           sesi.id,
           jenisCutiId,
+          namaKustomTersimpan,
           opsiSetengahHari,
           tanggalMulai,
           tanggalSelesai,
@@ -625,7 +673,12 @@ export async function ambilDaftarVerifikasiKetuaDivisi() {
   const [hasilMenunggu, hasilRiwayat] = await Promise.all([
     jalankanKueri(
       `SELECT pc.*,
-              jc.nama_cuti, jc.kode_cuti, jc.potong_kuota_tahunan,
+              CASE
+                WHEN NULLIF(TRIM(pc.nama_cuti_kustom), '') IS NOT NULL
+                  THEN jc.nama_cuti || ' — ' || TRIM(pc.nama_cuti_kustom)
+                ELSE jc.nama_cuti
+              END AS nama_cuti,
+              jc.kode_cuti, jc.potong_kuota_tahunan,
               p.nama_lengkap AS nama_pemohon, p.email AS email_pemohon,
               p.foto_profil AS foto_pemohon, p.peran AS peran_pemohon,
               p.sisa_kuota_cuti, p.kuota_cuti_awal,
@@ -645,7 +698,12 @@ export async function ambilDaftarVerifikasiKetuaDivisi() {
     ),
     jalankanKueri(
       `SELECT pc.*,
-              jc.nama_cuti, jc.kode_cuti,
+              CASE
+                WHEN NULLIF(TRIM(pc.nama_cuti_kustom), '') IS NOT NULL
+                  THEN jc.nama_cuti || ' — ' || TRIM(pc.nama_cuti_kustom)
+                ELSE jc.nama_cuti
+              END AS nama_cuti,
+              jc.kode_cuti,
               p.nama_lengkap AS nama_pemohon, p.peran AS peran_pemohon,
               d.nama_divisi,
               rp.nama_lengkap AS nama_rekan_pengganti,
@@ -1128,7 +1186,12 @@ export async function ambilRiwayatCutiLengkap() {
   const [hasilRiwayat, hasilJenis, hasilDivisi] = await Promise.all([
     jalankanKueri(
       `SELECT pc.*,
-              jc.nama_cuti, jc.kode_cuti,
+              CASE
+                WHEN NULLIF(TRIM(pc.nama_cuti_kustom), '') IS NOT NULL
+                  THEN jc.nama_cuti || ' — ' || TRIM(pc.nama_cuti_kustom)
+                ELSE jc.nama_cuti
+              END AS nama_cuti,
+              jc.kode_cuti,
               p.nama_lengkap AS nama_pemohon, p.email AS email_pemohon,
               p.peran AS peran_pemohon, p.divisi_id,
               d.nama_divisi,

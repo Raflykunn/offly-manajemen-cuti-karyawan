@@ -83,6 +83,13 @@ export async function ubahProfilSendiri(statusSebelumnya, formData) {
     };
   }
 
+  if (telepon && !/^\d{12,13}$/.test(telepon)) {
+    return {
+      sukses: false,
+      pesan: "Nomor telepon harus berupa 12–13 digit angka.",
+    };
+  }
+
   if (kataSandiBaru && kataSandiBaru.length < 6) {
     return {
       sukses: false,

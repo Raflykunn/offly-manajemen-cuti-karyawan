@@ -228,9 +228,19 @@ export default function FormulirProfil({ pengguna }) {
                     id="telepon"
                     name="telepon"
                     type="tel"
+                    inputMode="numeric"
                     autoComplete="tel"
+                    pattern="[0-9]{12,13}"
+                    minLength={12}
+                    maxLength={13}
+                    title="Nomor HP harus terdiri dari 12–13 digit angka."
                     defaultValue={pengguna.telepon || ""}
-                    placeholder="0812xxxxxxxx"
+                    placeholder="0812xxxxxxxx (12–13 digit)"
+                    onInput={(e) => {
+                      e.currentTarget.value = e.currentTarget.value
+                        .replace(/\D/g, "")
+                        .slice(0, 13);
+                    }}
                   />
                 </div>
               </div>

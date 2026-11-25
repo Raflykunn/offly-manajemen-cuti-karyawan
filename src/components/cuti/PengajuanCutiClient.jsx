@@ -41,20 +41,41 @@ export default function PengajuanCutiClient({
   pengguna,
   daftarJenisCuti,
   daftarRekanPengganti,
+  dataUlangi = null,
+  peringatanUlangi = "",
 }) {
   const router = useRouter();
   const [sedangProses, mulaiTransisi] = useTransition();
   const [pesanBanner, aturPesanBanner] = useState(null);
 
   const [jenisCutiId, aturJenisCutiId] = useState(
-    daftarJenisCuti[0] ? String(daftarJenisCuti[0].id) : ""
+    dataUlangi?.jenis_cuti_id
+      ? String(dataUlangi.jenis_cuti_id)
+      : daftarJenisCuti[0]
+        ? String(daftarJenisCuti[0].id)
+        : ""
   );
-  const [opsiSetengahHari, aturOpsiSetengahHari] = useState(false);
-  const [tanggalMulai, aturTanggalMulai] = useState("");
-  const [tanggalSelesai, aturTanggalSelesai] = useState("");
-  const [rekanPenggantiId, aturRekanPenggantiId] = useState("");
-  const [lampiranUrl, aturLampiranUrl] = useState("");
-  const [namaLampiran, aturNamaLampiran] = useState("");
+  const [opsiSetengahHari, aturOpsiSetengahHari] = useState(
+    Boolean(dataUlangi?.opsi_setengah_hari)
+  );
+  const [tanggalMulai, aturTanggalMulai] = useState(
+    dataUlangi?.tanggal_mulai || ""
+  );
+  const [tanggalSelesai, aturTanggalSelesai] = useState(
+    dataUlangi?.tanggal_selesai || ""
+  );
+  const [rekanPenggantiId, aturRekanPenggantiId] = useState(
+    dataUlangi?.rekan_pengganti_id ? String(dataUlangi.rekan_pengganti_id) : ""
+  );
+  const [namaCutiKustom, aturNamaCutiKustom] = useState(
+    dataUlangi?.nama_cuti_kustom || ""
+  );
+  const [lampiranUrl, aturLampiranUrl] = useState(
+    dataUlangi?.lampiran_url || ""
+  );
+  const [namaLampiran, aturNamaLampiran] = useState(
+    dataUlangi?.lampiran_url ? "Lampiran sebelumnya tersimpan" : ""
+  );
   const [sedangUnggah, aturSedangUnggah] = useState(false);
 
   const [simulasi, aturSimulasi] = useState(null);
@@ -135,6 +156,15 @@ export default function PengajuanCutiClient({
     const berkas = event.target.files?.[0];
     if (!berkas) return;
 
+    if (!berkas.name.toLowerCase().endsWith(".pdf")) {
+      event.target.value = "";
+      aturPesanBanner({
+        sukses: false,
+        pesan: "Format berkas lampiran harus berupa PDF.",
+      });
+      return;
+    }
+
     aturSedangUnggah(true);
     const dataUnggah = new FormData();
     dataUnggah.append("berkas", berkas);
@@ -168,6 +198,7 @@ export default function PengajuanCutiClient({
     aturTanggalMulai("");
     aturTanggalSelesai("");
     aturRekanPenggantiId("");
+    aturNamaCutiKustom("");
     aturLampiranUrl("");
     aturNamaLampiran("");
     aturSimulasi(null);
@@ -212,6 +243,32 @@ export default function PengajuanCutiClient({
         </Button>
       </div>
 
+      {peringatanUlangi && (
+        <Alert variant="destructive" role="alert">
+          <AlertTriangle className="size-4" aria-hidden="true" />
+          <AlertDescription>{peringatanUlangi}</AlertDescription>
+        </Alert>
+      )}
+
+      {dataUlangi && (
+        <Alert className="border-primary/50 bg-accent text-accent-foreground">
+          <AlertTriangle className="size-4 text-primary" aria-hidden="true" />
+          <AlertDescription className="text-sm text-accent-foreground">
+            Mengajukan ulang berdasarkan{" "}
+            <span className="font-semibold">{dataUlangi.nomor_pengajuan}</span>
+            {(dataUlangi.catatan_hrd || dataUlangi.catatan_ketua) && (
+              <>
+                {" "}
+                — Catatan penolakan:{" "}
+                <span className="font-medium">
+                  {dataUlangi.catatan_hrd || dataUlangi.catatan_ketua}
+                </span>
+              </>
+            )}
+          </AlertDescription>
+        </Alert>
+      )}
+
       {pesanBanner && (
         <Alert
           variant={pesanBanner.sukses ? "default" : "destructive"}
@@ -236,6 +293,9 @@ export default function PengajuanCutiClient({
           </CardHeader>
           <CardContent>
             <form onSubmit={tanganiKirimPengajuan} className="space-y-4">
+              {dataUlangi && (
+                <input type="hidden" name="ulangi_dari_id" value={dataUlangi.id} />
+              )}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label>Jenis Cuti</Label>
@@ -261,6 +321,23 @@ export default function PengajuanCutiClient({
                     <p className="text-[11px] text-muted-foreground">
                       {jenisAktif.deskripsi}
                     </p>
+                  )}
+                  {jenisAktif?.kode_cuti === "LAINNYA" && (
+                    <div className="space-y-1.5 pt-2">
+                      <Label htmlFor="nama_cuti_kustom">
+                        Nama / Keperluan Cuti Lainnya
+                      </Label>
+                      <Input
+                        id="nama_cuti_kustom"
+                        name="nama_cuti_kustom"
+                        value={namaCutiKustom}
+                        onChange={(e) => aturNamaCutiKustom(e.target.value)}
+                        placeholder="Contoh: Cuti Duka Kerabat, Izin Acara Keluarga"
+                        minLength={3}
+                        maxLength={120}
+                        required
+                      />
+                    </div>
                   )}
                 </div>
 
@@ -341,32 +418,50 @@ export default function PengajuanCutiClient({
                   </Alert>
                 )}
 
-              <label className="flex items-center gap-2 text-sm cursor-pointer select-none rounded-lg border p-3 bg-muted/20">
-                <Checkbox
-                  checked={opsiSetengahHari}
-                  disabled={!tanggalMulai}
-                  onCheckedChange={(v) => {
-                    const aktif = Boolean(v);
-                    aturOpsiSetengahHari(aktif);
-                    if (aktif && tanggalMulai) {
-                      aturTanggalSelesai(tanggalMulai);
-                    }
-                  }}
-                />
-                <input
-                  type="hidden"
-                  name="opsi_setengah_hari"
-                  value={opsiSetengahHari ? "on" : ""}
-                />
-                <div>
-                  <span className="font-medium">
-                    Ajukan Cuti Setengah Hari (0.5 Hari)
-                  </span>
-                  <p className="text-xs text-muted-foreground">
-                    Aktif jika tanggal mulai dan tanggal selesai jatuh pada 1 hari kerja yang sama.
-                  </p>
-                </div>
-              </label>
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm cursor-pointer select-none rounded-lg border p-3 bg-muted/20">
+                  <Checkbox
+                    checked={opsiSetengahHari}
+                    disabled={!tanggalMulai}
+                    onCheckedChange={(v) => aturOpsiSetengahHari(Boolean(v))}
+                  />
+                  <input
+                    type="hidden"
+                    name="opsi_setengah_hari"
+                    value={opsiSetengahHari ? "on" : ""}
+                  />
+                  <div>
+                    <span className="font-medium">
+                      Ajukan Cuti Setengah Hari (0.5 Hari)
+                    </span>
+                    <p className="text-xs text-muted-foreground">
+                      Aktif jika tanggal mulai dan tanggal selesai jatuh pada 1 hari kerja yang sama.
+                    </p>
+                  </div>
+                </label>
+
+                {opsiSetengahHari &&
+                  tanggalMulai &&
+                  tanggalSelesai &&
+                  tanggalMulai !== tanggalSelesai && (
+                    <Alert className="border-amber-500/60 bg-amber-50 dark:bg-amber-950/50 text-amber-950 dark:text-amber-100">
+                      <AlertTriangle className="size-4 text-amber-700 dark:text-amber-300" aria-hidden="true" />
+                      <AlertDescription className="flex flex-wrap items-center justify-between gap-2 text-sm text-amber-950 dark:text-amber-100">
+                        <span>
+                          Cuti setengah hari hanya berlaku untuk 1 hari yang sama.
+                        </span>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => aturTanggalSelesai(tanggalMulai)}
+                        >
+                          Samakan ke {formatTanggalIndo(tanggalMulai)}
+                        </Button>
+                      </AlertDescription>
+                    </Alert>
+                  )}
+              </div>
 
               <div className="space-y-1.5">
                 <Label htmlFor="alasan_cuti">Alasan Pengajuan Cuti</Label>
@@ -374,6 +469,7 @@ export default function PengajuanCutiClient({
                   id="alasan_cuti"
                   name="alasan_cuti"
                   rows={2}
+                  defaultValue={dataUlangi?.alasan_cuti || ""}
                   placeholder="Jelaskan keperluan cuti Anda dengan jelas"
                   required
                 />
@@ -387,6 +483,7 @@ export default function PengajuanCutiClient({
                   id="catatan_tugas"
                   name="catatan_tugas"
                   rows={2}
+                  defaultValue={dataUlangi?.catatan_tugas || ""}
                   placeholder="Daftar pekerjaan atau tanggung jawab yang dialihkan ke rekan pengganti"
                 />
               </div>
@@ -397,6 +494,7 @@ export default function PengajuanCutiClient({
                   <Input
                     id="alamat_selama_cuti"
                     name="alamat_selama_cuti"
+                    defaultValue={dataUlangi?.alamat_selama_cuti || ""}
                     placeholder="Kota / alamat lengkap"
                     required
                   />
@@ -406,7 +504,19 @@ export default function PengajuanCutiClient({
                   <Input
                     id="nomor_darurat"
                     name="nomor_darurat"
-                    placeholder="08xxxxxxxxxx"
+                    type="tel"
+                    inputMode="numeric"
+                    pattern="[0-9]{12,13}"
+                    minLength={12}
+                    maxLength={13}
+                    title="Nomor HP harus terdiri dari 12–13 digit angka."
+                    defaultValue={dataUlangi?.nomor_darurat || ""}
+                    placeholder="08xxxxxxxxxx (12–13 digit)"
+                    onInput={(e) => {
+                      e.currentTarget.value = e.currentTarget.value
+                        .replace(/\D/g, "")
+                        .slice(0, 13);
+                    }}
                     required
                   />
                 </div>
@@ -414,13 +524,13 @@ export default function PengajuanCutiClient({
 
               <div className="space-y-1.5">
                 <Label htmlFor="berkas_lampiran" className="flex items-center gap-2">
-                  <span>Lampiran Dokumen / Surat Dokter</span>
+                  <span>Lampiran Dokumen / Surat Dokter (PDF)</span>
                   {jenisAktif?.wajib_lampiran ? (
-                    <Badge variant="destructive" className="text-[10px]">
+                    <Badge variant="destructive" className="text-xs">
                       Wajib
                     </Badge>
                   ) : (
-                    <Badge variant="outline" className="text-[10px]">
+                    <Badge variant="outline" className="text-xs">
                       Opsional
                     </Badge>
                   )}
@@ -429,7 +539,7 @@ export default function PengajuanCutiClient({
                   <Input
                     id="berkas_lampiran"
                     type="file"
-                    accept=".pdf,.jpg,.jpeg,.png"
+                    accept=".pdf,application/pdf"
                     onChange={tanganiUnggahBerkas}
                   />
                   {sedangUnggah && (

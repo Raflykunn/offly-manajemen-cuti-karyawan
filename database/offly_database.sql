@@ -58,6 +58,7 @@ CREATE TABLE pengajuan_cuti (
     nomor_pengajuan VARCHAR(40) NOT NULL UNIQUE,
     pengguna_id INTEGER NOT NULL REFERENCES pengguna(id) ON DELETE CASCADE,
     jenis_cuti_id INTEGER NOT NULL REFERENCES jenis_cuti(id) ON DELETE RESTRICT,
+    nama_cuti_kustom VARCHAR(120),
     opsi_setengah_hari BOOLEAN NOT NULL DEFAULT FALSE,
     tanggal_pengajuan DATE NOT NULL DEFAULT CURRENT_DATE,
     tanggal_mulai DATE NOT NULL,
@@ -156,7 +157,8 @@ INSERT INTO jenis_cuti (
     (2, 'SAKIT', 'Cuti Sakit', 'Cuti karena gangguan kesehatan dengan lampiran wajib surat keterangan dokter.', 14, -3, TRUE, FALSE, TRUE),
     (3, 'MENIKAH', 'Cuti Menikah', 'Cuti khusus pernikahan karyawan dengan melampirkan surat keterangan atau undangan resmi.', 3, 7, TRUE, FALSE, TRUE),
     (4, 'MELAHIRKAN', 'Cuti Melahirkan', 'Cuti persalinan bagi karyawati dengan lampiran surat keterangan dokter atau bidan.', 90, 14, TRUE, FALSE, TRUE),
-    (5, 'DUKA', 'Cuti Duka Keluarga', 'Cuti kedukaan anggota keluarga inti yang dapat diajukan mendadak.', 2, -3, FALSE, FALSE, TRUE);
+    (5, 'DUKA', 'Cuti Duka Keluarga', 'Cuti kedukaan anggota keluarga inti yang dapat diajukan mendadak.', 2, -3, FALSE, FALSE, TRUE),
+    (6, 'LAINNYA', 'Cuti Lainnya', 'Cuti keperluan khusus atau mendadak sesuai keterangan pemohon.', 5, -3, FALSE, FALSE, TRUE);
 
 INSERT INTO hari_libur (id, tanggal, nama_libur, jenis) VALUES
     (1, '2026-01-01', 'Tahun Baru 2026 Masehi', 'Libur Nasional'),

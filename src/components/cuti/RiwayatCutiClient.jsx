@@ -1,8 +1,9 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Ban, Download, Eye, History, Search } from "lucide-react";
+import { Ban, Download, Eye, History, RotateCcw, Search } from "lucide-react";
 import { batalkanPengajuanCuti } from "@/actions/cuti-aksi";
 import {
   formatAngkaKuota,
@@ -388,6 +389,21 @@ export default function RiwayatCutiClient({
                               Batalkan
                             </Button>
                           )}
+                        {item.pengguna_id === sesiPenggunaId &&
+                          ["Rejected by Leader", "Rejected by HRD"].includes(
+                            item.status
+                          ) && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              nativeButton={false}
+                              render={<Link href={`/pengajuan-cuti?ulangi=${item.id}`} />}
+                              className="border-primary/45 text-primary hover:bg-accent hover:text-accent-foreground"
+                            >
+                              <RotateCcw className="size-3.5 mr-1" />
+                              Ajukan Ulang
+                            </Button>
+                          )}
                         {item.status === "Approved by HRD" && (
                           <Button
                             size="sm"
@@ -418,6 +434,14 @@ export default function RiwayatCutiClient({
       <ModalDetailCuti
         pengajuan={detailDipilih}
         saatTutup={() => aturDetailDipilih(null)}
+        bisaAjukanUlang={
+          detailDipilih
+            ? detailDipilih.pengguna_id === sesiPenggunaId &&
+              ["Rejected by Leader", "Rejected by HRD"].includes(
+                detailDipilih.status
+              )
+            : false
+        }
       />
 
       <Dialog

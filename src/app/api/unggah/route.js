@@ -4,20 +4,13 @@ import path from "path";
 import { NextResponse } from "next/server";
 import { ambilSesiPengguna } from "@/lib/autentikasi";
 
-const EKSTENSI_DIIZINKAN = new Set([".pdf", ".jpg", ".jpeg", ".png"]);
+const EKSTENSI_DIIZINKAN = new Set([".pdf"]);
 const UKURAN_MAKS_BYTE = 5 * 1024 * 1024;
 
 function apakahIsiBerkasValid(ekstensi, buffer) {
-  if (!buffer || buffer.length < 4) return false;
+  if (!buffer || buffer.length < 5) return false;
   if (ekstensi === ".pdf") {
     return buffer.subarray(0, 5).toString("ascii") === "%PDF-";
-  }
-  if (ekstensi === ".png") {
-    const tandaPng = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
-    return buffer.length >= 8 && buffer.subarray(0, 8).equals(tandaPng);
-  }
-  if (ekstensi === ".jpg" || ekstensi === ".jpeg") {
-    return buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;
   }
   return false;
 }
@@ -54,7 +47,7 @@ export async function POST(request) {
       return NextResponse.json(
         {
           sukses: false,
-          pesan: "Format berkas harus berupa PDF, JPG, JPEG, atau PNG.",
+          pesan: "Format berkas harus berupa PDF.",
         },
         { status: 400 }
       );
@@ -68,7 +61,7 @@ export async function POST(request) {
       return NextResponse.json(
         {
           sukses: false,
-          pesan: "Isi berkas tidak sesuai dengan format PDF, JPG, JPEG, atau PNG.",
+          pesan: "Isi berkas tidak sesuai dengan format PDF.",
         },
         { status: 400 }
       );
