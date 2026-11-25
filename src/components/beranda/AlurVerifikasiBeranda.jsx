@@ -40,20 +40,20 @@ const TAHAP_KETUA = [
 
 function GarisTahap({ daftarTahap, kolomMd }) {
   return (
-    <div className="relative pt-4">
-      <ol className={`relative grid grid-cols-1 ${kolomMd} gap-8 md:gap-6`}>
+    <div className="relative pt-2">
+      <ol className={`relative grid grid-cols-1 ${kolomMd} gap-4 md:gap-6`}>
         {daftarTahap.map((tahap, indeks) => (
           <li
             key={tahap.nomor}
-            className="relative flex md:flex-col md:items-center md:text-center gap-4 md:gap-3"
+            className="relative rounded-xl border border-border/90 bg-card p-5 shadow-sm dark:shadow-none flex md:flex-col md:items-center md:text-center gap-4 md:gap-3"
           >
             {indeks < daftarTahap.length - 1 && (
               <span
                 aria-hidden="true"
-                className="hidden md:block absolute top-5 left-[calc(50%+1.5rem)] -right-1/2 border-t border-border"
+                className="hidden md:block absolute top-10 -right-6 w-6 border-t border-border"
               />
             )}
-            <span className="relative z-10 size-10 rounded-full bg-accent text-primary border border-primary/25 font-mono text-sm font-bold tabular-nums flex items-center justify-center shrink-0">
+            <span className="relative z-10 size-10 rounded-full bg-accent text-primary border border-primary/35 font-mono text-sm font-bold tabular-nums flex items-center justify-center shrink-0">
               {tahap.nomor}
             </span>
             <div className="space-y-1">

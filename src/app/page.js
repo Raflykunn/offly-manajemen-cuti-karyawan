@@ -31,7 +31,7 @@ async function ambilDataPublikBeranda() {
         `SELECT id, TO_CHAR(tanggal, 'YYYY-MM-DD') AS tanggal, nama_libur, jenis
          FROM hari_libur
          ORDER BY tanggal ASC
-         LIMIT 12`
+         LIMIT 4`
       ),
       jalankanKueri(
         `SELECT
@@ -136,21 +136,21 @@ export default async function HalamanUtama() {
               </div>
 
               <div className="grid grid-cols-3 gap-2.5 sm:gap-3 pt-2 max-w-lg tabular-nums text-center">
-                <div className="rounded-xl border bg-card px-3 py-3 sm:px-4 shadow-2xs">
+                <div className="rounded-xl border border-border/90 bg-card px-3 py-3 sm:px-4 shadow-sm dark:shadow-none">
                   <p className="text-xl sm:text-2xl font-bold font-mono">12</p>
                   <p className="text-xs text-muted-foreground leading-snug mt-0.5">
                     Hari Kerja / Tahun
                   </p>
                 </div>
-                <div className="rounded-xl border border-primary/25 bg-accent/40 dark:bg-accent/20 px-3 py-3 sm:px-4 shadow-2xs">
+                <div className="rounded-xl border border-primary/40 bg-accent/80 dark:bg-accent/30 px-3 py-3 sm:px-4 shadow-sm dark:shadow-none">
                   <p className="text-xl sm:text-2xl font-bold font-mono text-primary">
                     {ringkasan.total_divisi}
                   </p>
-                  <p className="text-xs text-muted-foreground leading-snug mt-0.5">
+                  <p className="text-xs text-foreground/80 dark:text-muted-foreground leading-snug mt-0.5">
                     Divisi Terdaftar
                   </p>
                 </div>
-                <div className="rounded-xl border bg-card px-3 py-3 sm:px-4 shadow-2xs">
+                <div className="rounded-xl border border-border/90 bg-card px-3 py-3 sm:px-4 shadow-sm dark:shadow-none">
                   <p className="text-xl sm:text-2xl font-bold font-mono">
                     {daftarJenisCuti.length}
                   </p>
@@ -169,11 +169,11 @@ export default async function HalamanUtama() {
 
         <section id="alur" tabIndex={-1} className="border-b bg-muted/20 scroll-mt-20 outline-none">
           <div className="max-w-6xl mx-auto px-4 md:px-6 py-12 md:py-14 space-y-8 ungkap-gulir">
-            <div className="flex flex-wrap items-end justify-between gap-4">
+            <div className="space-y-2 max-w-2xl">
               <h2 className="judul-seimbang text-2xl md:text-3xl font-bold tracking-tight">
                 Verifikasi berjenjang sesuai peran di divisi
               </h2>
-              <p className="paragraf-rapi text-sm text-muted-foreground max-w-sm">
+              <p className="paragraf-rapi text-sm text-muted-foreground">
                 Kuota tahunan otomatis kembali ke saldo karyawan apabila pengajuan dibatalkan atau ditolak.
               </p>
             </div>
@@ -194,7 +194,7 @@ export default async function HalamanUtama() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-            <div className="md:col-span-7 rounded-xl border bg-card p-6 flex flex-col justify-between gap-6 hover:border-primary/40 transition-colors">
+            <div className="md:col-span-7 rounded-xl border bg-card p-6 shadow-sm dark:shadow-none flex flex-col justify-between gap-6 hover:border-primary/40 transition-colors">
               <div className="space-y-2">
                 <div className="size-9 rounded-lg bg-accent dark:bg-accent/60 text-accent-foreground flex items-center justify-center">
                   <Clock3 className="size-4 text-primary" aria-hidden="true" />
@@ -241,7 +241,7 @@ export default async function HalamanUtama() {
               </div>
             </div>
 
-            <div className="md:col-span-5 rounded-xl border bg-card p-6 flex flex-col justify-between gap-6 hover:border-primary/40 transition-colors">
+            <div className="md:col-span-5 rounded-xl border bg-card p-6 shadow-sm dark:shadow-none flex flex-col justify-between gap-6 hover:border-primary/40 transition-colors">
               <div className="space-y-2">
                 <div className="size-9 rounded-lg bg-accent dark:bg-accent/60 text-accent-foreground flex items-center justify-center">
                   <ShieldAlert className="size-4 text-primary" aria-hidden="true" />
@@ -272,7 +272,7 @@ export default async function HalamanUtama() {
               </div>
             </div>
 
-            <div className="md:col-span-6 rounded-xl border bg-card p-6 flex flex-col justify-between gap-5 hover:border-primary/40 transition-colors">
+            <div className="md:col-span-6 rounded-xl border bg-card p-6 shadow-sm dark:shadow-none flex flex-col justify-between gap-5 hover:border-primary/40 transition-colors">
               <div className="space-y-2">
                 <div className="size-9 rounded-lg bg-accent dark:bg-accent/60 text-accent-foreground flex items-center justify-center">
                   <FileText className="size-4 text-primary" aria-hidden="true" />
@@ -295,7 +295,7 @@ export default async function HalamanUtama() {
               </div>
             </div>
 
-            <div className="md:col-span-6 rounded-xl border bg-card p-6 flex flex-col justify-between gap-5 hover:border-primary/40 transition-colors">
+            <div className="md:col-span-6 rounded-xl border bg-card p-6 shadow-sm dark:shadow-none flex flex-col justify-between gap-5 hover:border-primary/40 transition-colors">
               <div className="space-y-2">
                 <div className="size-9 rounded-lg bg-accent dark:bg-accent/60 text-accent-foreground flex items-center justify-center">
                   <FileCheck2 className="size-4 text-primary" aria-hidden="true" />
@@ -336,8 +336,8 @@ export default async function HalamanUtama() {
                   Data jenis cuti belum tersedia.
                 </div>
               ) : (
-                <div className="rounded-xl border bg-card divide-y divide-border overflow-hidden">
-                  {daftarJenisCuti.map((item) => (
+                <div className="rounded-xl border bg-card divide-y divide-border overflow-hidden shadow-sm dark:shadow-none">
+                  {daftarJenisCuti.slice(0, 5).map((item) => (
                     <div
                       key={item.id}
                       className="px-4 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 hover:bg-muted/50 transition-colors"

@@ -22,7 +22,7 @@ export default function DaftarHariLiburBeranda({ daftarHariLibur }) {
 
   return (
     <div className="space-y-3">
-      <div className="rounded-xl border bg-card divide-y divide-border overflow-hidden">
+      <div className="rounded-xl border bg-card divide-y divide-border overflow-hidden shadow-sm dark:shadow-none">
         {daftarTampil.map((libur) => (
           <div
             key={libur.id}
