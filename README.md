@@ -1,128 +1,362 @@
-<div align="center">
+<p align="center">
+  <img width="96" height="96" alt="Logo Offly" src="public/logo-512.png" />
+</p>
 
-# Offly
+<h1 align="center">Offly — Sistem Manajemen Cuti Karyawan</h1>
 
-**Sistem Manajemen Cuti Karyawan**
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js-16.4-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js">
+  <img src="https://img.shields.io/badge/React-19.3-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React">
+  <img src="https://img.shields.io/badge/JavaScript-JSX-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript">
+  <img src="https://img.shields.io/badge/PostgreSQL-Raw%20SQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL">
+  <img src="https://img.shields.io/badge/Tailwind%20CSS-v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS">
+</p>
 
-![Next.js](https://img.shields.io/badge/Next.js_16.4-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
-![React](https://img.shields.io/badge/React_19-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS_v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
+<h3 align="center">
+Satu pintu pengajuan, saldo, dan persetujuan cuti tim tanpa rekap manual.
+</h3>
 
-[Tentang Proyek](#tentang-proyek) · [Fitur Utama](#fitur-utama) · [Mulai Cepat](#mulai-cepat) · [Akun Demo](#akun-demo) · [Struktur Proyek](#struktur-proyek)
-
-</div>
+<p align="center">
+  <a href="#-fitur">📋 Fitur</a> ·
+  <a href="#-instalasi">🚀 Instalasi</a> ·
+  <a href="#-dokumentasi">📚 Dokumentasi</a> ·
+  <a href="#-kontribusi">🤝 Kontribusi</a>
+</p>
 
 ---
 
-<details>
-<summary>Daftar Isi</summary>
+## 📋 Daftar Isi
 
-1. [Tentang Proyek](#tentang-proyek)
-2. [Teknologi yang Digunakan](#teknologi-yang-digunakan)
-3. [Fitur Utama](#fitur-utama)
-4. [Mulai Cepat](#mulai-cepat)
-5. [Akun Demo](#akun-demo)
-6. [Struktur Proyek](#struktur-proyek)
-7. [Perintah Proyek](#perintah-proyek)
+- [🎯 Tentang Proyek](#-tentang-proyek)
+- [🖼️ Tampilan](#-tampilan)
+- [✨ Fitur](#-fitur)
+- [🧰 Teknologi yang Digunakan](#-teknologi-yang-digunakan)
+- [💻 Persyaratan Sistem](#-persyaratan-sistem)
+- [🚀 Instalasi](#-instalasi)
+- [🔧 Konfigurasi](#-konfigurasi)
+- [🔐 Akun Demo](#-akun-demo)
+- [📁 Struktur Proyek](#-struktur-proyek)
+- [📚 Dokumentasi](#-dokumentasi)
+- [🧪 Pengujian](#-pengujian)
+- [🆘 Masalah Umum](#-masalah-umum)
+- [🤝 Kontribusi](#-kontribusi)
+- [👤 Kontak](#-kontak)
 
-</details>
+---
 
-## Tentang Proyek
+## 🎯 Tentang Proyek
 
-Offly menangani pengajuan cuti, verifikasi berjenjang, dan persetujuan HRD secara terstruktur dalam satu aplikasi web. Seluruh aturan bisnis dijalankan di server dan transaksi database PostgreSQL, mulai dari perhitungan hari kerja, pengembalian kuota otomatis, penguncian kapasitas divisi, hingga penerbitan surat cuti PDF.
+**Offly** adalah platform manajemen cuti karyawan berbasis web yang mendigitalisasi proses pengajuan, verifikasi berjenjang, dan persetujuan akhir HRD. Seluruh aturan bisnis—mulai dari perhitungan hari kerja efektif, pengecekan periode larangan cuti, kapasitas divisi, pengembalian kuota otomatis, hingga penerbitan Surat Cuti PDF—dijalankan langsung di server dan transaksi PostgreSQL.
 
-### Teknologi yang Digunakan
+Sistem ini melayani empat peran utama (**Karyawan**, **Ketua Divisi**, **HRD**, dan **Admin**) dengan otorisasi yang selalu diverifikasi di sisi server.
+
+### 🎯 Tujuan
+- 📅 Menghilangkan rekap cuti manual dengan perhitungan hari kerja dan kuota otomatis
+- 🛡️ Menjaga alur persetujuan berjenjang (`Karyawan → Ketua Divisi → HRD` dan `Ketua Divisi → HRD`)
+- 👥 Memastikan tugas tetap berjalan lewat mekanisme rekan pengganti dan batas kapasitas divisi
+- 📄 Menerbitkan surat izin cuti resmi berformat PDF secara otomatis setelah disetujui HRD
+
+### ⭐ Nilai Inti
+- ✅ **Satu Design System** — Warna OKLCH, tipografi, radius, dan bayangan dikelola terpusat di [globals.css](src/app/globals.css) ([DESIGN_WARNA.md](DESIGN_WARNA.md))
+- ✅ **Otorisasi di Server** — Setiap Server Action dan Route Handler memverifikasi sesi JWT HTTP-Only serta peran pengguna di PostgreSQL
+- ✅ **Transaksi Aman** — Pengajuan, pembatalan, dan persetujuan memakai transaksi `BEGIN/COMMIT` dengan penguncian baris `FOR UPDATE`
+- ✅ **Lampiran Privat** — Berkas lampiran divalidasi sebagai PDF (`%PDF-`, maks. 5 MB), disimpan di `storage/lampiran/`, dan diakses lewat `/api/lampiran/[nama]` setelah cek autentikasi
+- ✅ **Notifikasi Terarah** — Setiap notifikasi pengajuan cuti langsung membuka detail surat terkait (`?detail=<id>`)
+
+---
+
+## 🖼️ Tampilan
+
+### Beranda
+<img alt="Halaman Beranda Offly" src="docs/screenshots/beranda.png" />
+
+---
+
+### Masuk
+<img alt="Halaman Masuk Offly" src="docs/screenshots/masuk.png" />
+
+---
+
+### Dasbor Karyawan
+<img alt="Dasbor Karyawan Offly" src="docs/screenshots/dasbor_karyawan.png" />
+
+---
+
+### Pengajuan Cuti
+<img alt="Halaman Pengajuan Cuti Offly" src="docs/screenshots/pengajuan_cuti.png" />
+
+---
+
+### Riwayat Cuti
+<img alt="Halaman Riwayat Cuti Offly" src="docs/screenshots/riwayat_cuti.png" />
+
+---
+
+### Verifikasi Cuti (Ketua Divisi)
+<img alt="Halaman Verifikasi Cuti Ketua Divisi" src="docs/screenshots/verifikasi_cuti.png" />
+
+---
+
+### Persetujuan Akhir (HRD)
+<img alt="Halaman Persetujuan Akhir HRD" src="docs/screenshots/persetujuan_hrd.png" />
+
+---
+
+## ✨ Fitur
+
+### 👤 Karyawan
+- 📝 **Pengajuan Cuti & Simulasi Kuota** — Hitung hari kerja otomatis (mengecualikan akhir pekan, libur nasional, dan cuti bersama), mendukung cuti setengah hari (`0.5`), dan jenis **Cuti Lainnya** kustom
+- 🔔 **Wajib Ketua Divisi Aktif** — Jika belum ditempatkan di divisi berketua aktif, tersedia tombol 1-klik untuk mengirim notifikasi penempatan ke Admin
+- 🔁 **Ajukan Ulang & Batalkan** — Pengajuan `Pending` dapat dibatalkan dengan pengembalian kuota otomatis; pengajuan ditolak bisa langsung diajukan ulang dengan data terisi otomatis
+- 📄 **Surat Cuti PDF** — Unduh surat resmi setelah status **Disetujui HRD**
+
+### 🧑‍💼 Ketua Divisi
+- ✅ **Verifikasi Cuti** — Tinjau antrean pengajuan anggota divisi lengkap dengan alasan, rekan pengganti, catatan tugas, dan lampiran PDF, lalu **Setujui** atau **Tolak** (catatan wajib)
+- 📆 **Pengajuan Pribadi** — Pengajuan cuti Ketua Divisi langsung diteruskan ke antrean HRD
+
+### 🏢 HRD
+- 🏛️ **Persetujuan Akhir (Satuan & Massal)** — Proses pengajuan yang lolos verifikasi ketua maupun pengajuan langsung Ketua Divisi dengan peringatan otomatis bila melampaui batas kapasitas divisi
+- 🗓️ **Kalender, Larangan Cuti & Kapasitas** — Kelola hari libur nasional, cuti bersama, periode larangan cuti, dan persentase batas kapasitas per divisi
+- ⏰ **Pengingat Kuota Hangus** — Pantau karyawan yang jarang mengambil cuti menjelang akhir tahun dan kirim notifikasi pengingat
+
+### 🛠️ Admin
+- 👥 **Manajemen Pengguna & Divisi** — CRUD pengguna, atur ulang kuota tahunan, kelola divisi beserta anggota dan Ketua Divisi
+- 📑 **Manajemen Jenis Cuti** — Konfigurasi dinamis kuota default, batas hari pengajuan, syarat lampiran PDF, dan aturan pemotongan kuota tahunan
+
+### 🎨 Profil & Umum
+- 🖼️ **Ganti Avatar Sekali Klik** — Klik avatar pada halaman profil untuk memilih gambar (`JPG`, `PNG`, `WEBP`, maks. 1 MB) yang langsung tersimpan
+- 🔒 **Keamanan Kata Sandi** — Mengganti kata sandi mewajibkan verifikasi kata sandi lama dan konfirmasi kata sandi baru
+- 🌓 **Mode Terang & Gelap** — Pengalih tema dengan penyimpanan preferensi lokal
+
+---
+
+## 🧰 Teknologi yang Digunakan
 
 | Lapisan | Teknologi |
 | :--- | :--- |
-| Kerangka Kerja | Next.js 16.4.6 (App Router, Turbopack), React 19.3 |
-| Antarmuka | Tailwind CSS v4, `@base-ui/react`, Lucide Icons |
-| Database | PostgreSQL dengan kueri SQL mentah (`pg`) |
-| Autentikasi & PDF | `jose` (JWT cookie `httpOnly`), `bcryptjs`, `pdf-lib` |
+| **Framework & UI** | Next.js `16.4.6` (App Router), React `19.3`, Tailwind CSS `v4`, `@base-ui/react`, `lucide-react` |
+| **Backend** | Next.js Server Actions (`src/actions/*.js`) & Route Handlers (`src/app/api/*/route.js`) |
+| **Database** | PostgreSQL dengan kueri Raw SQL (`pg`) |
+| **Autentikasi & PDF** | `jose` (JWT cookie `httpOnly`), `bcryptjs`, `pdf-lib` |
 
-## Fitur Utama
+---
 
-### Hak Akses per Peran
+## 💻 Persyaratan Sistem
 
-| Peran | Cakupan Utama |
-| :--- | :--- |
-| **Karyawan** | Mengajukan cuti, menyimulasikan kuota (*what-if*), membatalkan pengajuan `Pending`, memantau riwayat, dan mengunduh surat cuti PDF |
-| **Ketua Divisi** | Memverifikasi pengajuan anggota divisinya serta mengajukan cuti pribadi langsung ke antrean HRD |
-| **HRD** | Memberikan persetujuan final (satuan atau massal), mengelola hari libur, periode *blackout*, kapasitas divisi, dan pengingat kuota hangus |
-| **Admin** | Mengelola akun pengguna, mereset kuota tahunan, mengatur divisi beserta anggotanya, serta mengonfigurasi jenis cuti dinamis |
+- **Node.js** v20+ dan **npm**
+- **PostgreSQL** v14+
+- **pgAdmin 4** (atau `psql`) untuk menjalankan skrip SQL awal
 
-### Aturan Bisnis dan Keamanan
+---
 
-- **Perhitungan Hari Kerja Otomatis:** Cuti tahunan (12 hari kerja per tahun, syarat masa kerja minimal 1 tahun, pengajuan minimal H-3) mendukung cuti setengah hari (`0.5` hari) dan mengecualikan Sabtu, Minggu, serta hari libur nasional.
-- **Jenis Cuti Dinamis:** Cuti sakit dapat diajukan H-0 hingga 3 hari setelah mulai sakit dengan lampiran surat dokter; jenis cuti lain dapat ditambah atau dinonaktifkan langsung oleh Admin di database.
-- **Proteksi Kapasitas dan Bentrok:** Pengajuan otomatis ditolak jika bertabrakan dengan pengajuan aktif lain, jatuh pada periode *blackout*, atau melewati batas kapasitas divisi.
-- **Penyimpanan Lampiran Privat:** Berkas unggahan dicek berdasarkan *magic bytes* (PDF, PNG, JPEG), disimpan di luar folder `public` (`storage/lampiran/`), dan hanya dibuka lewat `/api/lampiran/[nama]` setelah pengecekan sesi serta hak akses.
-- **Perlindungan Sesi dan Akses Masuk:** Cookie sesi diverifikasi ulang ke status aktif di database melalui `src/proxy.js`, dilengkapi pembatasan percobaan gagal masuk.
+## 🚀 Instalasi
 
-## Mulai Cepat
-
-### Prasyarat
-
-- **Node.js** (disarankan v20 ke atas) dan **npm**
-- **PostgreSQL**
-- **pgAdmin 4** (unduh di [pgadmin.org/download](https://www.pgadmin.org/download/))
-
-### Langkah Instalasi
-
-1. **Siapkan database di pgAdmin 4**
-   - Buka **pgAdmin 4**, lalu buat database baru bernama `offly_db`.
-   - Klik kanan `offly_db` dan pilih **Query Tool**.
-   - Buka berkas `database/offly_database.sql`, lalu jalankan kuerinya (**Execute / F5**).
-
-2. **Konfigurasi variabel lingkungan**
-   Salin `.env.example` menjadi `.env.local`, lalu sesuaikan koneksi database dan kunci rahasia sesi:
-   ```env
-   DATABASE_URL=postgresql://postgres:password_anda@localhost:5432/offly_db
-   AUTH_SECRET=kunci-rahasia-offly-ganti-di-produksi-minimal-32-karakter
+1. **Clone repository**
+   ```bash
+   git clone https://github.com/Raflykunn/offly-manajemen-cuti-karyawan.git
+   cd offly-manajemen-cuti-karyawan
    ```
 
-3. **Pasang dependensi dan jalankan aplikasi**
+2. **Siapkan database PostgreSQL**
+   - Buat database baru bernama `offly_db` di **pgAdmin 4**.
+   - Buka **Query Tool** pada `offly_db`, lalu jalankan seluruh isi berkas [database/offly_database.sql](database/offly_database.sql).
+
+3. **Pasang dependensi**
    ```bash
    npm install
+   ```
+
+4. **Konfigurasi lingkungan** (lihat bagian [Konfigurasi](#-konfigurasi)), lalu jalankan server pengembangan:
+   ```bash
    npm run dev
    ```
 
-4. Buka `http://localhost:3000` di peramban.
+5. Buka `http://localhost:3000` di peramban.
 
-## Akun Demo
+---
 
-Seluruh akun bawaan dari `database/offly_database.sql` memakai kata sandi **`password123`**:
+## 🔧 Konfigurasi
+
+Salin `.env.example` menjadi `.env.local` pada root proyek (sejajar dengan `package.json`), lalu isi nilai berikut:
+
+```env
+DATABASE_URL=postgresql://postgres:password_anda@localhost:5432/offly_db
+AUTH_SECRET=kunci-rahasia-offly-minimal-32-karakter
+```
+
+---
+
+## 🔐 Akun Demo
+
+Seluruh akun bawaan dari [database/offly_database.sql](database/offly_database.sql) memakai kata sandi **`password123`**:
 
 | Peran | Email | Username |
 | :--- | :--- | :--- |
-| Admin | `admin@offly.id` | `admin` |
-| HRD | `hrd@offly.id` | `hrd_sari` |
-| Ketua Divisi | `budi.ketua@offly.id` | `ketua_budi` |
-| Karyawan | `rafly@offly.id` | `rafly_dev` |
+| **Admin** | `admin@offly.id` | `admin` |
+| **HRD** | `hrd@offly.id` | `hrd_sari` |
+| **Ketua Divisi** | `budi.ketua@offly.id` | `ketua_budi` |
+| **Karyawan** | `rafly@offly.id` | `rafly_dev` |
 
-## Struktur Proyek
+---
+
+## 📁 Struktur Proyek
 
 ```text
 database/
-  offly_database.sql      Skema tabel dan data awal PostgreSQL
+  offly_database.sql      Skema 7 tabel dan data awal PostgreSQL
+public/
+  logo.svg                Logo vektor utama Offly
 src/
   actions/                Server Actions (autentikasi, cuti, pengguna, divisi, konfigurasi, dasbor)
-  app/                    Halaman App Router dan Route Handlers (/api/unggah, /api/lampiran, /api/cuti)
-  components/             Komponen antarmuka per modul
-  lib/                    Koneksi database, token sesi, dan kalkulasi cuti
+  app/                    Halaman App Router, favicon/apple-icon, dan Route Handlers API
+  components/             Komponen antarmuka per modul (beranda, dasbor, cuti, cms, profil, tata-letak)
+  lib/                    Koneksi database, token sesi JWT, dan kalkulasi cuti
   proxy.js                Proteksi rute per peran
 storage/
-  lampiran/               Penyimpanan privat berkas lampiran pengajuan cuti
+  lampiran/               Penyimpanan privat berkas lampiran PDF pengajuan cuti
 ```
 
-## Perintah Proyek
+<details>
+<summary>Lihat struktur lengkap berkas</summary>
 
-| Perintah | Fungsi |
+```text
+offly-manajemen-cuti-karyawan/
+├── database/
+│   └── offly_database.sql
+├── docs/
+│   └── screenshots/
+│       ├── beranda.png
+│       ├── dasbor_karyawan.png
+│       ├── masuk.png
+│       ├── pengajuan_cuti.png
+│       ├── persetujuan_hrd.png
+│       ├── riwayat_cuti.png
+│       └── verifikasi_cuti.png
+├── public/
+│   ├── favicon-16.png
+│   ├── favicon-32.png
+│   ├── icon-192.png
+│   ├── icon.svg
+│   ├── logo-512.png
+│   └── logo.svg
+├── src/
+│   ├── actions/
+│   │   ├── autentikasi-aksi.js
+│   │   ├── cuti-aksi.js
+│   │   ├── dasbor-aksi.js
+│   │   ├── divisi-aksi.js
+│   │   ├── konfigurasi-aksi.js
+│   │   └── pengguna-aksi.js
+│   ├── app/
+│   │   ├── (dasbor)/
+│   │   │   ├── dasbor/
+│   │   │   ├── manajemen-divisi/[id]/
+│   │   │   ├── manajemen-jenis-cuti/
+│   │   │   ├── manajemen-pengguna/
+│   │   │   ├── pengajuan-cuti/
+│   │   │   ├── pengaturan-kalender/
+│   │   │   ├── persetujuan-hrd/
+│   │   │   ├── profil/
+│   │   │   ├── riwayat-cuti/
+│   │   │   ├── verifikasi-divisi/
+│   │   │   ├── layout.js
+│   │   │   └── loading.js
+│   │   ├── api/
+│   │   │   ├── cuti/
+│   │   │   │   ├── [id]/surat/route.js
+│   │   │   │   └── simulasi/route.js
+│   │   │   ├── lampiran/[nama]/route.js
+│   │   │   └── unggah/route.js
+│   │   ├── masuk/
+│   │   ├── apple-icon.png
+│   │   ├── favicon.ico
+│   │   ├── globals.css
+│   │   ├── layout.js
+│   │   ├── loading.js
+│   │   ├── not-found.js
+│   │   └── page.js
+│   ├── components/
+│   │   ├── beranda/
+│   │   ├── cms/
+│   │   ├── cuti/
+│   │   ├── dasbor/
+│   │   ├── masuk/
+│   │   ├── profil/
+│   │   ├── tata-letak/
+│   │   └── ui/
+│   ├── lib/
+│   │   ├── autentikasi.js
+│   │   ├── db.js
+│   │   ├── kalkulasi-cuti.js
+│   │   ├── token.js
+│   │   └── utils.js
+│   └── proxy.js
+├── storage/
+│   └── lampiran/
+│       └── contoh-surat-dokter.pdf
+├── components.json
+├── eslint.config.mjs
+├── jsconfig.json
+├── next.config.mjs
+├── package.json
+└── README.md
+```
+
+</details>
+
+---
+
+## 📚 Dokumentasi
+
+Aplikasi ini memakai arsitektur **Next.js App Router** berlapis: **Proxy & Autentikasi** (`src/proxy.js`, `src/lib/autentikasi.js`) → **Halaman & Komponen UI** (`src/app/`, `src/components/`) → **Server Actions & Route Handlers** (`src/actions/`, `src/app/api/`) → **PostgreSQL Raw SQL & Storage Lokal** (`src/lib/db.js`, `storage/lampiran/`).
+
+### 🔌 Ringkasan API
+
+| Endpoint | Metode | Fungsi |
+| :--- | :--- | :--- |
+| `/api/cuti/simulasi` | `POST` | Simulasi hari kerja, sisa kuota, kapasitas divisi, larangan cuti, dan validasi overlap |
+| `/api/cuti/[id]/surat` | `GET` | Menerbitkan dan mengunduh Surat Izin Cuti resmi berformat PDF |
+| `/api/unggah` | `POST` | Mengunggah lampiran PDF (maks. 5 MB) ke `storage/lampiran/` |
+| `/api/lampiran/[nama]` | `GET` | Menyajikan berkas lampiran PDF secara aman untuk pengguna terautentikasi |
+
+---
+
+## 🧪 Pengujian
+
+```bash
+# Memeriksa aturan ESLint di seluruh kode
+npm run lint
+
+# Membangun bundel produksi Next.js
+npm run build
+```
+
+---
+
+## 🆘 Masalah Umum
+
+| Pesan | Penyebab & Solusi |
 | :--- | :--- |
-| `npm run dev` | Menjalankan server pengembangan Next.js |
-| `npm run build` | Membangun bundel produksi |
-| `npm run start` | Menjalankan server produksi setelah `build` |
-| `npm run lint` | Memeriksa aturan ESLint pada kode |
+| `password authentication failed` | Kata sandi pada `DATABASE_URL` di `.env.local` tidak sesuai dengan PostgreSQL lokal |
+| `ECONNREFUSED` | Layanan PostgreSQL belum berjalan atau menggunakan port selain `5432` |
+| `database "offly_db" does not exist` | Database belum dibuat atau skrip `database/offly_database.sql` belum dijalankan |
+| `Cannot find module 'pg'` | Jalankan `npm install` terlebih dahulu |
 
-<p align="right">(<a href="#offly">kembali ke atas</a>)</p>
+---
+
+## 🤝 Kontribusi
+
+1. 🍴 **Fork** repository ini
+2. 🌿 **Buat** branch fitur baru (`git checkout -b feat/FiturBaru`)
+3. 💾 **Commit** perubahan Anda (`git commit -m "feat: tambah FiturBaru"`)
+4. 📤 **Push** ke branch (`git push origin feat/FiturBaru`)
+5. 🔄 **Buka** Pull Request
+
+> ⚠️ Jangan pernah meng-commit `.env.local` atau `.env`. Keduanya sudah dikecualikan di `.gitignore`.
+
+---
+
+## 👤 Kontak
+
+[![GitHub](https://img.shields.io/badge/GitHub-Raflykunn-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Raflykunn)
+[![Repository](https://img.shields.io/badge/Project-Offly-a32f00?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Raflykunn/offly-manajemen-cuti-karyawan)
