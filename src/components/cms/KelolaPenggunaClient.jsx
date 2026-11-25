@@ -542,7 +542,7 @@ export default function KelolaPenggunaClient({
                 />
               </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="space-y-1.5">
                 <Label>Peran</Label>
                 <Select
@@ -560,34 +560,6 @@ export default function KelolaPenggunaClient({
                   </SelectContent>
                 </Select>
               </div>
-              {peranForm === "karyawan" ? (
-                <div className="space-y-1.5">
-                  <Label>Divisi</Label>
-                  <Select
-                    name="divisi_id"
-                    value={divisiForm}
-                    onValueChange={aturDivisiForm}
-                    required
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue>
-                        {(v) => petaDivisi.get(v) || "Pilih Divisi"}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {daftarDivisi.map((d) => (
-                        <SelectItem key={d.id} value={String(d.id)}>
-                          {d.nama_divisi}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              ) : (
-                <input type="hidden" name="divisi_id" value="kosong" />
-              )}
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="tambah_kuota">Kuota Cuti Awal (Hari)</Label>
                 <Input

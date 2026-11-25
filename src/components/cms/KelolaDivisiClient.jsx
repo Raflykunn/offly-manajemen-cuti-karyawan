@@ -6,11 +6,11 @@ import { useRouter } from "next/navigation";
 import {
   AlertTriangle,
   Building2,
-  Eye,
   Pencil,
   Plus,
   Search,
   Trash2,
+  UserPlus,
   Users,
 } from "lucide-react";
 import {
@@ -393,9 +393,10 @@ export default function KelolaDivisiClient({
                         variant="outline"
                         nativeButton={false}
                         render={<Link href={`/manajemen-divisi/${d.id}`} />}
+                        className="border-primary/45 text-primary hover:bg-accent hover:text-accent-foreground"
                       >
-                        <Eye className="size-3.5 mr-1" />
-                        Detail &amp; Anggota
+                        <UserPlus className="size-3.5 mr-1" />
+                        Tambah / Kelola Anggota
                       </Button>
                       <Button
                         size="icon-sm"

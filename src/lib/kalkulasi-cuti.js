@@ -105,10 +105,16 @@ export function validasiBatasWaktuPengajuan(
   const selisihHari = selisihHariKalender(tanggalPengajuanStr, tanggalMulaiStr);
 
   if (batas > 0) {
+    if (selisihHari < 0) {
+      return {
+        valid: false,
+        pesan: "Tanggal mulai cuti tidak boleh di masa lalu.",
+      };
+    }
     if (selisihHari < batas) {
       return {
         valid: false,
-        pesan: `${jenisCuti.nama_cuti} wajib diajukan minimal H-${batas} sebelum tanggal mulai cuti.`,
+        pesan: `${jenisCuti.nama_cuti} harus diajukan minimal H-${batas} sebelum tanggal mulai.`,
       };
     }
   } else if (batas < 0) {

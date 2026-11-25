@@ -162,12 +162,12 @@ export async function POST(request) {
     }
     if (hasilHitung.totalHari <= 0) {
       daftarPesanValidasi.push(
-        "Rentang tanggal tidak memiliki hari kerja efektif (hanya akhir pekan atau hari libur)."
+        "Tanggal yang dipilih jatuh pada akhir pekan atau hari libur (0 hari kerja)."
       );
     }
     if (
       opsiSetengahHari &&
-      hasilHitung.rincianHariKerja.length !== 1
+      hasilHitung.rincianHariKerja.length > 1
     ) {
       daftarPesanValidasi.push(
         "Opsi cuti setengah hari (0.5) hanya berlaku untuk tepat 1 hari kerja."

@@ -99,12 +99,12 @@ export default function DasborAdmin({ data }) {
         <Card
           className={
             statistik.pendingApproval > 0
-              ? "border-primary/40 bg-accent/25"
+              ? "border-2 border-primary bg-accent"
               : undefined
           }
         >
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-foreground">
+            <CardTitle className="text-sm font-semibold text-accent-foreground">
               Pending Approval
             </CardTitle>
             <Clock3 className="size-4 text-primary" aria-hidden="true" />
@@ -113,11 +113,11 @@ export default function DasborAdmin({ data }) {
             <div className="text-2xl font-bold tabular-nums text-primary">
               {statistik.pendingApproval}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-sm text-accent-foreground/90 mt-1">
               Menunggu verifikasi atasan atau HRD{" "}
               <Link
                 href="/riwayat-cuti"
-                className="font-medium text-primary hover:underline"
+                className="font-semibold text-primary hover:underline"
               >
                 (Lihat antrean)
               </Link>

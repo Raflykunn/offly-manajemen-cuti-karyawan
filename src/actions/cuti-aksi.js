@@ -74,8 +74,9 @@ export async function ambilDataHalamanPengajuan() {
        FROM pengguna
        WHERE status_aktif = TRUE
          AND id <> $1
-         AND peran IN ('karyawan', 'ketua_divisi')
-       ORDER BY (CASE WHEN divisi_id = $2 THEN 0 ELSE 1 END), nama_lengkap ASC`,
+         AND peran = 'karyawan'
+         AND divisi_id = $2
+       ORDER BY nama_lengkap ASC`,
       [sesi.id, sesi.divisi_id ?? -1]
     ),
     jalankanKueri(
@@ -288,17 +289,34 @@ export async function ajukanCutiBaru(formData) {
         );
       }
 
-      if (rekanPenggantiId !== null) {
+      if (rekanPenggantiId === null) {
+        if (pengguna.divisi_id) {
+          const adaKandidatRes = await klien.query(
+            `SELECT 1 FROM pengguna
+             WHERE status_aktif = TRUE AND id <> $1 AND peran = 'karyawan' AND divisi_id = $2
+             LIMIT 1`,
+            [sesi.id, pengguna.divisi_id]
+          );
+          if (adaKandidatRes.rows.length > 0) {
+            throw new Error("Rekan pengganti satu divisi wajib dipilih.");
+          }
+        }
+      } else {
         if (!Number.isInteger(rekanPenggantiId) || rekanPenggantiId <= 0 || rekanPenggantiId === sesi.id) {
           throw new Error("Rekan pengganti tidak valid atau tidak boleh diri sendiri.");
         }
         const rekanRes = await klien.query(
-          `SELECT id, peran, status_aktif FROM pengguna WHERE id = $1`,
+          `SELECT id, peran, divisi_id, status_aktif FROM pengguna WHERE id = $1`,
           [rekanPenggantiId]
         );
         const rekan = rekanRes.rows[0];
-        if (!rekan || !rekan.status_aktif || !["karyawan", "ketua_divisi"].includes(rekan.peran)) {
-          throw new Error("Rekan pengganti tidak aktif atau tidak memenuhi syarat.");
+        if (
+          !rekan ||
+          !rekan.status_aktif ||
+          rekan.peran !== "karyawan" ||
+          rekan.divisi_id !== pengguna.divisi_id
+        ) {
+          throw new Error("Rekan pengganti harus karyawan aktif dari divisi yang sama.");
         }
         const rekanCutiRes = await klien.query(
           `SELECT 1 FROM pengajuan_cuti

@@ -1,12 +1,10 @@
 "use client";
 
 import {
-  AlertTriangle,
   CalendarDays,
   CheckCircle2,
   Sparkles,
   Users,
-  XCircle,
 } from "lucide-react";
 import { formatAngkaKuota, formatTanggalIndo } from "@/lib/kalkulasi-cuti";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -169,27 +167,16 @@ export default function PanelSimulasiWhatIf({
               </div>
             )}
 
-            <Separator />
-
-            {simulasi.dapatDiajukan ? (
-              <Alert className="border-emerald-600/40 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-950 dark:text-emerald-100">
-                <CheckCircle2 className="size-4 text-emerald-700 dark:text-emerald-300" />
-                <AlertDescription className="text-sm">
-                  Pengajuan memenuhi seluruh aturan kuota, rentang waktu, dan kalender perusahaan.
-                </AlertDescription>
-              </Alert>
-            ) : (
-              <Alert variant="destructive">
-                <XCircle className="size-4" />
-                <AlertDescription className="text-sm space-y-1">
-                  {simulasi.daftarPesanValidasi.map((pesan, indeks) => (
-                    <p key={indeks} className="flex items-start gap-1">
-                      <AlertTriangle className="size-3 shrink-0 mt-0.5" />
-                      <span>{pesan}</span>
-                    </p>
-                  ))}
-                </AlertDescription>
-              </Alert>
+            {simulasi.dapatDiajukan && (
+              <>
+                <Separator />
+                <Alert className="border-emerald-600/40 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-950 dark:text-emerald-100">
+                  <CheckCircle2 className="size-4 text-emerald-700 dark:text-emerald-300" />
+                  <AlertDescription className="text-sm">
+                    Pengajuan memenuhi seluruh aturan kuota, rentang waktu, dan kalender perusahaan.
+                  </AlertDescription>
+                </Alert>
+              </>
             )}
           </>
         )}

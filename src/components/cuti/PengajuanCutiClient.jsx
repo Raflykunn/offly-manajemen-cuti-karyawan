@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
+  AlertTriangle,
   CalendarPlus,
   History,
   RotateCcw,
@@ -11,7 +12,7 @@ import {
   Upload,
 } from "lucide-react";
 import { ajukanCutiBaru } from "@/actions/cuti-aksi";
-import { formatTanggalIndo } from "@/lib/kalkulasi-cuti";
+import { formatTanggalIndo, formatTanggalIso } from "@/lib/kalkulasi-cuti";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import ComboboxCari from "@/components/ui/combobox-cari";
 import {
   Select,
   SelectContent,
@@ -50,7 +52,7 @@ export default function PengajuanCutiClient({
   const [opsiSetengahHari, aturOpsiSetengahHari] = useState(false);
   const [tanggalMulai, aturTanggalMulai] = useState("");
   const [tanggalSelesai, aturTanggalSelesai] = useState("");
-  const [rekanPenggantiId, aturRekanPenggantiId] = useState("kosong");
+  const [rekanPenggantiId, aturRekanPenggantiId] = useState("");
   const [lampiranUrl, aturLampiranUrl] = useState("");
   const [namaLampiran, aturNamaLampiran] = useState("");
   const [sedangUnggah, aturSedangUnggah] = useState(false);
@@ -71,17 +73,26 @@ export default function PengajuanCutiClient({
     return peta;
   }, [daftarJenisCuti]);
 
-  const petaRekan = useMemo(() => {
-    const peta = new Map();
-    for (const r of daftarRekanPengganti) {
-      peta.set(String(r.id), r.nama_lengkap);
-    }
-    return peta;
-  }, [daftarRekanPengganti]);
+  const opsiRekan = useMemo(
+    () =>
+      daftarRekanPengganti.map((r) => ({
+        nilai: String(r.id),
+        label: r.nama_lengkap,
+        kataKunci: r.email || "",
+      })),
+    [daftarRekanPengganti]
+  );
 
   const tanggalLengkap = Boolean(
     jenisCutiId && tanggalMulai && tanggalSelesai && tanggalSelesai >= tanggalMulai
   );
+
+  const minTanggalMulai = useMemo(() => {
+    const batas = Number(jenisAktif?.batas_hari_pengajuan ?? 0);
+    const tgl = new Date();
+    tgl.setDate(tgl.getDate() + batas);
+    return formatTanggalIso(tgl);
+  }, [jenisAktif]);
 
   useEffect(() => {
     if (!tanggalLengkap) {
@@ -156,7 +167,7 @@ export default function PengajuanCutiClient({
     aturOpsiSetengahHari(false);
     aturTanggalMulai("");
     aturTanggalSelesai("");
-    aturRekanPenggantiId("kosong");
+    aturRekanPenggantiId("");
     aturLampiranUrl("");
     aturNamaLampiran("");
     aturSimulasi(null);
@@ -254,32 +265,26 @@ export default function PengajuanCutiClient({
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label>Rekan Pengganti (Handover)</Label>
-                  <Select
+                  <Label htmlFor="rekan_pengganti_cari">
+                    Rekan Pengganti (Handover)
+                  </Label>
+                  <ComboboxCari
+                    id="rekan_pengganti_cari"
                     name="rekan_pengganti_id"
-                    value={rekanPenggantiId}
-                    onValueChange={aturRekanPenggantiId}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue>
-                        {(v) =>
-                          v === "kosong"
-                            ? "Pilih Rekan Pengganti (Opsional)"
-                            : petaRekan.get(v) || "Rekan Pengganti"
-                        }
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="kosong">
-                        Tanpa Rekan Pengganti
-                      </SelectItem>
-                      {daftarRekanPengganti.map((r) => (
-                        <SelectItem key={r.id} value={String(r.id)}>
-                          {r.nama_lengkap}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    opsi={opsiRekan}
+                    nilai={rekanPenggantiId}
+                    saatUbahNilai={aturRekanPenggantiId}
+                    placeholder={
+                      opsiRekan.length === 0
+                        ? "Belum ada rekan satu divisi"
+                        : "Cari rekan satu divisi..."
+                    }
+                    teksKosong="Tidak ada rekan satu divisi yang cocok."
+                    ariaLabel="Cari dan pilih rekan pengganti satu divisi"
+                    wajib={opsiRekan.length > 0}
+                    nonaktif={opsiRekan.length === 0}
+                    batasTampil={10}
+                  />
                 </div>
               </div>
 
@@ -290,6 +295,7 @@ export default function PengajuanCutiClient({
                     id="tanggal_mulai"
                     name="tanggal_mulai"
                     type="date"
+                    min={minTanggalMulai}
                     value={tanggalMulai}
                     onChange={(e) => {
                       const nilaiBaru = e.target.value;
@@ -322,11 +328,30 @@ export default function PengajuanCutiClient({
                 </div>
               </div>
 
+              {simulasi &&
+                !simulasi.dapatDiajukan &&
+                simulasi.daftarPesanValidasi?.length > 0 && (
+                  <Alert variant="destructive" role="alert">
+                    <AlertTriangle className="size-4" aria-hidden="true" />
+                    <AlertDescription className="text-sm space-y-1">
+                      {simulasi.daftarPesanValidasi.map((pesan, indeks) => (
+                        <p key={indeks}>{pesan}</p>
+                      ))}
+                    </AlertDescription>
+                  </Alert>
+                )}
+
               <label className="flex items-center gap-2 text-sm cursor-pointer select-none rounded-lg border p-3 bg-muted/20">
                 <Checkbox
                   checked={opsiSetengahHari}
-                  disabled={tanggalMulai !== tanggalSelesai || !tanggalMulai}
-                  onCheckedChange={(v) => aturOpsiSetengahHari(Boolean(v))}
+                  disabled={!tanggalMulai}
+                  onCheckedChange={(v) => {
+                    const aktif = Boolean(v);
+                    aturOpsiSetengahHari(aktif);
+                    if (aktif && tanggalMulai) {
+                      aturTanggalSelesai(tanggalMulai);
+                    }
+                  }}
                 />
                 <input
                   type="hidden"
