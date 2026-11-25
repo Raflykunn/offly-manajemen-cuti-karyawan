@@ -5,13 +5,17 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   AlertTriangle,
+  Bell,
   CalendarPlus,
   History,
   RotateCcw,
   Send,
   Upload,
 } from "lucide-react";
-import { ajukanCutiBaru } from "@/actions/cuti-aksi";
+import {
+  ajukanCutiBaru,
+  kirimNotifPenempatanDivisiKeAdmin,
+} from "@/actions/cuti-aksi";
 import { formatTanggalIndo, formatTanggalIso } from "@/lib/kalkulasi-cuti";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -47,6 +51,23 @@ export default function PengajuanCutiClient({
   const router = useRouter();
   const [sedangProses, mulaiTransisi] = useTransition();
   const [pesanBanner, aturPesanBanner] = useState(null);
+  const [notifAdminTerkirim, aturNotifAdminTerkirim] = useState(false);
+
+  const tanpaKetuaAktif =
+    pengguna.peran === "karyawan" &&
+    (!pengguna.divisi_id ||
+      !pengguna.ketua_divisi_id ||
+      pengguna.ketua_aktif !== true);
+
+  function tanganiKirimNotifAdmin() {
+    mulaiTransisi(async () => {
+      const hasil = await kirimNotifPenempatanDivisiKeAdmin();
+      aturPesanBanner(hasil);
+      if (hasil.sukses) {
+        aturNotifAdminTerkirim(true);
+      }
+    });
+  }
 
   const [jenisCutiId, aturJenisCutiId] = useState(
     dataUlangi?.jenis_cuti_id
@@ -243,6 +264,29 @@ export default function PengajuanCutiClient({
         </Button>
       </div>
 
+      {tanpaKetuaAktif && (
+        <Alert variant="destructive" role="alert">
+          <AlertTriangle className="size-4" aria-hidden="true" />
+          <AlertDescription className="flex flex-wrap items-center justify-between gap-3">
+            <span>
+              Anda belum memiliki divisi atau Ketua Divisi aktif. Kirim permintaan ke Admin agar ditempatkan sebelum mengajukan cuti.
+            </span>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              disabled={sedangProses || notifAdminTerkirim}
+              onClick={tanganiKirimNotifAdmin}
+            >
+              <Bell className="size-3.5 mr-1.5" aria-hidden="true" />
+              {notifAdminTerkirim
+                ? "Notifikasi Terkirim"
+                : "Kirim Notifikasi ke Admin"}
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+
       {peringatanUlangi && (
         <Alert variant="destructive" role="alert">
           <AlertTriangle className="size-4" aria-hidden="true" />
@@ -343,7 +387,7 @@ export default function PengajuanCutiClient({
 
                 <div className="space-y-1.5">
                   <Label htmlFor="rekan_pengganti_cari">
-                    Rekan Pengganti (Handover)
+                    Rekan Pengganti
                   </Label>
                   <ComboboxCari
                     id="rekan_pengganti_cari"
@@ -477,7 +521,7 @@ export default function PengajuanCutiClient({
 
               <div className="space-y-1.5">
                 <Label htmlFor="catatan_tugas">
-                  Catatan Tugas Serah Terima (Handover)
+                  Catatan Serah Terima Tugas
                 </Label>
                 <Textarea
                   id="catatan_tugas"
@@ -571,18 +615,19 @@ export default function PengajuanCutiClient({
                   onClick={(e) => resetFormulir(e.currentTarget.form)}
                 >
                   <RotateCcw className="size-4 mr-1.5" />
-                  Reset Form
+                  Kosongkan Formulir
                 </Button>
                 <Button
                   type="submit"
                   disabled={
                     sedangProses ||
                     sedangUnggah ||
+                    tanpaKetuaAktif ||
                     (tanggalLengkap && simulasi && !simulasi.dapatDiajukan)
                   }
                 >
                   <Send className="size-4 mr-1.5" />
-                  {sedangProses ? "Mengirim..." : "Submit Pengajuan Cuti"}
+                  {sedangProses ? "Mengirim..." : "Kirim Pengajuan Cuti"}
                 </Button>
               </div>
             </form>

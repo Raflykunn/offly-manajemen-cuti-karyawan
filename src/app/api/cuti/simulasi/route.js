@@ -5,6 +5,7 @@ import {
   apakahLayakCutiTahunan,
   formatTanggalIso,
   hitungHariKerjaCuti,
+  labelStatusCuti,
   pesanTanpaHariKerja,
   validasiBatasWaktuPengajuan,
 } from "@/lib/kalkulasi-cuti";
@@ -206,7 +207,7 @@ export async function POST(request) {
     if (hasilOverlap.rows.length > 0) {
       const ov = hasilOverlap.rows[0];
       daftarPesanValidasi.push(
-        `Anda sudah mengajukan surat cuti untuk tanggal tersebut (${ov.nomor_pengajuan}, ${ov.status}).`
+        `Anda sudah mengajukan surat cuti untuk tanggal tersebut (${ov.nomor_pengajuan}, ${labelStatusCuti(ov.status)}).`
       );
     }
 

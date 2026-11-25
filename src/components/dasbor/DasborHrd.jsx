@@ -50,7 +50,7 @@ export default function DasborHrd({ data }) {
             variant="outline"
             size="sm"
           >
-            Kalender &amp; Blackout
+            Kalender &amp; Larangan Cuti
           </Button>
           <Button
             nativeButton={false}
@@ -79,18 +79,40 @@ export default function DasborHrd({ data }) {
           </CardContent>
         </Card>
 
-        <Card className="border-primary/30 bg-accent/25">
+        <Card
+          className={
+            statistik.pendingFinal > 0
+              ? "border-2 border-primary bg-accent"
+              : undefined
+          }
+        >
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Pending Final Approval
+            <CardTitle
+              className={
+                statistik.pendingFinal > 0
+                  ? "text-sm font-semibold text-accent-foreground"
+                  : "text-sm font-medium text-muted-foreground"
+              }
+            >
+              Menunggu Persetujuan Akhir
             </CardTitle>
-            <Clock3 className="size-4 text-primary" />
+            <Clock3 className="size-4 text-primary" aria-hidden="true" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-primary">
+            <div
+              className={`text-2xl font-bold tabular-nums ${
+                statistik.pendingFinal > 0 ? "text-primary" : ""
+              }`}
+            >
               {statistik.pendingFinal}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p
+              className={
+                statistik.pendingFinal > 0
+                  ? "text-sm text-accent-foreground/90 mt-1"
+                  : "text-xs text-muted-foreground mt-1"
+              }
+            >
               Siap diproses HRD sekarang
             </p>
           </CardContent>

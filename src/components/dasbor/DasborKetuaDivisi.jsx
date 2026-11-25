@@ -12,6 +12,7 @@ import {
   formatTanggalIndo,
   gayaStatusCuti,
   labelPeranPengguna,
+  labelStatusCuti,
 } from "@/lib/kalkulasi-cuti";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -84,18 +85,40 @@ export default function DasborKetuaDivisi({ data }) {
           </CardContent>
         </Card>
 
-        <Card className="border-primary/30 bg-accent/25">
+        <Card
+          className={
+            statistik.pendingVerifikasi > 0
+              ? "border-2 border-primary bg-accent"
+              : undefined
+          }
+        >
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Pending Verifikasi
+            <CardTitle
+              className={
+                statistik.pendingVerifikasi > 0
+                  ? "text-sm font-semibold text-accent-foreground"
+                  : "text-sm font-medium text-muted-foreground"
+              }
+            >
+              Menunggu Verifikasi
             </CardTitle>
-            <Clock3 className="size-4 text-primary" />
+            <Clock3 className="size-4 text-primary" aria-hidden="true" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-primary">
+            <div
+              className={`text-2xl font-bold tabular-nums ${
+                statistik.pendingVerifikasi > 0 ? "text-primary" : ""
+              }`}
+            >
               {statistik.pendingVerifikasi}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p
+              className={
+                statistik.pendingVerifikasi > 0
+                  ? "text-sm text-accent-foreground/90 mt-1"
+                  : "text-xs text-muted-foreground mt-1"
+              }
+            >
               Menunggu persetujuan tahap pertama
             </p>
           </CardContent>
@@ -210,7 +233,7 @@ export default function DasborKetuaDivisi({ data }) {
             <div>
               <CardTitle className="text-base">Antrean Verifikasi Terbaru</CardTitle>
               <CardDescription>
-                Pengajuan cuti bawahan berstatus Pending.
+                Pengajuan cuti bawahan yang masih menunggu.
               </CardDescription>
             </div>
             <Button
@@ -250,7 +273,7 @@ export default function DasborKetuaDivisi({ data }) {
                       variant="outline"
                       className={gayaStatusCuti(item.status)}
                     >
-                      {item.status}
+                      {labelStatusCuti(item.status)}
                     </Badge>
                   </div>
                 ))}

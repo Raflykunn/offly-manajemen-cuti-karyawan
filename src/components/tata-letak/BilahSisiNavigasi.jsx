@@ -34,7 +34,7 @@ function dapatkanDaftarMenu(peran) {
       ...menuDasar,
       { label: "Manajemen Pengguna", href: "/manajemen-pengguna", ikon: Users },
       { label: "Manajemen Divisi", href: "/manajemen-divisi", ikon: Building2 },
-      { label: "Jenis Cuti Dinamis", href: "/manajemen-jenis-cuti", ikon: ListChecks },
+      { label: "Manajemen Jenis Cuti", href: "/manajemen-jenis-cuti", ikon: ListChecks },
       { label: "Kalender & Kapasitas", href: "/pengaturan-kalender", ikon: CalendarCog },
       { label: "Riwayat Cuti", href: "/riwayat-cuti", ikon: History },
       { label: "Profil Saya", href: "/profil", ikon: UserCircle },
@@ -44,17 +44,17 @@ function dapatkanDaftarMenu(peran) {
   if (peran === "ketua_divisi") {
     return [
       ...menuDasar,
-      { label: "Verifikasi Divisi", href: "/verifikasi-divisi", ikon: CheckSquare },
+      { label: "Verifikasi Cuti", href: "/verifikasi-divisi", ikon: CheckSquare },
       { label: "Ajukan Cuti", href: "/pengajuan-cuti", ikon: CalendarPlus },
       { label: "Riwayat Cuti", href: "/riwayat-cuti", ikon: History },
-      { label: "Profil & Kuota", href: "/profil", ikon: UserCircle },
+      { label: "Profil Saya", href: "/profil", ikon: UserCircle },
     ];
   }
 
   if (peran === "hrd") {
     return [
       ...menuDasar,
-      { label: "Persetujuan Final", href: "/persetujuan-hrd", ikon: ClipboardCheck },
+      { label: "Persetujuan Akhir", href: "/persetujuan-hrd", ikon: ClipboardCheck },
       { label: "Kalender & Kapasitas", href: "/pengaturan-kalender", ikon: CalendarCog },
       { label: "Riwayat Cuti", href: "/riwayat-cuti", ikon: History },
       { label: "Profil Saya", href: "/profil", ikon: UserCircle },
@@ -64,8 +64,8 @@ function dapatkanDaftarMenu(peran) {
   return [
     ...menuDasar,
     { label: "Ajukan Cuti", href: "/pengajuan-cuti", ikon: CalendarPlus },
-    { label: "Riwayat & Surat Cuti", href: "/riwayat-cuti", ikon: History },
-    { label: "Profil & Kuota", href: "/profil", ikon: UserCircle },
+    { label: "Riwayat Cuti", href: "/riwayat-cuti", ikon: History },
+    { label: "Profil Saya", href: "/profil", ikon: UserCircle },
   ];
 }
 

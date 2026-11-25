@@ -392,7 +392,7 @@ export default function PersetujuanHrdClient({
             </DialogTitle>
             <DialogDescription>
               {aksiModal?.keputusan === "setuju"
-                ? `Pengajuan ${aksiModal?.pengajuan.nomor_pengajuan} akan berstatus Approved by HRD dan Surat Cuti PDF otomatis tersedia bagi pemohon.`
+                ? `Pengajuan ${aksiModal?.pengajuan.nomor_pengajuan} akan berstatus Disetujui HRD dan Surat Cuti PDF otomatis tersedia bagi pemohon.`
                 : `Pengajuan ${aksiModal?.pengajuan.nomor_pengajuan} akan ditolak dan kuota pemohon dikembalikan otomatis.`}
             </DialogDescription>
           </DialogHeader>

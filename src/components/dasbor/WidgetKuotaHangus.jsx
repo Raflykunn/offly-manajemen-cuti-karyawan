@@ -47,7 +47,7 @@ export default function WidgetKuotaHangus({ kandidat = [] }) {
               Peringatan Kuota Hangus (Sisa &ge; 8 Hari)
             </CardTitle>
             <CardDescription>
-              Daftar karyawan eligible yang jarang mengambil cuti menjelang akhir tahun.
+              Daftar karyawan yang memenuhi syarat tetapi jarang mengambil cuti menjelang akhir tahun.
             </CardDescription>
           </div>
           <Badge variant="outline" className="bg-amber-50 text-amber-800 border-amber-200">

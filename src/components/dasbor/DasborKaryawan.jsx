@@ -12,6 +12,7 @@ import {
   formatAngkaKuota,
   formatTanggalIndo,
   gayaStatusCuti,
+  labelStatusCuti,
 } from "@/lib/kalkulasi-cuti";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -41,7 +42,7 @@ export default function DasborKaryawan({ data }) {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Dasbor Karyawan</h1>
           <p className="text-sm text-muted-foreground">
-            Pantau sisa kuota cuti tahunan secara real-time, status pengajuan, dan tugas pengganti.
+            Pantau sisa kuota cuti tahunan secara langsung, status pengajuan, dan tugas pengganti.
           </p>
         </div>
         <Button
@@ -55,20 +56,20 @@ export default function DasborKaryawan({ data }) {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="border-primary/30 bg-accent/25">
+        <Card className="border-2 border-primary bg-accent">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="text-sm font-semibold text-accent-foreground">
               Sisa Kuota Cuti Tahunan
             </CardTitle>
-            <CalendarCheck className="size-4 text-primary" />
+            <CalendarCheck className="size-4 text-primary" aria-hidden="true" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-primary">
+            <div className="text-2xl font-bold tabular-nums text-primary">
               {formatAngkaKuota(infoPengguna.sisa_kuota_cuti)} Hari
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-sm text-accent-foreground/90 mt-1">
               Dari kuota awal {formatAngkaKuota(infoPengguna.kuota_cuti_awal)} hari{" "}
-              {layakTahunan ? "• Eligible" : "• Masa kerja < 1 thn"}
+              {layakTahunan ? "• Memenuhi Syarat" : "• Masa kerja < 1 thn"}
             </p>
           </CardContent>
         </Card>
@@ -179,7 +180,7 @@ export default function DasborKaryawan({ data }) {
                           variant="outline"
                           className={gayaStatusCuti(item.status)}
                         >
-                          {item.status}
+                          {labelStatusCuti(item.status)}
                         </Badge>
                       </TableCell>
                     </TableRow>
@@ -194,7 +195,7 @@ export default function DasborKaryawan({ data }) {
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
               <UserCheck2 className="size-4 text-primary" />
-              Tugas Pengganti (Handover)
+              Tugas Pengganti
             </CardTitle>
             <CardDescription>
               Rekan divisi yang menunjuk Anda sebagai pengganti sementara.
@@ -220,7 +221,7 @@ export default function DasborKaryawan({ data }) {
                         variant="outline"
                         className={gayaStatusCuti(tugas.status)}
                       >
-                        {tugas.status}
+                        {labelStatusCuti(tugas.status)}
                       </Badge>
                     </div>
                     <p className="text-xs text-muted-foreground">

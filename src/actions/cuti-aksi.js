@@ -9,6 +9,7 @@ import {
   formatTanggalIso,
   hitungHariKerjaCuti,
   hitungKapasitasCutiDivisi,
+  labelStatusCuti,
   pesanTanpaHariKerja,
   validasiBatasWaktuPengajuan,
 } from "@/lib/kalkulasi-cuti";
@@ -57,9 +58,11 @@ export async function ambilDataHalamanPengajuan() {
   ] = await Promise.all([
     jalankanKueri(
       `SELECT p.id, p.nama_lengkap, p.peran, p.divisi_id, p.kuota_cuti_awal,
-              p.sisa_kuota_cuti, p.tanggal_bergabung, d.nama_divisi
+              p.sisa_kuota_cuti, p.tanggal_bergabung, d.nama_divisi,
+              d.ketua_divisi_id, k.status_aktif AS ketua_aktif
        FROM pengguna p
        LEFT JOIN divisi d ON d.id = p.divisi_id
+       LEFT JOIN pengguna k ON k.id = d.ketua_divisi_id
        WHERE p.id = $1`,
       [sesi.id]
     ),
@@ -237,6 +240,17 @@ export async function ajukanCutiBaru(formData) {
         throw new Error("Akun pengguna tidak ditemukan.");
       }
 
+      if (
+        pengguna.peran === "karyawan" &&
+        (!pengguna.divisi_id ||
+          !pengguna.ketua_divisi_id ||
+          pengguna.ketua_aktif !== true)
+      ) {
+        throw new Error(
+          "Anda belum memiliki divisi atau Ketua Divisi aktif. Kirim permintaan penempatan divisi ke Admin sebelum mengajukan cuti."
+        );
+      }
+
       const jenisRes = await klien.query(
         `SELECT * FROM jenis_cuti WHERE id = $1 AND status_aktif = TRUE`,
         [jenisCutiId]
@@ -321,7 +335,7 @@ export async function ajukanCutiBaru(formData) {
       );
       if (overlapRes.rows.length > 0) {
         throw new Error(
-          `Anda sudah mengajukan surat cuti untuk tanggal tersebut (${overlapRes.rows[0].nomor_pengajuan}, ${overlapRes.rows[0].status}).`
+          `Anda sudah mengajukan surat cuti untuk tanggal tersebut (${overlapRes.rows[0].nomor_pengajuan}, ${labelStatusCuti(overlapRes.rows[0].status)}).`
         );
       }
 
@@ -1237,5 +1251,79 @@ export async function ambilRiwayatCutiLengkap() {
     }),
     daftarJenisCuti: hasilJenis.rows,
     daftarDivisi: hasilDivisi.rows,
+  };
+}
+
+export async function kirimNotifPenempatanDivisiKeAdmin() {
+  const sesi = await wajibSesiPengguna(["karyawan"]);
+
+  const res = await jalankanKueri(
+    `SELECT p.id, p.nama_lengkap, p.email, p.divisi_id, d.nama_divisi,
+            d.ketua_divisi_id, k.status_aktif AS ketua_aktif
+     FROM pengguna p
+     LEFT JOIN divisi d ON d.id = p.divisi_id
+     LEFT JOIN pengguna k ON k.id = d.ketua_divisi_id
+     WHERE p.id = $1 AND p.status_aktif = TRUE`,
+    [sesi.id]
+  );
+
+  const pengguna = res.rows[0];
+  if (!pengguna) {
+    return { sukses: false, pesan: "Akun pengguna tidak ditemukan." };
+  }
+
+  if (
+    pengguna.divisi_id &&
+    pengguna.ketua_divisi_id &&
+    pengguna.ketua_aktif === true
+  ) {
+    return {
+      sukses: false,
+      pesan: "Anda sudah terhubung ke divisi dengan Ketua Divisi aktif.",
+    };
+  }
+
+  const sudahAda = await jalankanKueri(
+    `SELECT 1 FROM notifikasi
+     WHERE judul = 'Permintaan Penempatan Divisi / Ketua'
+       AND pesan LIKE $1
+       AND sudah_dibaca = FALSE
+       AND dibuat_pada::date = CURRENT_DATE
+     LIMIT 1`,
+    [`%${pengguna.email}%`]
+  );
+  if (sudahAda.rows.length > 0) {
+    return {
+      sukses: true,
+      pesan: "Permintaan Anda sudah dikirim ke Admin hari ini.",
+    };
+  }
+
+  const adminRes = await jalankanKueri(
+    `SELECT id FROM pengguna WHERE peran = 'admin' AND status_aktif = TRUE`
+  );
+  if (adminRes.rows.length === 0) {
+    return { sukses: false, pesan: "Tidak ditemukan akun Admin aktif." };
+  }
+
+  const tautan = pengguna.divisi_id
+    ? `/manajemen-divisi/${pengguna.divisi_id}`
+    : "/manajemen-divisi";
+  const alasan = pengguna.divisi_id
+    ? `belum memiliki Ketua Divisi aktif pada Divisi ${pengguna.nama_divisi || "terkait"}`
+    : "belum ditempatkan pada divisi mana pun";
+  const pesan = `${pengguna.nama_lengkap} (${pengguna.email}) belum dapat mengajukan cuti karena ${alasan}.`;
+
+  for (const admin of adminRes.rows) {
+    await jalankanKueri(
+      `INSERT INTO notifikasi (pengguna_id, judul, pesan, tautan)
+       VALUES ($1, $2, $3, $4)`,
+      [admin.id, "Permintaan Penempatan Divisi / Ketua", pesan, tautan]
+    );
+  }
+
+  return {
+    sukses: true,
+    pesan: "Notifikasi permintaan penempatan divisi berhasil dikirim ke Admin.",
   };
 }

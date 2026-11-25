@@ -7,19 +7,19 @@ const TAHAP_KARYAWAN = [
     nomor: "01",
     peran: "Karyawan",
     keterangan: "Mengajukan cuti dan menunjuk rekan serah terima tugas.",
-    status: "Pending",
+    status: "Menunggu",
   },
   {
     nomor: "02",
     peran: "Ketua Divisi",
     keterangan: "Memeriksa kesiapan tugas dan beban tim di divisi.",
-    status: "Approved by Leader",
+    status: "Disetujui Ketua Divisi",
   },
   {
     nomor: "03",
     peran: "HRD",
     keterangan: "Pengesahan akhir dan penerbitan surat cuti PDF.",
-    status: "Approved by HRD",
+    status: "Disetujui HRD",
   },
 ];
 
@@ -28,13 +28,13 @@ const TAHAP_KETUA = [
     nomor: "01",
     peran: "Ketua Divisi",
     keterangan: "Mengajukan cuti pribadi langsung menuju antrean HRD.",
-    status: "Pending",
+    status: "Menunggu",
   },
   {
     nomor: "02",
     peran: "HRD",
     keterangan: "Memvalidasi kapasitas divisi dan menerbitkan surat izin cuti.",
-    status: "Approved by HRD",
+    status: "Disetujui HRD",
   },
 ];
 

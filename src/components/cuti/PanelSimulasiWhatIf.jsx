@@ -29,7 +29,7 @@ export default function PanelSimulasiWhatIf({
         <div className="flex items-center justify-between gap-2">
           <CardTitle className="text-base flex items-center gap-2">
             <Sparkles className="size-4 text-primary" />
-            Simulasi Kuota &amp; Kalender (What-If)
+            Simulasi Kuota &amp; Kalender
           </CardTitle>
           {sedangMemuat && (
             <Badge variant="outline" className="text-sm">

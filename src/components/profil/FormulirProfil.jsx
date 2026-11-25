@@ -104,7 +104,7 @@ export default function FormulirProfil({ pengguna }) {
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Profil &amp; Kuota Cuti</h1>
         <p className="text-sm text-muted-foreground">
-          Kelola informasi akun pribadi Anda dan pantau sisa kuota cuti tahunan secara real-time.
+          Kelola informasi akun pribadi Anda dan pantau sisa kuota cuti tahunan secara langsung.
         </p>
       </div>
 
@@ -196,7 +196,7 @@ export default function FormulirProfil({ pengguna }) {
                     Informasi Kuota Tahunan
                   </CardTitle>
                   <Badge variant={layakTahunan ? "default" : "secondary"}>
-                    {layakTahunan ? "Eligible" : "Masa Kerja < 1 Thn"}
+                    {layakTahunan ? "Memenuhi Syarat" : "Masa Kerja < 1 Thn"}
                   </Badge>
                 </div>
                 <CardDescription>

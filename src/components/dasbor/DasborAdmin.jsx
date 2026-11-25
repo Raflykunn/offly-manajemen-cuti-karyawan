@@ -105,7 +105,7 @@ export default function DasborAdmin({ data }) {
         >
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-semibold text-accent-foreground">
-              Pending Approval
+              Menunggu Persetujuan
             </CardTitle>
             <Clock3 className="size-4 text-primary" aria-hidden="true" />
           </CardHeader>
@@ -201,7 +201,7 @@ export default function DasborAdmin({ data }) {
                           variant="outline"
                           className="bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/60 dark:text-amber-200 dark:border-amber-800/70"
                         >
-                          Belum Eligible
+                          Belum Memenuhi Syarat
                         </Badge>
                       ) : (
                         <Badge

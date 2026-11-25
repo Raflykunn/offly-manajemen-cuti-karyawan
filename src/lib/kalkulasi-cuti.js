@@ -249,6 +249,18 @@ export function gayaStatusCuti(status) {
   return peta[status] || "bg-muted text-muted-foreground";
 }
 
+export function labelStatusCuti(status) {
+  const peta = {
+    Pending: "Menunggu",
+    "Approved by Leader": "Disetujui Ketua Divisi",
+    "Approved by HRD": "Disetujui HRD",
+    "Rejected by Leader": "Ditolak Ketua Divisi",
+    "Rejected by HRD": "Ditolak HRD",
+    Cancelled: "Dibatalkan",
+  };
+  return peta[status] || status;
+}
+
 export function hitungKapasitasCutiDivisi(
   totalAnggota,
   sedangCuti,

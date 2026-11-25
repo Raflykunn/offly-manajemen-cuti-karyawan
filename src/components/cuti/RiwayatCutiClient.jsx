@@ -9,6 +9,7 @@ import {
   formatAngkaKuota,
   formatTanggalIndo,
   labelPeranPengguna,
+  labelStatusCuti,
 } from "@/lib/kalkulasi-cuti";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -205,21 +206,21 @@ export default function RiwayatCutiClient({
             <Select value={filterStatus} onValueChange={aturFilterStatus}>
               <SelectTrigger className="w-full sm:w-auto">
                 <SelectValue>
-                  {(v) => (v === "semua" ? "Semua Status" : v)}
+                  {(v) => (v === "semua" ? "Semua Status" : labelStatusCuti(v))}
                 </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="semua">Semua Status</SelectItem>
-                <SelectItem value="Pending">Pending</SelectItem>
+                <SelectItem value="Pending">Menunggu</SelectItem>
                 <SelectItem value="Approved by Leader">
-                  Approved by Leader
+                  Disetujui Ketua Divisi
                 </SelectItem>
-                <SelectItem value="Approved by HRD">Approved by HRD</SelectItem>
+                <SelectItem value="Approved by HRD">Disetujui HRD</SelectItem>
                 <SelectItem value="Rejected by Leader">
-                  Rejected by Leader
+                  Ditolak Ketua Divisi
                 </SelectItem>
-                <SelectItem value="Rejected by HRD">Rejected by HRD</SelectItem>
-                <SelectItem value="Cancelled">Cancelled</SelectItem>
+                <SelectItem value="Rejected by HRD">Ditolak HRD</SelectItem>
+                <SelectItem value="Cancelled">Dibatalkan</SelectItem>
               </SelectContent>
             </Select>
 
@@ -348,7 +349,7 @@ export default function RiwayatCutiClient({
                           </span>
                           {adalahHandover && (
                             <Badge variant="outline" className="text-sm">
-                              Rekan Handover
+                              Rekan Pengganti
                             </Badge>
                           )}
                         </div>

@@ -158,10 +158,10 @@ export default function KelolaKalenderClient({
       <div>
         <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
           <CalendarCog className="size-6 text-primary" />
-          Pengaturan Kalender, Blackout &amp; Kapasitas Tim
+          Pengaturan Kalender, Larangan Cuti &amp; Kapasitas Tim
         </h1>
         <p className="text-sm text-muted-foreground">
-          Kelola hari libur nasional/cuti bersama, tanggal larangan cuti (blackout period), dan batas persentase cuti per divisi.
+          Kelola hari libur nasional/cuti bersama, tanggal larangan cuti, dan batas persentase cuti per divisi.
         </p>
       </div>
 
@@ -311,10 +311,10 @@ export default function KelolaKalenderClient({
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
                   <Ban className="size-4 text-primary" />
-                  Tambah Blackout Period
+                  Tambah Periode Larangan Cuti
                 </CardTitle>
                 <CardDescription>
-                  Rentang tanggal sibuk (misal tutup buku) di mana pengajuan cuti diblokir.
+                  Rentang tanggal sibuk (misal tutup buku) saat pengajuan cuti diblokir.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -357,7 +357,7 @@ export default function KelolaKalenderClient({
                     className="w-full"
                     disabled={sedangProses}
                   >
-                    Simpan Blackout Period
+                    Simpan Periode Larangan Cuti
                   </Button>
                 </form>
               </CardContent>
@@ -366,7 +366,7 @@ export default function KelolaKalenderClient({
             <Card className="lg:col-span-8">
               <CardHeader>
                 <CardTitle className="text-base">
-                  Daftar Periode Blackout ({periodeBlackout.length})
+                  Daftar Periode Larangan Cuti ({periodeBlackout.length})
                 </CardTitle>
               </CardHeader>
               <CardContent className="overflow-x-auto">
@@ -585,7 +585,7 @@ export default function KelolaKalenderClient({
         judul={
           targetHapus?.jenis === "libur"
             ? "Hapus Hari Libur?"
-            : "Hapus Periode Blackout?"
+            : "Hapus Periode Larangan Cuti?"
         }
         deskripsi={`Data "${targetHapus?.label}" akan dihapus dari pengaturan kalender perusahaan.`}
         labelKonfirmasi="Ya, Hapus"

@@ -241,7 +241,7 @@ export default function KelolaPenggunaClient({
             variant="outline"
           >
             <RotateCcw className="size-4 mr-1.5" />
-            Reset Kuota Tahunan
+            Atur Ulang Kuota Tahunan
           </Button>
           <Button onClick={bukaModalTambah} size="sm">
             <UserPlus className="size-4 mr-1.5" />
@@ -808,7 +808,7 @@ export default function KelolaPenggunaClient({
       >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Reset Kuota Cuti Tahunan</DialogTitle>
+            <DialogTitle>Atur Ulang Kuota Cuti Tahunan</DialogTitle>
             <DialogDescription>
               Sisa kuota cuti seluruh pengguna aktif akan dikembalikan sama
               dengan kuota cuti awal masing-masing. Lanjutkan?
@@ -825,7 +825,7 @@ export default function KelolaPenggunaClient({
               onClick={tanganiResetKuotaTahunan}
               disabled={sedangMemproses}
             >
-              {sedangMemproses ? "Mereset..." : "Ya, Reset Kuota"}
+              {sedangMemproses ? "Memproses..." : "Ya, Atur Ulang Kuota"}
             </Button>
           </DialogFooter>
         </DialogContent>
