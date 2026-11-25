@@ -48,7 +48,7 @@ import {
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import LencanaStatusCuti from "./LencanaStatusCuti";
-import ModalDetailCuti from "./ModalDetailCuti";
+import ModalDetailCuti, { useDetailNotifikasi } from "./ModalDetailCuti";
 
 export default function RiwayatCutiClient({
   sesiPeran,
@@ -56,6 +56,7 @@ export default function RiwayatCutiClient({
   daftarRiwayat,
   daftarJenisCuti,
   daftarDivisi,
+  detailIdAwal = null,
 }) {
   const router = useRouter();
   const [sedangProses, mulaiTransisi] = useTransition();
@@ -64,7 +65,11 @@ export default function RiwayatCutiClient({
   const [filterJenis, aturFilterJenis] = useState("semua");
   const [filterDivisi, aturFilterDivisi] = useState("semua");
   const [urutkan, aturUrutkan] = useState("terbaru");
-  const [detailDipilih, aturDetailDipilih] = useState(null);
+  const [detailDipilih, aturDetailDipilih, tutupDetail] = useDetailNotifikasi(
+    daftarRiwayat,
+    detailIdAwal,
+    "/riwayat-cuti"
+  );
   const [pengajuanDibatalkan, aturPengajuanDibatalkan] = useState(null);
   const [alasanBatal, aturAlasanBatal] = useState("");
   const [pesanBanner, aturPesanBanner] = useState(null);
@@ -433,7 +438,7 @@ export default function RiwayatCutiClient({
 
       <ModalDetailCuti
         pengajuan={detailDipilih}
-        saatTutup={() => aturDetailDipilih(null)}
+        saatTutup={tutupDetail}
         bisaAjukanUlang={
           detailDipilih
             ? detailDipilih.pengguna_id === sesiPenggunaId &&

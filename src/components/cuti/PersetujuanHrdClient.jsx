@@ -8,6 +8,7 @@ import {
   Check,
   CheckCheck,
   ClipboardCheck,
+  Eye,
   FileText,
   ShieldCheck,
   UserCheck,
@@ -47,11 +48,20 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import LencanaStatusCuti from "./LencanaStatusCuti";
+import ModalDetailCuti, { useDetailNotifikasi } from "./ModalDetailCuti";
 
-export default function PersetujuanHrdClient({ daftarMenunggu }) {
+export default function PersetujuanHrdClient({
+  daftarMenunggu,
+  detailIdAwal = null,
+}) {
   const router = useRouter();
   const [sedangProses, mulaiTransisi] = useTransition();
   const [pesanBanner, aturPesanBanner] = useState(null);
+  const [detailDipilih, bukaDetail, tutupDetail] = useDetailNotifikasi(
+    daftarMenunggu,
+    detailIdAwal,
+    "/persetujuan-hrd"
+  );
 
   const [daftarTerpilih, aturDaftarTerpilih] = useState([]);
   const [aksiModal, aturAksiModal] = useState(null);
@@ -142,7 +152,7 @@ export default function PersetujuanHrdClient({ daftarMenunggu }) {
               }}
             >
               <CheckCheck className="size-4 mr-1.5" />
-              Multi-Approve Terpilih ({daftarTerpilih.length})
+              Setujui Terpilih ({daftarTerpilih.length})
             </Button>
           </div>
         )}
@@ -276,12 +286,12 @@ export default function PersetujuanHrdClient({ daftarMenunggu }) {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                     <div className="rounded-lg border p-3 space-y-1">
                       <p className="font-semibold text-muted-foreground">
-                        Alasan &amp; Catatan Handover
+                        Alasan &amp; Catatan Tugas
                       </p>
                       <p className="text-sm text-foreground">{item.alasan_cuti}</p>
                       {item.catatan_tugas && (
                         <p className="text-muted-foreground pt-1">
-                          Handover: {item.catatan_tugas}
+                          Catatan Tugas: {item.catatan_tugas}
                         </p>
                       )}
                     </div>
@@ -330,28 +340,38 @@ export default function PersetujuanHrdClient({ daftarMenunggu }) {
                       }
                     >
                       <FileText className="size-3.5 mr-1.5" />
-                      Lihat Surat Dokter / Lampiran
+                      Lihat Lampiran (PDF)
                     </Button>
                   )}
                 </CardContent>
 
-                <CardFooter className="border-t pt-3 justify-end gap-2">
+                <CardFooter className="border-t pt-3 justify-between gap-2">
                   <Button
-                    variant="destructive"
+                    variant="outline"
                     size="sm"
-                    onClick={() => bukaModalTunggal(item, "tolak")}
+                    onClick={() => bukaDetail(item)}
                   >
-                    <X className="size-4 mr-1" />
-                    Reject
+                    <Eye className="size-4 mr-1" />
+                    Detail
                   </Button>
-                  <Button
-                    variant="default"
-                    size="sm"
-                    onClick={() => bukaModalTunggal(item, "setuju")}
-                  >
-                    <Check className="size-4 mr-1" />
-                    Approve Final
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => bukaModalTunggal(item, "tolak")}
+                    >
+                      <X className="size-4 mr-1" />
+                      Tolak
+                    </Button>
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={() => bukaModalTunggal(item, "setuju")}
+                    >
+                      <Check className="size-4 mr-1" />
+                      Setujui Final
+                    </Button>
+                  </div>
                 </CardFooter>
               </Card>
             );
@@ -452,6 +472,38 @@ export default function PersetujuanHrdClient({ daftarMenunggu }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <ModalDetailCuti
+        pengajuan={detailDipilih}
+        saatTutup={tutupDetail}
+        aksiFooter={
+          detailDipilih ? (
+            <>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  const target = detailDipilih;
+                  tutupDetail();
+                  bukaModalTunggal(target, "tolak");
+                }}
+              >
+                <X className="size-4 mr-1.5" />
+                Tolak
+              </Button>
+              <Button
+                onClick={() => {
+                  const target = detailDipilih;
+                  tutupDetail();
+                  bukaModalTunggal(target, "setuju");
+                }}
+              >
+                <Check className="size-4 mr-1.5" />
+                Setujui Final
+              </Button>
+            </>
+          ) : null
+        }
+      />
     </div>
   );
 }

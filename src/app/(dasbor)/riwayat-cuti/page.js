@@ -6,9 +6,13 @@ export const metadata = {
   title: "Riwayat Cuti | Offly",
 };
 
-export default async function HalamanRiwayatCuti() {
+export default async function HalamanRiwayatCuti({ searchParams }) {
   await wajibSesiPengguna();
-  const data = await ambilRiwayatCutiLengkap();
+  const [data, params] = await Promise.all([
+    ambilRiwayatCutiLengkap(),
+    searchParams,
+  ]);
+  const detailIdAwal = Number(params?.detail) || null;
 
   return (
     <RiwayatCutiClient
@@ -17,6 +21,7 @@ export default async function HalamanRiwayatCuti() {
       daftarRiwayat={data.daftarRiwayat}
       daftarJenisCuti={data.daftarJenisCuti}
       daftarDivisi={data.daftarDivisi}
+      detailIdAwal={detailIdAwal}
     />
   );
 }

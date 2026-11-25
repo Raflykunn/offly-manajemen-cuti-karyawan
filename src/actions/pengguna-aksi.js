@@ -5,6 +5,7 @@ import { jalankanKueri, jalankanTransaksi } from "@/lib/db";
 import {
   ambilSesiPengguna,
   buatHashKataSandi,
+  verifikasiKataSandi,
   wajibSesiPengguna,
 } from "@/lib/autentikasi";
 import { formatTanggalIso } from "@/lib/kalkulasi-cuti";
@@ -74,7 +75,11 @@ export async function ubahProfilSendiri(statusSebelumnya, formData) {
   const telepon = String(formData.get("telepon") || "").trim();
   const alamat = String(formData.get("alamat") || "").trim();
   const fotoProfil = String(formData.get("foto_profil") || "").trim();
+  const kataSandiLama = String(formData.get("kata_sandi_lama") || "");
   const kataSandiBaru = String(formData.get("kata_sandi_baru") || "");
+  const konfirmasiKataSandi = String(
+    formData.get("konfirmasi_kata_sandi") || ""
+  );
 
   if (!namaLengkap) {
     return {
@@ -90,15 +95,63 @@ export async function ubahProfilSendiri(statusSebelumnya, formData) {
     };
   }
 
-  if (kataSandiBaru && kataSandiBaru.length < 6) {
+  if (
+    fotoProfil &&
+    fotoProfil.startsWith("data:") &&
+    !/^data:image\/(jpeg|jpg|png|webp);base64,/i.test(fotoProfil)
+  ) {
     return {
       sukses: false,
-      pesan: "Kata sandi baru minimal terdiri dari 6 karakter.",
+      pesan: "Format foto profil harus berupa gambar (JPG, PNG, atau WEBP).",
     };
   }
 
+  const inginGantiSandi = Boolean(
+    kataSandiLama || kataSandiBaru || konfirmasiKataSandi
+  );
+  if (inginGantiSandi) {
+    if (!kataSandiLama) {
+      return {
+        sukses: false,
+        pesan: "Masukkan kata sandi lama Anda untuk mengganti kata sandi.",
+      };
+    }
+    if (!kataSandiBaru) {
+      return {
+        sukses: false,
+        pesan: "Masukkan kata sandi baru.",
+      };
+    }
+    if (kataSandiBaru.length < 6) {
+      return {
+        sukses: false,
+        pesan: "Kata sandi baru minimal terdiri dari 6 karakter.",
+      };
+    }
+    if (kataSandiBaru !== konfirmasiKataSandi) {
+      return {
+        sukses: false,
+        pesan: "Konfirmasi kata sandi baru tidak cocok.",
+      };
+    }
+  }
+
   try {
-    if (kataSandiBaru) {
+    if (inginGantiSandi) {
+      const cekPengguna = await jalankanKueri(
+        `SELECT kata_sandi_hash FROM pengguna WHERE id = $1`,
+        [sesi.id]
+      );
+      const hashLama = cekPengguna.rows[0]?.kata_sandi_hash;
+      const sandiLamaBenar =
+        hashLama && (await verifikasiKataSandi(kataSandiLama, hashLama));
+      if (!sandiLamaBenar) {
+        return {
+          sukses: false,
+          pesan: "Kata sandi lama yang Anda masukkan salah.",
+        };
+      }
+
       const hashBaru = await buatHashKataSandi(kataSandiBaru);
       await jalankanKueri(
         `UPDATE pengguna
@@ -147,6 +200,45 @@ export async function ubahProfilSendiri(statusSebelumnya, formData) {
     return {
       sukses: false,
       pesan: "Terjadi kesalahan saat menyimpan perubahan profil.",
+    };
+  }
+}
+
+export async function ubahFotoProfilSendiri(fotoProfil) {
+  const sesi = await wajibSesiPengguna();
+  const dataUrl = String(fotoProfil || "").trim();
+
+  if (!/^data:image\/(jpeg|jpg|png|webp);base64,/i.test(dataUrl)) {
+    return {
+      sukses: false,
+      pesan: "Format foto profil harus berupa gambar (JPG, PNG, atau WEBP).",
+    };
+  }
+
+  if (dataUrl.length > 1_500_000) {
+    return {
+      sukses: false,
+      pesan: "Ukuran gambar maksimal 1 MB.",
+    };
+  }
+
+  try {
+    await jalankanKueri(
+      `UPDATE pengguna
+       SET foto_profil = $1, diperbarui_pada = NOW()
+       WHERE id = $2`,
+      [dataUrl, sesi.id]
+    );
+    revalidatePath("/profil");
+    revalidatePath("/dasbor");
+    return {
+      sukses: true,
+      pesan: "Foto profil berhasil diperbarui.",
+    };
+  } catch {
+    return {
+      sukses: false,
+      pesan: "Gagal memperbarui foto profil.",
     };
   }
 }

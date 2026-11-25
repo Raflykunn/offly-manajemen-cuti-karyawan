@@ -1,8 +1,10 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import {
   CalendarCheck,
+  Camera,
   KeyRound,
   Mail,
   MapPin,
@@ -11,7 +13,10 @@ import {
   Shield,
   User,
 } from "lucide-react";
-import { ubahProfilSendiri } from "@/actions/pengguna-aksi";
+import {
+  ubahFotoProfilSendiri,
+  ubahProfilSendiri,
+} from "@/actions/pengguna-aksi";
 import {
   apakahLayakCutiTahunan,
   formatAngkaKuota,
@@ -35,10 +40,13 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 
 export default function FormulirProfil({ pengguna }) {
+  const router = useRouter();
   const [statusAksi, simpanProfil, sedangMenyimpan] = useActionState(
     ubahProfilSendiri,
     null
   );
+  const [sedangUnggahFoto, mulaiUnggahFoto] = useTransition();
+  const inputFotoRef = useRef(null);
   const [pratinjauFoto, aturPratinjauFoto] = useState(
     pengguna?.foto_profil || ""
   );
@@ -54,22 +62,42 @@ export default function FormulirProfil({ pengguna }) {
   function tanganiPilihBerkasFoto(event) {
     const berkas = event.target.files?.[0];
     if (!berkas) return;
+
+    const ekstensiValid = /\.(jpe?g|png|webp)$/i.test(berkas.name || "");
+    const tipeValid = ["image/jpeg", "image/png", "image/webp"].includes(
+      berkas.type
+    );
+    if (!ekstensiValid || !tipeValid) {
+      aturGalatFoto("Hanya menerima berkas gambar (.jpg, .jpeg, .png, .webp).");
+      event.target.value = "";
+      return;
+    }
+
     if (berkas.size > 1024 * 1024) {
       aturGalatFoto("Ukuran gambar maksimal 1 MB.");
       event.target.value = "";
       return;
     }
     aturGalatFoto("");
+    const fotoSebelumnya = pratinjauFoto;
     const pembaca = new FileReader();
     pembaca.onload = () => {
       if (typeof pembaca.result === "string") {
-        aturPratinjauFoto(pembaca.result);
+        const dataUrlBaru = pembaca.result;
+        aturPratinjauFoto(dataUrlBaru);
+        mulaiUnggahFoto(async () => {
+          const hasil = await ubahFotoProfilSendiri(dataUrlBaru);
+          if (hasil.sukses) {
+            router.refresh();
+          } else {
+            aturPratinjauFoto(fotoSebelumnya);
+            aturGalatFoto(hasil.pesan);
+          }
+        });
       }
     };
     pembaca.readAsDataURL(berkas);
   }
-
-  const fotoDariUnggahanLokal = pratinjauFoto.startsWith("data:");
 
   return (
     <div className="space-y-6">
@@ -84,14 +112,44 @@ export default function FormulirProfil({ pengguna }) {
         <div className="lg:col-span-4 space-y-6">
           <Card>
             <CardHeader className="items-center text-center pb-3">
-              <Avatar className="size-20 mx-auto border-2 border-primary/30">
-                {pratinjauFoto && (
-                  <AvatarImage src={pratinjauFoto} alt={pengguna.nama_lengkap} />
-                )}
-                <AvatarFallback className="bg-primary/15 text-accent-foreground text-xl font-bold">
-                  {pengguna.nama_lengkap?.slice(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
+              <input
+                ref={inputFotoRef}
+                type="file"
+                accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                className="hidden"
+                aria-label="Pilih foto profil"
+                onChange={tanganiPilihBerkasFoto}
+              />
+              <button
+                type="button"
+                disabled={sedangUnggahFoto}
+                onClick={() => inputFotoRef.current?.click()}
+                className="group relative mx-auto rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 cursor-pointer disabled:opacity-60 disabled:cursor-wait"
+                aria-label="Ubah foto profil"
+                title="Klik untuk memilih foto profil"
+              >
+                <Avatar className="size-20 border-2 border-primary/30 transition-opacity group-hover:opacity-85">
+                  {pratinjauFoto && (
+                    <AvatarImage src={pratinjauFoto} alt={pengguna.nama_lengkap} />
+                  )}
+                  <AvatarFallback className="bg-primary/15 text-accent-foreground text-xl font-bold">
+                    {pengguna.nama_lengkap?.slice(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="absolute bottom-0 right-0 size-7 rounded-full bg-primary text-primary-foreground border-2 border-background flex items-center justify-center shadow-xs">
+                  <Camera className="size-3.5" aria-hidden="true" />
+                </span>
+              </button>
+              {sedangUnggahFoto && (
+                <p className="text-xs text-muted-foreground mt-2">
+                  Menyimpan foto profil...
+                </p>
+              )}
+              {galatFoto && (
+                <p role="alert" className="text-xs text-destructive mt-1">
+                  {galatFoto}
+                </p>
+              )}
               <CardTitle className="mt-3 text-lg">{pengguna.nama_lengkap}</CardTitle>
               <CardDescription className="font-mono text-xs">
                 @{pengguna.username}
@@ -268,64 +326,54 @@ export default function FormulirProfil({ pengguna }) {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="foto_profil_url">URL Foto Profil (Opsional)</Label>
-                  <input type="hidden" name="foto_profil" value={pratinjauFoto} />
-                  <Input
-                    id="foto_profil_url"
-                    type="url"
-                    value={fotoDariUnggahanLokal ? "" : pratinjauFoto}
-                    onChange={(e) => {
-                      aturGalatFoto("");
-                      aturPratinjauFoto(e.target.value);
-                    }}
-                    placeholder={
-                      fotoDariUnggahanLokal
-                        ? "Gambar lokal dipilih (siap disimpan)"
-                        : "https://... atau pilih file gambar"
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="unggah_foto_lokal">Atau Pilih Gambar Lokal (&le; 1 MB)</Label>
-                  <Input
-                    id="unggah_foto_lokal"
-                    type="file"
-                    accept="image/png,image/jpeg,image/webp"
-                    aria-invalid={galatFoto ? "true" : undefined}
-                    aria-describedby={galatFoto ? "galat-foto-lokal" : undefined}
-                    onChange={tanganiPilihBerkasFoto}
-                  />
-                  {galatFoto && (
-                    <p id="galat-foto-lokal" role="alert" className="text-xs text-destructive">
-                      {galatFoto}
-                    </p>
-                  )}
-                </div>
-              </div>
+              <input type="hidden" name="foto_profil" value={pratinjauFoto} />
 
               <Separator className="my-2" />
 
-              <div className="space-y-2">
-                <Label
-                  htmlFor="kata_sandi_baru"
-                  className="flex items-center gap-1.5"
-                >
+              <div className="space-y-4">
+                <p className="text-sm font-medium flex items-center gap-1.5">
                   <KeyRound className="size-3.5 text-primary" aria-hidden="true" />
-                  Kata Sandi Baru (Kosongkan jika tidak ingin mengganti)
-                </Label>
-                <Input
-                  id="kata_sandi_baru"
-                  name="kata_sandi_baru"
-                  type="password"
-                  autoComplete="new-password"
-                  minLength={6}
-                  aria-describedby="bantuan-sandi-baru"
-                  placeholder="Minimal 6 karakter"
-                />
+                  Ubah Kata Sandi (Opsional)
+                </p>
+                <div className="space-y-2">
+                  <Label htmlFor="kata_sandi_lama">Kata Sandi Lama</Label>
+                  <Input
+                    id="kata_sandi_lama"
+                    name="kata_sandi_lama"
+                    type="password"
+                    autoComplete="current-password"
+                    placeholder="Masukkan kata sandi saat ini"
+                  />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="kata_sandi_baru">Kata Sandi Baru</Label>
+                    <Input
+                      id="kata_sandi_baru"
+                      name="kata_sandi_baru"
+                      type="password"
+                      autoComplete="new-password"
+                      minLength={6}
+                      aria-describedby="bantuan-sandi-baru"
+                      placeholder="Minimal 6 karakter"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="konfirmasi_kata_sandi">
+                      Konfirmasi Kata Sandi Baru
+                    </Label>
+                    <Input
+                      id="konfirmasi_kata_sandi"
+                      name="konfirmasi_kata_sandi"
+                      type="password"
+                      autoComplete="new-password"
+                      minLength={6}
+                      placeholder="Ulangi kata sandi baru"
+                    />
+                  </div>
+                </div>
                 <p id="bantuan-sandi-baru" className="text-xs text-muted-foreground">
-                  Gunakan minimal 6 karakter bila ingin mengganti kata sandi.
+                  Kosongkan semua kolom kata sandi jika tidak ingin mengganti.
                 </p>
               </div>
 

@@ -9,6 +9,7 @@ import {
   formatTanggalIso,
   hitungHariKerjaCuti,
   hitungKapasitasCutiDivisi,
+  pesanTanpaHariKerja,
   validasiBatasWaktuPengajuan,
 } from "@/lib/kalkulasi-cuti";
 
@@ -276,7 +277,7 @@ export async function ajukanCutiBaru(formData) {
       }
 
       const liburRes = await klien.query(
-        `SELECT tanggal, nama_libur FROM hari_libur`
+        `SELECT tanggal, nama_libur, jenis FROM hari_libur`
       );
       const hasilHitung = hitungHariKerjaCuti(
         tanggalMulai,
@@ -286,9 +287,7 @@ export async function ajukanCutiBaru(formData) {
       );
 
       if (hasilHitung.totalHari <= 0) {
-        throw new Error(
-          "Rentang tanggal yang dipilih tidak mencakup hari kerja aktif."
-        );
+        throw new Error(pesanTanpaHariKerja(hasilHitung));
       }
 
       if (opsiSetengahHari && hasilHitung.rincianHariKerja.length !== 1) {
@@ -322,7 +321,7 @@ export async function ajukanCutiBaru(formData) {
       );
       if (overlapRes.rows.length > 0) {
         throw new Error(
-          `Tanggal cuti bertabrakan dengan pengajuan ${overlapRes.rows[0].nomor_pengajuan} (${overlapRes.rows[0].status}).`
+          `Anda sudah mengajukan surat cuti untuk tanggal tersebut (${overlapRes.rows[0].nomor_pengajuan}, ${overlapRes.rows[0].status}).`
         );
       }
 
@@ -491,7 +490,7 @@ export async function ajukanCutiBaru(formData) {
             rekanPenggantiId,
             "Ditunjuk Sebagai Rekan Pengganti",
             `${pengguna.nama_lengkap} menunjuk Anda sebagai rekan pengganti untuk cuti ${nomorPengajuan} (${tanggalMulai} s.d. ${tanggalSelesai}).`,
-            "/riwayat-cuti",
+            `/riwayat-cuti?detail=${idBaru}`,
           ]
         );
       }
@@ -509,7 +508,7 @@ export async function ajukanCutiBaru(formData) {
             pengguna.ketua_divisi_id,
             "Pengajuan Cuti Divisi Baru",
             `${pengguna.nama_lengkap} mengajukan ${jenisCuti.nama_cuti} (${hasilHitung.totalHari} hari) dengan nomor ${nomorPengajuan}.`,
-            "/verifikasi-divisi",
+            `/verifikasi-divisi?detail=${idBaru}`,
           ]
         );
       } else {
@@ -528,7 +527,7 @@ export async function ajukanCutiBaru(formData) {
           await klien.query(
             `INSERT INTO notifikasi (pengguna_id, judul, pesan, tautan)
              VALUES ($1, $2, $3, $4)`,
-            [hrd.id, judulNotif, pesanNotif, "/persetujuan-hrd"]
+            [hrd.id, judulNotif, pesanNotif, `/persetujuan-hrd?detail=${idBaru}`]
           );
         }
       }
@@ -555,7 +554,7 @@ export async function ajukanCutiBaru(formData) {
   }
 }
 
-async function kirimNotifRekanBatalAtauTolak(klien, rekanId, nomorPengajuan, keterangan) {
+async function kirimNotifRekanBatalAtauTolak(klien, rekanId, pengajuanId, nomorPengajuan, keterangan) {
   if (!rekanId) return;
   await klien.query(
     `INSERT INTO notifikasi (pengguna_id, judul, pesan, tautan)
@@ -564,7 +563,7 @@ async function kirimNotifRekanBatalAtauTolak(klien, rekanId, nomorPengajuan, ket
       rekanId,
       "Pembaruan Tugas Pengganti Cuti",
       `Pengajuan cuti ${nomorPengajuan} yang menunjuk Anda sebagai pengganti telah ${keterangan}.`,
-      "/riwayat-cuti",
+      `/riwayat-cuti?detail=${pengajuanId}`,
     ]
   );
 }
@@ -628,6 +627,7 @@ export async function batalkanPengajuanCuti(pengajuanId, alasanPembatalan) {
       await kirimNotifRekanBatalAtauTolak(
         klien,
         pengajuan.rekan_pengganti_id,
+        pengajuan.id,
         pengajuan.nomor_pengajuan,
         "dibatalkan oleh pemohon"
       );
@@ -813,7 +813,7 @@ export async function verifikasiCutiKetuaDivisi(
             data.pengguna_id,
             "Disetujui Ketua Divisi",
             `Pengajuan ${data.nomor_pengajuan} telah disetujui Ketua Divisi dan diteruskan ke HRD.`,
-            "/pengajuan-cuti",
+            `/riwayat-cuti?detail=${data.id}`,
           ]
         );
 
@@ -828,7 +828,7 @@ export async function verifikasiCutiKetuaDivisi(
               hrd.id,
               "Verifikasi Atasan Selesai - Menunggu HRD",
               `Pengajuan ${data.nomor_pengajuan} atas nama ${data.nama_pemohon} telah disetujui Ketua Divisi.`,
-              "/persetujuan-hrd",
+              `/persetujuan-hrd?detail=${data.id}`,
             ]
           );
         }
@@ -864,13 +864,14 @@ export async function verifikasiCutiKetuaDivisi(
           data.pengguna_id,
           "Pengajuan Cuti Ditolak Ketua Divisi",
           `Pengajuan ${data.nomor_pengajuan} ditolak Ketua Divisi dengan alasan: ${catatan}`,
-          "/pengajuan-cuti",
+          `/riwayat-cuti?detail=${data.id}`,
         ]
       );
 
       await kirimNotifRekanBatalAtauTolak(
         klien,
         data.rekan_pengganti_id,
+        data.id,
         data.nomor_pengajuan,
         "ditolak oleh Ketua Divisi"
       );
@@ -1027,7 +1028,7 @@ export async function verifikasiFinalHrd(pengajuanId, keputusan, catatanHrd) {
             data.pengguna_id,
             "Pengajuan Cuti Disetujui HRD",
             `Pengajuan ${data.nomor_pengajuan} telah mendapatkan persetujuan final HRD. Anda dapat mengunduh Surat Cuti (PDF) sekarang.`,
-            "/riwayat-cuti",
+            `/riwayat-cuti?detail=${data.id}`,
           ]
         );
 
@@ -1062,13 +1063,14 @@ export async function verifikasiFinalHrd(pengajuanId, keputusan, catatanHrd) {
           data.pengguna_id,
           "Pengajuan Cuti Ditolak HRD",
           `Pengajuan ${data.nomor_pengajuan} ditolak HRD dengan alasan: ${catatan}`,
-          "/pengajuan-cuti",
+          `/riwayat-cuti?detail=${data.id}`,
         ]
       );
 
       await kirimNotifRekanBatalAtauTolak(
         klien,
         data.rekan_pengganti_id,
+        data.id,
         data.nomor_pengajuan,
         "ditolak oleh HRD"
       );
@@ -1143,7 +1145,7 @@ export async function setujuiBanyakCutiHrd(daftarPengajuanId, catatanHrd) {
             data.pengguna_id,
             "Pengajuan Cuti Disetujui HRD",
             `Pengajuan ${data.nomor_pengajuan} telah disetujui HRD. Surat cuti PDF sudah dapat diunduh.`,
-            "/riwayat-cuti",
+            `/riwayat-cuti?detail=${data.id}`,
           ]
         );
         total += 1;

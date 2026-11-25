@@ -47,10 +47,13 @@ export function hitungHariKerjaCuti(
       typeof item === "string" ? formatTanggalIso(item) : formatTanggalIso(item.tanggal)
     )
   );
-  const petaNamaLibur = new Map();
+  const petaInfoLibur = new Map();
   for (const item of daftarTanggalLibur) {
     if (typeof item === "object" && item?.tanggal) {
-      petaNamaLibur.set(formatTanggalIso(item.tanggal), item.nama_libur || "Hari Libur");
+      petaInfoLibur.set(formatTanggalIso(item.tanggal), {
+        nama: item.nama_libur || "Hari Libur",
+        jenis: item.jenis || "Libur Nasional",
+      });
     }
   }
 
@@ -66,9 +69,11 @@ export function hitungHariKerjaCuti(
     if (indeksHari === 0 || indeksHari === 6) {
       akhirPekanTerlewati += 1;
     } else if (setLibur.has(kunciTanggal)) {
+      const infoLibur = petaInfoLibur.get(kunciTanggal);
       hariLiburTerlewati.push({
         tanggal: kunciTanggal,
-        nama: petaNamaLibur.get(kunciTanggal) || "Hari Libur",
+        nama: infoLibur?.nama || "Hari Libur",
+        jenis: infoLibur?.jenis || "Libur Nasional",
       });
     } else {
       rincianHariKerja.push(kunciTanggal);
@@ -87,6 +92,34 @@ export function hitungHariKerjaCuti(
     hariLiburTerlewati,
     akhirPekanTerlewati,
   };
+}
+
+export function pesanTanpaHariKerja(hasilHitung) {
+  const adaAkhirPekan = hasilHitung.akhirPekanTerlewati > 0;
+  const daftarCutiBersama = hasilHitung.hariLiburTerlewati.filter(
+    (h) => h.jenis === "Cuti Bersama"
+  );
+  const daftarLiburNasional = hasilHitung.hariLiburTerlewati.filter(
+    (h) => h.jenis !== "Cuti Bersama"
+  );
+
+  if (adaAkhirPekan && daftarCutiBersama.length === 0 && daftarLiburNasional.length === 0) {
+    return "Tanggal yang dipilih jatuh pada akhir pekan (Sabtu/Minggu), tidak dihitung hari kerja.";
+  }
+  if (!adaAkhirPekan && daftarCutiBersama.length > 0 && daftarLiburNasional.length === 0) {
+    const nama = daftarCutiBersama.map((h) => h.nama).join(", ");
+    return `Tanggal yang dipilih bertepatan dengan cuti bersama (${nama}), sehingga tidak perlu mengajukan cuti.`;
+  }
+  if (!adaAkhirPekan && daftarLiburNasional.length > 0 && daftarCutiBersama.length === 0) {
+    const nama = daftarLiburNasional.map((h) => h.nama).join(", ");
+    return `Tanggal yang dipilih bertepatan dengan libur nasional (${nama}), sehingga tidak perlu mengajukan cuti.`;
+  }
+
+  const bagian = [];
+  if (adaAkhirPekan) bagian.push("akhir pekan");
+  if (daftarCutiBersama.length > 0) bagian.push("cuti bersama");
+  if (daftarLiburNasional.length > 0) bagian.push("libur nasional");
+  return `Seluruh tanggal yang dipilih jatuh pada ${bagian.join(" dan ")} (0 hari kerja).`;
 }
 
 export function selisihHariKalender(tanggalAwalStr, tanggalAkhirStr) {

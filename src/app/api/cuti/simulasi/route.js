@@ -5,6 +5,7 @@ import {
   apakahLayakCutiTahunan,
   formatTanggalIso,
   hitungHariKerjaCuti,
+  pesanTanpaHariKerja,
   validasiBatasWaktuPengajuan,
 } from "@/lib/kalkulasi-cuti";
 
@@ -161,9 +162,7 @@ export async function POST(request) {
       daftarPesanValidasi.push("Tanggal selesai tidak boleh sebelum tanggal mulai.");
     }
     if (hasilHitung.totalHari <= 0) {
-      daftarPesanValidasi.push(
-        "Tanggal yang dipilih jatuh pada akhir pekan atau hari libur (0 hari kerja)."
-      );
+      daftarPesanValidasi.push(pesanTanpaHariKerja(hasilHitung));
     }
     if (
       opsiSetengahHari &&
@@ -207,7 +206,7 @@ export async function POST(request) {
     if (hasilOverlap.rows.length > 0) {
       const ov = hasilOverlap.rows[0];
       daftarPesanValidasi.push(
-        `Tanggal bertabrakan (overlap) dengan pengajuan ${ov.nomor_pengajuan} (${ov.status}).`
+        `Anda sudah mengajukan surat cuti untuk tanggal tersebut (${ov.nomor_pengajuan}, ${ov.status}).`
       );
     }
 

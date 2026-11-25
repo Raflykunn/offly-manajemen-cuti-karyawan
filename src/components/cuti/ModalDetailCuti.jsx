@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   CheckCircle2,
   Clock,
@@ -30,10 +32,35 @@ import {
 import { Separator } from "@/components/ui/separator";
 import LencanaStatusCuti from "./LencanaStatusCuti";
 
+export function useDetailNotifikasi(daftar, detailIdAwal, ruteDasar) {
+  const router = useRouter();
+  const [detailManual, aturDetailManual] = useState(null);
+
+  const detailDariUrl = detailIdAwal
+    ? daftar.find((item) => item.id === detailIdAwal) ?? null
+    : null;
+
+  const detailDipilih = detailManual ?? detailDariUrl;
+
+  function bukaDetail(item) {
+    aturDetailManual(item);
+  }
+
+  function tutupDetail() {
+    aturDetailManual(null);
+    if (detailIdAwal) {
+      router.replace(ruteDasar, { scroll: false });
+    }
+  }
+
+  return [detailDipilih, bukaDetail, tutupDetail];
+}
+
 export default function ModalDetailCuti({
   pengajuan,
   saatTutup,
   bisaAjukanUlang = false,
+  aksiFooter = null,
 }) {
   if (!pengajuan) return null;
 
@@ -83,7 +110,7 @@ export default function ModalDetailCuti({
 
           <div className="space-y-2">
             <p className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-              Alasan &amp; Serah Terima (Handover)
+              Alasan &amp; Serah Terima Tugas
             </p>
             <div className="rounded-lg border p-3 space-y-2">
               <p>{pengajuan.alasan_cuti}</p>
@@ -256,6 +283,7 @@ export default function ModalDetailCuti({
               Unduh Surat Cuti (PDF)
             </Button>
           )}
+          {aksiFooter}
           <Button variant="outline" onClick={saatTutup}>
             Tutup
           </Button>

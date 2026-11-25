@@ -6,6 +6,7 @@ import {
   Calendar,
   Check,
   CheckSquare,
+  Eye,
   FileText,
   UserCheck,
   X,
@@ -39,17 +40,24 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import LencanaStatusCuti from "./LencanaStatusCuti";
+import ModalDetailCuti, { useDetailNotifikasi } from "./ModalDetailCuti";
 
 export default function VerifikasiKetuaDivisiClient({
   divisi,
   daftarMenunggu,
   daftarRiwayatDivisi,
+  detailIdAwal = null,
 }) {
   const router = useRouter();
   const [sedangProses, mulaiTransisi] = useTransition();
   const [pesanBanner, aturPesanBanner] = useState(null);
   const [aksiModal, aturAksiModal] = useState(null);
   const [catatan, aturCatatan] = useState("");
+  const [detailDipilih, bukaDetail, tutupDetail] = useDetailNotifikasi(
+    [...daftarMenunggu, ...daftarRiwayatDivisi],
+    detailIdAwal,
+    "/verifikasi-divisi"
+  );
 
   function bukaModalVerifikasi(pengajuan, keputusan) {
     aturCatatan("");
@@ -116,35 +124,35 @@ export default function VerifikasiKetuaDivisiClient({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {daftarMenunggu.map((item) => (
               <Card key={item.id} className="flex flex-col justify-between">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <Avatar className="size-10 border">
-                        {item.foto_pemohon && (
-                          <AvatarImage
-                            src={item.foto_pemohon}
-                            alt={item.nama_pemohon}
-                          />
-                        )}
-                        <AvatarFallback className="bg-primary/15 text-accent-foreground font-semibold">
-                          {item.nama_pemohon.slice(0, 2).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="min-w-0">
-                        <CardTitle className="text-base truncate">
-                          {item.nama_pemohon}
-                        </CardTitle>
-                        <CardDescription className="text-sm">
-                          {item.nomor_pengajuan} • Diajukan{" "}
-                          {formatTanggalIndo(item.tanggal_pengajuan)}
-                        </CardDescription>
-                      </div>
+                <CardHeader className="pb-3 space-y-2.5">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <Avatar className="size-10 border shrink-0">
+                      {item.foto_pemohon && (
+                        <AvatarImage
+                          src={item.foto_pemohon}
+                          alt={item.nama_pemohon}
+                        />
+                      )}
+                      <AvatarFallback className="bg-primary/15 text-accent-foreground font-semibold">
+                        {item.nama_pemohon.slice(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0">
+                      <CardTitle className="text-base truncate">
+                        {item.nama_pemohon}
+                      </CardTitle>
+                      <CardDescription className="text-sm truncate">
+                        {item.nomor_pengajuan} • Diajukan{" "}
+                        {formatTanggalIndo(item.tanggal_pengajuan)}
+                      </CardDescription>
                     </div>
+                  </div>
+                  <div>
                     <Badge variant="secondary">{item.nama_cuti}</Badge>
                   </div>
                 </CardHeader>
 
-                <CardContent className="space-y-3 text-sm">
+                <CardContent className="flex-1 space-y-3 text-sm">
                   <div className="rounded-lg border bg-muted/25 p-3 flex flex-wrap items-center justify-between gap-2 text-xs">
                     <span className="flex items-center gap-1.5 font-medium">
                       <Calendar className="size-3.5 text-primary" />
@@ -174,7 +182,7 @@ export default function VerifikasiKetuaDivisiClient({
                     {item.catatan_tugas && (
                       <p className="text-muted-foreground">
                         <span className="font-medium text-foreground">
-                          Catatan Handover:{" "}
+                          Catatan Tugas:{" "}
                         </span>
                         {item.catatan_tugas}
                       </p>
@@ -196,28 +204,38 @@ export default function VerifikasiKetuaDivisiClient({
                       }
                     >
                       <FileText className="size-3.5 mr-1.5" />
-                      Lihat Surat Dokter / Lampiran
+                      Lihat Lampiran (PDF)
                     </Button>
                   )}
                 </CardContent>
 
-                <CardFooter className="border-t pt-3 gap-2 justify-end">
+                <CardFooter className="border-t pt-3 gap-2 justify-between">
                   <Button
-                    variant="destructive"
+                    variant="outline"
                     size="sm"
-                    onClick={() => bukaModalVerifikasi(item, "tolak")}
+                    onClick={() => bukaDetail(item)}
                   >
-                    <X className="size-4 mr-1" />
-                    Reject
+                    <Eye className="size-4 mr-1" />
+                    Detail
                   </Button>
-                  <Button
-                    variant="default"
-                    size="sm"
-                    onClick={() => bukaModalVerifikasi(item, "setuju")}
-                  >
-                    <Check className="size-4 mr-1" />
-                    Approve
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => bukaModalVerifikasi(item, "tolak")}
+                    >
+                      <X className="size-4 mr-1" />
+                      Tolak
+                    </Button>
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={() => bukaModalVerifikasi(item, "setuju")}
+                    >
+                      <Check className="size-4 mr-1" />
+                      Setujui
+                    </Button>
+                  </div>
                 </CardFooter>
               </Card>
             ))}
@@ -234,9 +252,11 @@ export default function VerifikasiKetuaDivisiClient({
           </CardHeader>
           <CardContent className="space-y-2">
             {daftarRiwayatDivisi.map((r) => (
-              <div
+              <button
                 key={r.id}
-                className="flex flex-wrap items-center justify-between gap-2 rounded-lg border p-3 text-sm"
+                type="button"
+                onClick={() => bukaDetail(r)}
+                className="w-full text-left flex flex-wrap items-center justify-between gap-2 rounded-lg border p-3 text-sm hover:bg-muted/40 transition-colors cursor-pointer"
               >
                 <div>
                   <span className="font-semibold">{r.nama_pemohon}</span>{" "}
@@ -244,13 +264,13 @@ export default function VerifikasiKetuaDivisiClient({
                     ({r.nomor_pengajuan})
                   </span>
                   <p className="text-sm text-muted-foreground">
-                    {r.nama_cuti} • {formatTanggalIndo(r.tanggal_mulai)} –{" "}
+                    {r.nama_cuti} • {formatTanggalIndo(r.tanggal_mulai)} s.d.{" "}
                     {formatTanggalIndo(r.tanggal_selesai)} (
                     {formatAngkaKuota(r.total_hari_cuti)} hari)
                   </p>
                 </div>
                 <LencanaStatusCuti status={r.status} />
-              </div>
+              </button>
             ))}
           </CardContent>
         </Card>
@@ -316,6 +336,38 @@ export default function VerifikasiKetuaDivisiClient({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <ModalDetailCuti
+        pengajuan={detailDipilih}
+        saatTutup={tutupDetail}
+        aksiFooter={
+          detailDipilih?.status === "Pending" ? (
+            <>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  const target = detailDipilih;
+                  tutupDetail();
+                  bukaModalVerifikasi(target, "tolak");
+                }}
+              >
+                <X className="size-4 mr-1.5" />
+                Tolak
+              </Button>
+              <Button
+                onClick={() => {
+                  const target = detailDipilih;
+                  tutupDetail();
+                  bukaModalVerifikasi(target, "setuju");
+                }}
+              >
+                <Check className="size-4 mr-1.5" />
+                Setujui &amp; Teruskan ke HRD
+              </Button>
+            </>
+          ) : null
+        }
+      />
     </div>
   );
 }
