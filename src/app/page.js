@@ -263,7 +263,7 @@ export default async function HalamanUtama() {
                 render={<Link href="/dasbor" />}
                 variant="secondary"
                 size="lg"
-                className="shrink-0"
+                className="shrink-0 bg-white text-zinc-900 hover:bg-white/90"
               >
                 Buka Dasbor Sekarang
                 <ArrowRight className="size-4 ml-1.5" aria-hidden="true" />
@@ -274,7 +274,7 @@ export default async function HalamanUtama() {
                 render={<Link href="/masuk" />}
                 variant="secondary"
                 size="lg"
-                className="shrink-0"
+                className="shrink-0 bg-white text-zinc-900 hover:bg-white/90"
               >
                 <LogIn className="size-4 mr-1.5" aria-hidden="true" />
                 Masuk ke Offly
