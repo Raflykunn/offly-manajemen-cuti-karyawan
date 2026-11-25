@@ -1,10 +1,10 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowLeft,
-  CalendarCheck2,
   Eye,
   EyeOff,
   Lock,
@@ -37,12 +37,19 @@ export default function FormulirMasuk() {
 
   return (
     <div className="min-h-dvh w-full bg-background flex items-center justify-center p-4 md:p-8">
-      <main className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-        <div className="hidden lg:col-span-6 rounded-xl border border-primary/80 bg-primary text-primary-foreground p-8 md:p-10 lg:flex flex-col justify-end shadow-md">
+      <main className="w-full max-w-sm md:max-w-5xl grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
+        <div className="hidden md:col-span-6 rounded-xl border border-primary/80 bg-primary text-primary-foreground p-8 lg:p-10 md:flex flex-col justify-end shadow-md">
           <div className="space-y-6">
             <Link href="/" className="inline-flex items-center gap-3 rounded-lg">
-              <div className="size-11 rounded-lg bg-primary-foreground/15 border border-primary-foreground/25 text-primary-foreground flex items-center justify-center shadow-xs">
-                <CalendarCheck2 className="size-5" aria-hidden="true" />
+              <div className="size-11 rounded-lg bg-white/95 border border-primary-foreground/25 flex items-center justify-center shadow-xs">
+                <Image
+                  src="/logo.svg"
+                  alt=""
+                  width={28}
+                  height={28}
+                  className="size-7"
+                  aria-hidden="true"
+                />
               </div>
               <div>
                 <span className="text-xl font-bold tracking-tight block">Offly</span>
@@ -60,7 +67,7 @@ export default function FormulirMasuk() {
           </div>
         </div>
 
-        <Card className="lg:col-span-6 shadow-xs flex flex-col justify-center">
+        <Card className="md:col-span-6 shadow-xs flex flex-col justify-center">
           <CardHeader className="space-y-1">
             <CardTitle render={<h1 />} className="text-2xl font-semibold tracking-tight">
               Masuk ke Akun Anda

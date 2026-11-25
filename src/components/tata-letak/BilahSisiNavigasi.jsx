@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Building2,
-  CalendarCheck2,
   CalendarCog,
   CalendarPlus,
   CheckSquare,
@@ -89,9 +89,14 @@ export default function BilahSisiNavigasi({
     <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
       {tampilkanLogo && (
         <div className="flex items-center gap-3 px-4 py-4 border-b border-sidebar-border">
-          <div className="size-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center shadow-xs shrink-0">
-            <CalendarCheck2 className="size-5" aria-hidden="true" />
-          </div>
+          <Image
+            src="/logo.svg"
+            alt=""
+            width={36}
+            height={36}
+            className="size-9 shrink-0"
+            aria-hidden="true"
+          />
           <div className="min-w-0">
             <p className="text-base font-bold tracking-tight truncate">Offly</p>
             {pengguna?.nama_lengkap && (

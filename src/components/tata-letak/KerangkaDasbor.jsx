@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { CalendarCheck2, CalendarDays, Clock, Menu } from "lucide-react";
+import { CalendarDays, Clock, Menu } from "lucide-react";
 import { formatAngkaKuota, labelPeranPengguna } from "@/lib/kalkulasi-cuti";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -111,9 +112,14 @@ export default function KerangkaDasbor({
               href="/dasbor"
               className="flex items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
-              <span className="size-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center shrink-0">
-                <CalendarCheck2 className="size-4" aria-hidden="true" />
-              </span>
+              <Image
+                src="/logo.svg"
+                alt=""
+                width={32}
+                height={32}
+                className="size-8 shrink-0"
+                aria-hidden="true"
+              />
               <span className="font-bold tracking-tight text-base text-foreground">
                 Offly
               </span>

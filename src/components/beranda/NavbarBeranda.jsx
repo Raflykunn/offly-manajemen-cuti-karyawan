@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, CalendarCheck2, Menu } from "lucide-react";
+import { ArrowRight, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -71,9 +72,14 @@ export default function NavbarBeranda({ sudahMasuk = false }) {
           href="/"
           className="flex items-center gap-2.5 rounded-full pr-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          <span className="size-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center shrink-0">
-            <CalendarCheck2 className="size-4" aria-hidden="true" />
-          </span>
+          <Image
+            src="/logo.svg"
+            alt=""
+            width={32}
+            height={32}
+            className="size-8 shrink-0"
+            aria-hidden="true"
+          />
           <span className="font-bold tracking-tight text-base text-foreground">
             Offly
           </span>
@@ -134,9 +140,14 @@ export default function NavbarBeranda({ sudahMasuk = false }) {
             <SheetContent side="right" className="w-72">
               <SheetHeader>
                 <SheetTitle className="flex items-center gap-2 text-base">
-                  <span className="size-7 rounded-lg bg-primary text-primary-foreground flex items-center justify-center">
-                    <CalendarCheck2 className="size-4" aria-hidden="true" />
-                  </span>
+                  <Image
+                    src="/logo.svg"
+                    alt=""
+                    width={28}
+                    height={28}
+                    className="size-7 shrink-0"
+                    aria-hidden="true"
+                  />
                   Offly
                 </SheetTitle>
               </SheetHeader>
